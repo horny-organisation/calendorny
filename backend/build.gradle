@@ -1,7 +1,10 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.4'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version '3.4.4' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'com.diffplug.spotless' version '6.25.0' apply false
+    id 'com.github.spotbugs' version '5.2.5' apply false
+    id 'net.ltgt.errorprone' version '4.2.0' apply false
 }
 
 allprojects {
@@ -18,6 +21,11 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'pmd'
+    apply plugin: 'jacoco'
 
     java {
         toolchain {
@@ -28,13 +36,67 @@ subprojects {
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.springframework.boot:spring-boot-starter-web'
+
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
+
         testImplementation 'org.springframework.boot:spring-boot-starter-test'
         testImplementation 'org.springframework.boot:spring-boot-testcontainers'
         testImplementation 'org.springframework.security:spring-security-test'
         testImplementation 'org.testcontainers:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        testImplementation 'org.mockito:mockito-core'
+        testImplementation 'org.mockito:mockito-junit-jupiter'
+
+        testImplementation 'org.wiremock:wiremock-standalone:3.12.1'
+
+        errorprone 'com.google.errorprone:error_prone_core:2.36.0'
+
+        compileOnly 'com.github.spotbugs:spotbugs-annotations:4.9.0'
+
+        spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
+
+        compileOnly 'org.jetbrains:annotations:26.0.1'
+    }
+
+    spotless {
+        java {
+            palantirJavaFormat('2.50.0')
+                .formatJavadoc(true)
+            target 'src/**/*.java'
+        }
+    }
+
+
+    pmd {
+        toolVersion = "7.9.0"
+        ruleSets = [] // отключаем дефолтные
+        ruleSetFiles = files("${rootProject.projectDir}/pmd.xml")
+    }
+
+    spotbugs {
+        toolVersion = '4.9.0'
+        effort = 'max'
+        reportLevel = 'low'
+        excludeFilter = file("${rootProject.projectDir}/spotbugs-excludes.xml")
+    }
+
+    jacoco {
+        toolVersion = "0.8.12"
+    }
+
+    tasks.named('jacocoTestReport', JacocoReport) {
+        dependsOn tasks.test
+        reports {
+            xml.required = true
+            html.required = true
+        }
+        classDirectories.setFrom(fileTree("${buildDir}/classes/java/main") {
+            exclude '**/generated/**'
+        })
+        sourceDirectories.setFrom(files('src/main/java'))
+        executionData.setFrom(fileTree(buildDir).include("jacoco/test.exec"))
     }
 
     configurations {
@@ -43,7 +105,38 @@ subprojects {
         }
     }
 
+    tasks.register('fixCode') {
+        group = 'verification'
+        description = 'Applies Spotless formatting rules'
+        dependsOn 'spotlessApply'
+    }
+
+    tasks.register('checkCode') {
+        group = 'verification'
+        description = 'Runs all static code analysis tools (Spotless, PMD, SpotBugs, etc)'
+        dependsOn 'spotlessCheck', 'pmdMain', 'spotbugsMain'
+    }
+
     tasks.named('test') {
         useJUnitPlatform()
+        finalizedBy 'jacocoTestReport'
+    }
+
+}
+
+tasks.register('checkCode') {
+    group = 'verification'
+    description = 'Runs static code analysis for all modules'
+    dependsOn subprojects.collect { project ->
+        project.tasks.matching { it.name == 'checkCode' }
     }
 }
+
+tasks.register('fixCode') {
+    group = 'verification'
+    description = 'Applies Spotless formatting for all modules'
+    dependsOn subprojects.collect { project ->
+        project.tasks.matching { it.name == 'fixCode' }
+    }
+}
+

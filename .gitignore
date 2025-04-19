@@ -12,6 +12,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 **/.gitignore
+**/.gitattributes
 
 # AWS User-specific
 .idea/**/aws.xml

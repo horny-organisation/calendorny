@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK17 + Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          java-version: 17
+          distribution: temurin
+          cache-read-only: false
+
+      - name: Build & test
+        run: ./gradlew clean build
+
+      - name: Jacoco PR comment
+        if: github.event_name == 'pull_request'
+        uses: madrapps/jacoco-report@v1.7.1
+        with:
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 30
+          min-coverage-changed-files: 30
+          title: Code Coverage
+          update-comment: true
+
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JВK17 + Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          java-version: 17
+          distribution: temurin
+          cache-read-only: false
+
+      - name: Run checkCode
+        run: ./gradlew checkCode
