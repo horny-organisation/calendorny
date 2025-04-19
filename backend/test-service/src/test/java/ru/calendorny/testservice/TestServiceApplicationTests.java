@@ -1,11 +1,11 @@
-//package ru.calendorny.testservice;
+// package ru.calendorny.testservice;
 //
-//import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
 //
-//@SpringBootTest
-//class TestServiceApplicationTests {
+// @SpringBootTest
+// class TestServiceApplicationTests {
 //
 //    @Test
 //    void contextLoads() {}
-//}
+// }
