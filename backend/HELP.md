@@ -19,5 +19,5 @@ gradlew checkCode
 Чтобы выполнить задачу только для модуля используйте
 
 ```shell
-gradlew :module-name:checkCode
+gradlew module-name:checkCode
 ```
