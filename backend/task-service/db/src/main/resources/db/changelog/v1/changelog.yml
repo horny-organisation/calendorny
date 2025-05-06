@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: "Veronika"
+  - include:
+      file: DDL/V1_2025_05_06_SCHEMA_INITIALIZATION.sql
+      relativeToChangelogFile: true
