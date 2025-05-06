@@ -1,3 +1,5 @@
 rootProject.name = 'backend'
 
 include 'test-service'
+include 'task-service'
+
