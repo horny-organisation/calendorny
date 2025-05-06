@@ -2,4 +2,6 @@ rootProject.name = 'backend'
 
 include 'test-service'
 include 'task-service'
+include 'task-service:api'
+findProject(':task-service:api')?.name = 'api'
 
