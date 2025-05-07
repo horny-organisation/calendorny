@@ -1,16 +1,40 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: user
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: task_service_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  liquibase:
+    image: liquibase/liquibase:latest
+    container_name: liquibase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./db/changelog:/liquibase/changelog
+    command:
+      [
+        "--url=jdbc:postgresql://postgres:5432/task_service_db",
+        "--changeLogFile=changelog/db-changelog-master.yml",
+        "--username=postgres",
+        "--password=password",
+        "update"
+      ]
+    environment:
+      LIQUIBASE_CLASSPATH: /liquibase/changelog
 
 volumes:
   postgres_data:
