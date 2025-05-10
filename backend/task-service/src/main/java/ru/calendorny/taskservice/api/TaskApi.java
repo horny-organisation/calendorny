@@ -1,8 +1,9 @@
 package ru.calendorny.taskservice.api;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,32 +23,41 @@ import ru.calendorny.taskservice.dto.response.TaskResponse;
 public interface TaskApi {
 
     @PostMapping
-    ResponseEntity<?> createNewTask(
-            @RequestHeader("Authorization") String accessToken, @RequestBody CreateTaskRequest createTaskRequest);
+    ResponseEntity<TaskResponse> createNewTask(
+        @RequestHeader("Authorization") String accessToken,
+        @Valid @RequestBody CreateTaskRequest createTaskRequest
+    );
 
     @GetMapping
     ResponseEntity<List<TaskResponse>> getTasksList(
-            @RequestParam("from") LocalDateTime from,
-            @RequestParam("to") LocalDateTime to,
-            @RequestHeader("Authorization") String accessToken);
+        @RequestParam("from") LocalDate fromDate,
+        @RequestParam("to") LocalDate toDate,
+        @RequestHeader("Authorization") String accessToken
+    );
 
     @GetMapping("/{taskId}")
     ResponseEntity<TaskResponse> getTaskDetailsById(
-            @PathVariable("taskId") UUID taskId, @RequestHeader("Authorization") String accessToken);
+        @PathVariable("taskId") UUID taskId,
+        @RequestHeader("Authorization") String accessToken
+    );
 
     @PatchMapping("/{taskId}")
-    ResponseEntity<?> updateTaskById(
-            @PathVariable("taskId") UUID taskId,
-            @RequestHeader("Authorization") String accessToken,
-            @RequestBody UpdateTaskRequest updateTaskRequest);
+    ResponseEntity<TaskResponse> updateTaskById(
+        @PathVariable("taskId") UUID taskId,
+        @RequestHeader("Authorization") String accessToken,
+        @Valid @RequestBody UpdateTaskRequest updateTaskRequest
+    );
 
     @DeleteMapping("/{taskId}")
-    ResponseEntity<?> deleteTaskById(
-            @PathVariable("taskId") UUID taskId, @RequestHeader("Authorization") String accessToken);
+    ResponseEntity<Void> deleteTaskById(
+        @PathVariable("taskId") UUID taskId,
+        @RequestHeader("Authorization") String accessToken
+    );
 
-    @PatchMapping("/tasks/{taskId}/status")
+    @PatchMapping("/{taskId}/status")
     ResponseEntity<TaskResponse> updateTaskStatus(
-            @PathVariable("taskId") UUID taskId,
-            @RequestHeader("Authorization") String accessToken,
-            @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest);
+        @PathVariable("taskId") UUID taskId,
+        @RequestHeader("Authorization") String accessToken,
+        @Valid @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest
+    );
 }

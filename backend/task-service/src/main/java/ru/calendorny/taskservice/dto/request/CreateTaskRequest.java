@@ -1,22 +1,26 @@
 package ru.calendorny.taskservice.dto.request;
 
 import java.time.LocalDate;
-import lombok.EqualsAndHashCode;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.util.RecurrenceRule;
+import ru.calendorny.taskservice.util.RruleDto;
 
 @Getter
-@EqualsAndHashCode
 public class CreateTaskRequest {
 
+    @NotNull(message = "Task's title can not be null")
+    @NotBlank(message = "Task's title can not be empty")
     private String title;
 
+    @NotNull(message = "Task's description can not be null")
+    @NotBlank(message = "Task's description can not be empty")
     private String description;
 
-    private LocalDate due_date;
+    @NotNull(message = "Task's date can not be null")
+    @FutureOrPresent(message = "Task's date can not be in past")
+    private LocalDate dueDate;
 
-    private TaskStatus status;
-
-    private RecurrenceRule recurrenceRule;
+    private RruleDto rrule;
 }

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import lombok.Data;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.util.RecurrenceRule;
+import ru.calendorny.taskservice.util.RruleDto;
 
 @Data
 public class TaskResponse {
@@ -21,5 +21,5 @@ public class TaskResponse {
 
     TaskStatus status;
 
-    RecurrenceRule recurrenceRule;
+    RruleDto recurrenceRule;
 }

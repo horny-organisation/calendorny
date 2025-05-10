@@ -1,13 +1,11 @@
 package ru.calendorny.taskservice.dto.request;
 
 import java.time.LocalDate;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.util.RecurrenceRule;
+import ru.calendorny.taskservice.util.RruleDto;
 
 @Getter
-@EqualsAndHashCode
 public class UpdateTaskRequest {
 
     private String title;
@@ -18,5 +16,5 @@ public class UpdateTaskRequest {
 
     private TaskStatus status;
 
-    private RecurrenceRule recurrenceRule;
+    private RruleDto recurrenceRule;
 }
