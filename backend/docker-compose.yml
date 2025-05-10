@@ -1,0 +1,50 @@
+version: '3'
+services:
+  localRabbitMQ:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - meeting
+
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oauth2db
+    ports:
+      - "5434:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - meeting
+
+  liquibase-migrations:
+    container_name: migration
+    image: liquibase/liquibase:4.29
+    depends_on:
+      - postgres
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=changelog-master.xml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgres:5432/oauth2db
+      - --username=postgres
+      - --password=postgres
+      - update
+    volumes:
+      - ./migration:/changesets
+    networks:
+      - meeting
+
+volumes:
+  data:
+
+networks:
+  meeting:

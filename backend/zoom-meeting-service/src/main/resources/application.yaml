@@ -1,0 +1,71 @@
+app:
+  rabbit:
+    zoomMeetQueue: zoomMeetQueue
+    meetingLinksQueue: meetingLinksQueue
+    meetingCreateExchange: meetingCreateExchange
+    meetingLinksExchange: meetingLinksExchange
+    zoomMeetRoutingKey: zoomMeet
+    meetingLinkRoutingKey: meetingLink
+
+  zoom:
+    principal-name: ${ZOOM_OAUTH_PRINCIPAL_NAME}
+    client-registration-id: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
+    base-url: https://api.zoom.us/v2
+    meeting-create-url: /users/me/meetings
+    timezone: UTC
+    date-time-pattern: yyyy-MM-dd HH:mm
+
+
+spring:
+  application:
+    name: ZoomMeetingService
+
+  rabbitmq:
+    port: 5672
+    host: localhost
+    username: user
+    password: password
+
+  security:
+    oauth2:
+      client:
+        registration:
+          zoom:
+            client-id: ${ZOOM_CLIENT_ID}
+            client-secret: ${ZOOM_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/zoom
+            client-name: Zoom
+        provider:
+          zoom:
+            authorization-uri: https://zoom.us/oauth/authorize?prompt=consent&access_type=offline
+            token-uri: https://zoom.us/oauth/token
+            user-info-uri: https://api.zoom.us/v2/users/me
+            user-name-attribute: email
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5434/oauth2db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+  liquibase:
+    enabled: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.web.client: DEBUG
