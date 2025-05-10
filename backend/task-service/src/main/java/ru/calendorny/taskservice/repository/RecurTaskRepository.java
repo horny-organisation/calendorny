@@ -10,4 +10,5 @@ public interface RecurTaskRepository extends JpaRepository<RecurTaskEntity, UUID
 
     Optional<RecurTaskEntity> findById(UUID taskId);
     List<RecurTaskEntity> findAllByUserId(UUID userId);
+    boolean existsById (UUID taskId);
 }

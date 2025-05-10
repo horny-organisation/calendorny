@@ -13,6 +13,8 @@ public interface SingleTaskRepository extends JpaRepository<SingleTaskEntity, UU
 
     Optional<SingleTaskEntity> findById (UUID taskId);
 
+    boolean existsById (UUID taskId);
+
     @Query("SELECT t FROM SingleTaskEntity t WHERE t.userId = :userId AND t.dueDate BETWEEN :startDate AND :endDate")
     List<SingleTaskEntity> findAllByUserIdAndDueDateBetween(
         @Param("userId") UUID userId,

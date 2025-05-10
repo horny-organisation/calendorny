@@ -31,11 +31,14 @@ public class TaskManagerService {
         return getProcessor(taskId).getTask(taskId);
     }
 
-    public TaskResponse updateTask(UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse updateTask(UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto, UUID userId) {
+        System.out.println("update");
         TaskProcessor currentProcessor = getProcessor(taskId);
 
         boolean shouldBeRecur = rruleDto != null;
         boolean isCurrentlyRecur = currentProcessor instanceof RecurTaskProcessor;
+
+        System.out.println("1: " + shouldBeRecur + " 2: " + isCurrentlyRecur);
 
         if (shouldBeRecur != isCurrentlyRecur) {
             currentProcessor.hardDeleteTask(taskId);
@@ -45,7 +48,7 @@ public class TaskManagerService {
                 .findFirst()
                 .orElseThrow(TaskProcessorException::new);
 
-            // return newProcessor.createTask
+            return newProcessor.createTask(userId, title, desc, date, rruleDto);
         }
 
         return currentProcessor.updateTask(taskId, title, desc, date, status, rruleDto);

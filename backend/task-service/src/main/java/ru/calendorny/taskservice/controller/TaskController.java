@@ -45,7 +45,8 @@ public class TaskController implements TaskApi {
 
     @Override
     public ResponseEntity<TaskResponse> updateTaskById(UUID taskId, String accessToken, UpdateTaskRequest updateTaskRequest) {
-        TaskResponse taskResponse = taskManagerService.updateTask(taskId, updateTaskRequest.getTitle(), updateTaskRequest.getDescription(), updateTaskRequest.getDueDate(), updateTaskRequest.getStatus(), updateTaskRequest.getRecurrenceRule());
+        UUID userId = jwtService.getUserIdFromAccessToken(accessToken);
+        TaskResponse taskResponse = taskManagerService.updateTask(taskId, updateTaskRequest.getTitle(), updateTaskRequest.getDescription(), updateTaskRequest.getDueDate(), updateTaskRequest.getStatus(), updateTaskRequest.getRecurrenceRule(), userId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(taskResponse);
     }
 
