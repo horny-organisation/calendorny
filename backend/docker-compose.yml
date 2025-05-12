@@ -11,7 +11,7 @@ services:
     networks:
       - meeting
 
-  postgres:
+  meetingPostgres:
     image: postgres:17-alpine
     restart: always
     environment:
