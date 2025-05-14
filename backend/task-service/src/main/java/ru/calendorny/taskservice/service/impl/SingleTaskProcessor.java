@@ -1,7 +1,10 @@
 package ru.calendorny.taskservice.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
+import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
 import ru.calendorny.taskservice.enums.TaskStatus;
@@ -9,18 +12,18 @@ import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.repository.SingleTaskRepository;
 import ru.calendorny.taskservice.service.TaskProcessor;
-import ru.calendorny.taskservice.util.RruleDto;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class SingleTaskProcessor implements TaskProcessor {
 
     private final SingleTaskRepository repository;
 
     private final TaskMapper mapper;
+
+    public SingleTaskProcessor(SingleTaskRepository repository, TaskMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
+    }
 
     @Override
     public boolean supports(UUID taskId) {
@@ -28,12 +31,38 @@ public class SingleTaskProcessor implements TaskProcessor {
     }
 
     @Override
-    public TaskResponse getTask(UUID taskId) {
-        return repository.findById(taskId).map(mapper::fromSingleTaskToResponse).orElseThrow(TaskNotFoundException::new);
+    public boolean supportsRecurTask(boolean isRecur) {
+        return !isRecur;
     }
 
     @Override
-    public TaskResponse updateTask(UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse getTask(UUID taskId) {
+        return repository
+                .findById(taskId)
+                .map(mapper::fromSingleTaskToResponse)
+                .orElseThrow(TaskNotFoundException::new);
+    }
+
+    @Override
+    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
+        if (rruleDto != null) {
+            throw new IllegalArgumentException("SingleTask cannot have recurrence rule");
+        }
+        SingleTaskEntity newTask = SingleTaskEntity.builder()
+                .title(title)
+                .description(desc)
+                .userId(userId)
+                .dueDate(date)
+                .status(TaskStatus.PENDING)
+                .build();
+
+        SingleTaskEntity savedTask = repository.save(newTask);
+        return mapper.fromSingleTaskToResponse(savedTask);
+    }
+
+    @Override
+    public TaskResponse updateTask(
+            UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
         if (rruleDto != null) {
             throw new IllegalArgumentException("Can't update SingleTask with recurrence rule");
         }
@@ -51,7 +80,7 @@ public class SingleTaskProcessor implements TaskProcessor {
     public void deleteTask(UUID taskId) {
         SingleTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
         task.setStatus(TaskStatus.CANCELLED);
-        SingleTaskEntity savedTask = repository.save(task);
+        repository.save(task);
     }
 
     @Override
@@ -59,7 +88,7 @@ public class SingleTaskProcessor implements TaskProcessor {
         SingleTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
         task.setStatus(status);
         SingleTaskEntity savedTask = repository.save(task);
-        return mapper.fromSingleTaskToResponse(task);
+        return mapper.fromSingleTaskToResponse(savedTask);
     }
 
     @Override
@@ -68,32 +97,14 @@ public class SingleTaskProcessor implements TaskProcessor {
     }
 
     @Override
-    public boolean supportsRecurringTask(boolean recurring) {
-        return !recurring;
+    public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
+        List<SingleTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
+        return tasks.stream().map(mapper::fromSingleTaskToResponse).toList();
     }
 
     @Override
-    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
-        if (rruleDto != null) {
-            throw new IllegalArgumentException("SingleTask cannot have recurrence rule");
-        }
-        SingleTaskEntity newTask = SingleTaskEntity.builder()
-            .title(title)
-            .description(desc)
-            .userId(userId)
-            .dueDate(date)
-            .status(TaskStatus.PENDING)
-            .build();
-
-        SingleTaskEntity savedTask = repository.save(newTask);
-        return mapper.fromSingleTaskToResponse(savedTask);
-    }
-
-    @Override
-    public List<TaskResponse> getTasksByUserIdAndDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
-        List<SingleTaskEntity> tasks = repository.findAllByUserIdAndDueDateBetween(userId, fromDate, toDate);
-        return tasks.stream()
-            .map(mapper::fromSingleTaskToResponse)
-            .toList();
+    public List<TaskResponse> getPendingTasksByDate(LocalDate date) {
+        List<SingleTaskEntity> tasks = repository.findAllPendingByDueDate(date);
+        return tasks.stream().map(mapper::fromSingleTaskToResponse).toList();
     }
 }

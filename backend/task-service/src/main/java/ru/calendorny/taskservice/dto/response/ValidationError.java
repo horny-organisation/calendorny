@@ -1,11 +1,7 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.dto.response;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Builder
 public class ValidationError {
 

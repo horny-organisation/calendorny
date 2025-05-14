@@ -1,11 +1,11 @@
 package ru.calendorny.taskservice.dto.request;
 
-import java.time.LocalDate;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.Getter;
-import ru.calendorny.taskservice.util.RruleDto;
+import ru.calendorny.taskservice.dto.RruleDto;
 
 @Getter
 public class CreateTaskRequest {

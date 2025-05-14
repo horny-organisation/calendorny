@@ -1,39 +1,44 @@
 package ru.calendorny.taskservice.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.dmfs.rfc5545.DateTime;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
-import org.dmfs.rfc5545.recur.RecurrenceRule;
-import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
-import org.springframework.stereotype.Repository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
+import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.RecurTaskEntity;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.exception.RruleParsingException;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.repository.RecurTaskRepository;
 import ru.calendorny.taskservice.service.TaskProcessor;
 import ru.calendorny.taskservice.util.RruleCalculator;
 import ru.calendorny.taskservice.util.RruleConverter;
-import ru.calendorny.taskservice.util.RruleDto;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import ru.calendorny.taskservice.util.SingleTaskHelper;
 
 @Service
-@RequiredArgsConstructor
 public class RecurTaskProcessor implements TaskProcessor {
 
     private final RecurTaskRepository repository;
 
+    private final SingleTaskHelper singleTaskHelper;
+
     private final TaskMapper mapper;
+
+    public RecurTaskProcessor(RecurTaskRepository repository, SingleTaskHelper singleTaskHelper, TaskMapper mapper) {
+        this.repository = repository;
+        this.singleTaskHelper = singleTaskHelper;
+        this.mapper = mapper;
+    }
 
     @Override
     public boolean supports(UUID taskId) {
         return repository.existsById(taskId);
+    }
+
+    @Override
+    public boolean supportsRecurTask(boolean isRecur) {
+        return isRecur;
     }
 
     @Override
@@ -42,7 +47,26 @@ public class RecurTaskProcessor implements TaskProcessor {
     }
 
     @Override
-    public TaskResponse updateTask(UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
+        if (rruleDto == null) {
+            throw new IllegalStateException("Can't update RecurTask without recurrence rule");
+        }
+        RecurTaskEntity newTask = RecurTaskEntity.builder()
+                .title(title)
+                .description(desc)
+                .userId(userId)
+                .nextDate(date)
+                .rrule(RruleConverter.toRruleString(rruleDto))
+                .status(TaskStatus.PENDING)
+                .build();
+
+        RecurTaskEntity savedTask = repository.save(newTask);
+        return mapper.fromRecurTaskToResponse(savedTask);
+    }
+
+    @Override
+    public TaskResponse updateTask(
+            UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
         if (rruleDto == null) {
             throw new IllegalStateException("Can't update RecurTask without recurrence rule");
         }
@@ -52,7 +76,7 @@ public class RecurTaskProcessor implements TaskProcessor {
         task.setDescription(desc);
         task.setStatus(status);
         task.setRrule(rruleString);
-        task.setNextDate(RruleCalculator.findNextDate(rruleString, date));
+        task.setNextDate(date);
 
         RecurTaskEntity savedTask = repository.save(task);
         return mapper.fromRecurTaskToResponse(savedTask);
@@ -60,15 +84,21 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     @Override
     public void deleteTask(UUID taskId) {
+
         RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
         task.setStatus(TaskStatus.CANCELLED);
-        RecurTaskEntity savedTask = repository.save(task);
+        repository.save(task);
     }
 
     @Override
     public TaskResponse updateStatus(UUID taskId, TaskStatus status) {
         RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
-        task.setStatus(status);
+        LocalDate prevDate = task.getNextDate();
+        if (status.equals(TaskStatus.COMPLETED)) {
+            singleTaskHelper.createCompletedSingleTask(
+                    task.getTitle(), task.getDescription(), task.getUserId(), prevDate);
+        }
+        task.setNextDate(RruleCalculator.findNextDate(task.getRrule(), prevDate));
         RecurTaskEntity savedTask = repository.save(task);
         return mapper.fromRecurTaskToResponse(savedTask);
     }
@@ -79,63 +109,15 @@ public class RecurTaskProcessor implements TaskProcessor {
     }
 
     @Override
-    public boolean supportsRecurringTask(boolean recurring) {
-        return recurring;
+    public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
+
+        List<RecurTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
+        return tasks.stream().map(mapper::fromRecurTaskToResponse).toList();
     }
 
     @Override
-    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
-        if (rruleDto == null) {
-            throw new IllegalStateException("Can't update RecurTask without recurrence rule");
-        }
-        RecurTaskEntity newTask = RecurTaskEntity.builder()
-            .title(title)
-            .description(desc)
-            .userId(userId)
-            .nextDate(date)
-            .rrule(RruleConverter.toRruleString(rruleDto))
-            .status(TaskStatus.PENDING)
-            .build();
-
-        RecurTaskEntity savedTask = repository.save(newTask);
-        return mapper.fromRecurTaskToResponse(savedTask);
-    }
-
-    @Override
-    public List<TaskResponse> getTasksByUserIdAndDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
-        List<TaskResponse> tasks = new ArrayList<>();
-        List<RecurTaskEntity> recurTasks = repository.findAllByUserId(userId);
-        for (RecurTaskEntity recurTask : recurTasks) {
-            tasks.addAll(generateOccurrences(recurTask, fromDate, toDate));
-        }
-        return tasks;
-    }
-
-    private List<TaskResponse> generateOccurrences(RecurTaskEntity recurrenceTask, LocalDate from, LocalDate to) {
-        List<TaskResponse> result = new ArrayList<>();
-
-        DateTime start = new DateTime(from.getYear(), from.getMonthValue() - 1, from.getDayOfMonth());
-        try {
-            RecurrenceRule rule = new RecurrenceRule(recurrenceTask.getRrule());
-
-            RecurrenceRuleIterator it = rule.iterator(start);
-
-            while (it.hasNext()) {
-                DateTime next = it.next();
-
-                LocalDate nextDate = LocalDate.of(next.getYear(), next.getMonth() + 1, next.getDayOfMonth());
-
-                if (nextDate.isAfter(to)) {
-                    break;
-                }
-
-                if (!nextDate.isBefore(from)) {
-                    result.add(mapper.fromRecurTaskToResponse(recurrenceTask, nextDate));
-                }
-            }
-        } catch (InvalidRecurrenceRuleException e) {
-
-        }
-        return result;
+    public List<TaskResponse> getPendingTasksByDate(LocalDate date) {
+        List<RecurTaskEntity> tasks = repository.findAllPendingByNextDate(date);
+        return tasks.stream().map(mapper::fromRecurTaskToResponse).toList();
     }
 }

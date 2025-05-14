@@ -2,11 +2,13 @@ package ru.calendorny.taskservice.dto.response;
 
 import java.time.LocalDate;
 import java.util.UUID;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.util.RruleDto;
 
-@Data
+@Getter
+@Setter
 public class TaskResponse {
 
     UUID id;

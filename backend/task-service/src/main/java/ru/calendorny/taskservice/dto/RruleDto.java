@@ -1,8 +1,8 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.dto;
 
+import java.time.DayOfWeek;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.DayOfWeek;
 
 @Getter
 @Setter

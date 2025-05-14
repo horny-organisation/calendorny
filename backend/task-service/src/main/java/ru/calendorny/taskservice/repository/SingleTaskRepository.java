@@ -1,24 +1,25 @@
 package ru.calendorny.taskservice.repository;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public interface SingleTaskRepository extends JpaRepository<SingleTaskEntity, UUID> {
 
-    Optional<SingleTaskEntity> findById (UUID taskId);
+    @Query(
+        """
+        SELECT t FROM SingleTaskEntity t
+        WHERE t.userId = :userId
+        AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
+        AND t.dueDate BETWEEN :startDate AND :endDate
+        """)
+    List<SingleTaskEntity> findAllActiveByUserIdAndDateInterval(
+            @Param("userId") UUID userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-    boolean existsById (UUID taskId);
-
-    @Query("SELECT t FROM SingleTaskEntity t WHERE t.userId = :userId AND t.dueDate BETWEEN :startDate AND :endDate")
-    List<SingleTaskEntity> findAllByUserIdAndDueDateBetween(
-        @Param("userId") UUID userId,
-        @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate
-    );
+    @Query("SELECT t FROM SingleTaskEntity t WHERE t.status = 'PENDING' AND t.dueDate = :date")
+    List<SingleTaskEntity> findAllPendingByDueDate(LocalDate dueDate);
 }
