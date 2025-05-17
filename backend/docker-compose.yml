@@ -1,4 +1,5 @@
 services:
+
   kafka:
     image: apache/kafka:4.0.0
     container_name: kafka
@@ -8,12 +9,75 @@ services:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
       - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
-      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER \
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:9093
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
       - KAFKA_NUM_PARTITIONS=3
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka:9092 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - task-service
+
+  task-service-postgres:
+    image: postgres:16-alpine
+    container_name: task-service-postgres
+    ports:
+      - "5437:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${TASK_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TASK_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${TASK_SERVICE_POSTGRES_DB}
+    volumes:
+      - task_service_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${TASK_SERVICE_POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - task-service
+
+  task-service-liquibase:
+    image: liquibase:4.29
+    container_name: task-service-liquibase
+    depends_on:
+      task-service-postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      LIQUIBASE_CLASSPATH: /liquibase/changelog
+    volumes:
+      - ./task-service/db/changelog:/liquibase/changelog
+    command:
+      [
+        "--url=jdbc:postgresql://task-service-postgres/${TASK_SERVICE_POSTGRES_DB}",
+        "--username=${TASK_SERVICE_POSTGRES_USER}",
+        "--password=${TASK_SERVICE_POSTGRES_PASSWORD}",
+        "--changeLogFile=changelog/db-changelog-master.yml",
+        "update"
+      ]
+    networks:
+      - task-service
+
+volumes:
+  kafka-data:
+  task_service_postgres_data:
+
+networks:
+  task-service:
+    driver: bridge

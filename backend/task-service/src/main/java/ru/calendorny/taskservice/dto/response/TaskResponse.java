@@ -2,26 +2,25 @@ package ru.calendorny.taskservice.dto.response;
 
 import java.time.LocalDate;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.enums.TaskStatus;
 
-@Getter
-@Setter
-public class TaskResponse {
+@Builder
+public record TaskResponse(
 
-    UUID id;
+    UUID id,
 
-    UUID userId;
+    UUID userId,
 
-    String title;
+    String title,
 
-    String description;
+    String description,
 
-    LocalDate dueDate;
+    LocalDate dueDate,
 
-    TaskStatus status;
+    TaskStatus status,
 
-    RruleDto recurrenceRule;
+    RruleDto recurrenceRule
+) {
 }

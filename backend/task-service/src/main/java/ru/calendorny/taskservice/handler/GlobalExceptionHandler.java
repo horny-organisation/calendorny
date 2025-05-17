@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleGenericException(TaskNotFoundException ex) {
+
         ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
                 .description("Not found error")
                 .code("404")

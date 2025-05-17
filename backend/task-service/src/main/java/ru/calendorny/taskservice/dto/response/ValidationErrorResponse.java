@@ -4,17 +4,17 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class ValidationErrorResponse {
+public record ValidationErrorResponse (
 
-    String description;
+    String description,
 
-    String code;
+    String code,
 
-    String exceptionName;
+    String exceptionName,
 
-    String exceptionMessage;
+    String exceptionMessage,
 
-    List<String> stacktrace;
+    List<String> stacktrace,
 
-    List<ValidationError> validationErrors;
-}
+    List<ValidationError> validationErrors
+){}

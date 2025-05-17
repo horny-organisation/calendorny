@@ -4,15 +4,15 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public class ApiErrorResponse {
+public record ApiErrorResponse (
 
-    String description;
+    String description,
 
-    String code;
+    String code,
 
-    String exceptionName;
+    String exceptionName,
 
-    String exceptionMessage;
+    String exceptionMessage,
 
-    List<String> stackTrace;
-}
+    List<String> stackTrace
+){}

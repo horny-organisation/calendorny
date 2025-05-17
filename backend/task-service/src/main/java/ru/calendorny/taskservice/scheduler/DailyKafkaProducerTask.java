@@ -37,15 +37,15 @@ public class DailyKafkaProducerTask {
         List<TaskResponse> recurTasks = recurTaskProcessor.getPendingTasksByDate(LocalDate.now(ZoneOffset.UTC));
         recurTasks.stream().map(mapper::fromResponseToEvent).forEach(kafkaTaskEventProducer::send);
         recurTasks.forEach(t -> {
-            singleTaskProcessor.createTask(t.getUserId(), t.getTitle(), t.getDescription(), t.getDueDate(), null);
-            String rruleString = rruleConverter.toRruleString(t.getRecurrenceRule());
+            singleTaskProcessor.createTask(t.userId(), t.title(), t.description(), t.dueDate(), null);
+            String rruleString = rruleConverter.toRruleString(t.recurrenceRule());
             recurTaskProcessor.updateTask(
-                t.getId(),
-                t.getTitle(),
-                t.getDescription(),
-                RruleCalculator.findNextDate(rruleString, t.getDueDate()),
-                t.getStatus(),
-                t.getRecurrenceRule());
+                t.id(),
+                t.title(),
+                t.description(),
+                RruleCalculator.findNextDate(rruleString, t.dueDate()),
+                t.status(),
+                t.recurrenceRule());
         });
     }
 }
