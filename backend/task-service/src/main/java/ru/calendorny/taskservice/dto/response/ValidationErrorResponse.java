@@ -14,7 +14,5 @@ public record ValidationErrorResponse (
 
     String exceptionMessage,
 
-    List<String> stacktrace,
-
     List<ValidationError> validationErrors
 ){}
