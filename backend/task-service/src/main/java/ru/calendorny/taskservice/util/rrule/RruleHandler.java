@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util.rrulehandler;
+package ru.calendorny.taskservice.util.rrule;
 
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;

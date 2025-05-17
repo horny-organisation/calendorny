@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.util.rrule;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;

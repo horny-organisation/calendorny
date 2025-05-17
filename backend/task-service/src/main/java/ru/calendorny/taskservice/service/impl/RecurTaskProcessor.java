@@ -13,8 +13,8 @@ import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.repository.RecurTaskRepository;
 import ru.calendorny.taskservice.service.TaskProcessor;
-import ru.calendorny.taskservice.util.RruleCalculator;
-import ru.calendorny.taskservice.util.RruleConverter;
+import ru.calendorny.taskservice.util.rrule.RruleCalculator;
+import ru.calendorny.taskservice.util.rrule.RruleConverter;
 import ru.calendorny.taskservice.util.SingleTaskHelper;
 
 @Service

@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.util.rrule;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

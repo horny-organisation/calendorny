@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util.rrulehandler;
+package ru.calendorny.taskservice.util.rrule;
 
 
 import org.junit.jupiter.api.Test;

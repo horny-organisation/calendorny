@@ -7,7 +7,7 @@ import ru.calendorny.taskservice.dto.event.TodayTaskEvent;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.RecurTaskEntity;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
-import ru.calendorny.taskservice.util.RruleConverter;
+import ru.calendorny.taskservice.util.rrule.RruleConverter;
 
 @Mapper(componentModel = "spring", uses = RruleConverter.class)
 public interface TaskMapper {

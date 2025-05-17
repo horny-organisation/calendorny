@@ -36,7 +36,7 @@ public class BaseTaskManagerServiceImpl implements TaskManagerService {
         TaskProcessor currentProcessor = getProcessor(taskId);
 
         boolean shouldBeRecur = rruleDto != null;
-        boolean isCurrentlyRecur = currentProcessor instanceof RecurTaskProcessor;
+        boolean isCurrentlyRecur = currentProcessor.supportsRecurTask(true);
 
         if (shouldBeRecur != isCurrentlyRecur) {
             currentProcessor.hardDeleteTask(taskId);

@@ -1,10 +1,10 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.util.rrule;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.RruleHandler;
+import ru.calendorny.taskservice.util.rrule.RruleHandler;
 
 import java.util.List;
 import java.util.Optional;

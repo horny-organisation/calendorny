@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util;
+package ru.calendorny.taskservice.util.rrule;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.RruleHandler;
+import ru.calendorny.taskservice.util.rrule.RruleHandler;
+import ru.calendorny.taskservice.util.rrule.RruleHandlerRegistry;
 
 import java.util.Arrays;
 import java.util.List;

@@ -11,8 +11,8 @@ import ru.calendorny.taskservice.kafka.KafkaTaskEventProducer;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
-import ru.calendorny.taskservice.util.RruleCalculator;
-import ru.calendorny.taskservice.util.RruleConverter;
+import ru.calendorny.taskservice.util.rrule.RruleCalculator;
+import ru.calendorny.taskservice.util.rrule.RruleConverter;
 
 @Component
 @RequiredArgsConstructor
