@@ -24,6 +24,8 @@ public class DailyKafkaProducerTask {
 
     private final RruleConverter rruleConverter;
 
+    private final RruleCalculator rruleCalculator;
+
     private final KafkaTaskEventProducer kafkaTaskEventProducer;
 
     private final TaskMapper mapper;
@@ -43,7 +45,7 @@ public class DailyKafkaProducerTask {
                 t.id(),
                 t.title(),
                 t.description(),
-                RruleCalculator.findNextDate(rruleString, t.dueDate()),
+                rruleCalculator.findNextDate(rruleString, t.dueDate()),
                 t.status(),
                 t.recurrenceRule());
         });

@@ -29,6 +29,8 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     private final RruleConverter rruleConverter;
 
+    private final RruleCalculator rruleCalculator;
+
     @Override
     public boolean supports(UUID taskId) {
         return repository.existsById(taskId);
@@ -96,7 +98,7 @@ public class RecurTaskProcessor implements TaskProcessor {
             singleTaskHelper.createCompletedSingleTask(
                     task.getTitle(), task.getDescription(), task.getUserId(), prevDate);
         }
-        task.setNextDate(RruleCalculator.findNextDate(task.getRrule(), prevDate));
+        task.setNextDate(rruleCalculator.findNextDate(task.getRrule(), prevDate));
         RecurTaskEntity savedTask = repository.save(task);
         return mapper.fromRecurTaskToResponse(savedTask);
     }

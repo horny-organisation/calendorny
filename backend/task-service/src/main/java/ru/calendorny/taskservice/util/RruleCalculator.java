@@ -3,16 +3,19 @@ package ru.calendorny.taskservice.util;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import lombok.experimental.UtilityClass;
+import lombok.RequiredArgsConstructor;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.RecurrenceRule;
 import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
-import ru.calendorny.taskservice.exception.InvalidDateException;
+import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.exception.RruleParsingException;
 
-@UtilityClass
+@Component
+@RequiredArgsConstructor
 public class RruleCalculator {
+
+    private final RruleHandlerRegistry rruleHandlerRegistry;
 
     public LocalDate findNextDate(String rruleString, LocalDate fromDate) {
 
@@ -21,9 +24,11 @@ public class RruleCalculator {
         }
 
         if (fromDate == null) {
-            throw new InvalidDateException("Date can not be null");
+            throw new IllegalArgumentException("Date can not be null");
         }
         try {
+
+            rruleHandlerRegistry.validateRruleString(rruleString);
 
             RecurrenceRule rule = new RecurrenceRule(rruleString);
 
@@ -36,12 +41,11 @@ public class RruleCalculator {
                 DateTime next = it.next();
                 LocalDate nextDate = LocalDate.of(next.getYear(), next.getMonth() + 1, next.getDayOfMonth());
 
-                if (!nextDate.isBefore(fromDate)) {
+                if (nextDate.isAfter(fromDate)) {
                     return nextDate;
                 }
             }
-
-            throw new RruleParsingException("No next date");
+            return null;
         } catch (Exception e) {
             throw new RruleParsingException("Rrule parsing exception: %s".formatted(e.getMessage()));
         }
