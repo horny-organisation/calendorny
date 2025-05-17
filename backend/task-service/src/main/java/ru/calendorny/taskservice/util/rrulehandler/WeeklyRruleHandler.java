@@ -3,7 +3,6 @@ package ru.calendorny.taskservice.util.rrulehandler;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.RruleHandler;
 import java.time.DayOfWeek;
 
 @Component

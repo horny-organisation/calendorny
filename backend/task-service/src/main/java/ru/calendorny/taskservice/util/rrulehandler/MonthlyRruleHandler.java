@@ -11,7 +11,7 @@ public class MonthlyRruleHandler implements RruleHandler {
 
     @Override
     public boolean supports(RruleDto.Frequency frequency) {
-        return frequency == RruleDto.Frequency.WEEKLY;
+        return frequency == RruleDto.Frequency.MONTHLY;
     }
 
     @Override
@@ -20,7 +20,7 @@ public class MonthlyRruleHandler implements RruleHandler {
         if (day == null || day < 1 || day > 31) {
             throw new IllegalArgumentException("MONTHLY requires dayOfMonth");
         }
-        sb.append(";").append(BY_MONTHDAY_PREFIX).append("=").append(rruleDto.dayOfWeek());
+        sb.append(";").append(BY_MONTHDAY_PREFIX).append("=").append(rruleDto.dayOfMonth());
     }
 
     @Override
@@ -50,8 +50,12 @@ public class MonthlyRruleHandler implements RruleHandler {
             if (day < 1 || day > 31) {
                 throw new InvalidRruleException("BYMONTHDAY must be between 1 and 31");
             }
+        } catch (NumberFormatException e) {
+            throw new InvalidRruleException("Invalid BYMONTHDAY value - must be a number");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new InvalidRruleException("Invalid BYMONTHDAY format");
         } catch (Exception e) {
-            throw new InvalidRruleException("Invalid BYMONTHDAY value in MONTHLY rule");
+            throw new InvalidRruleException("Invalid RRULE format: " + e.getMessage());
         }
     }
 }

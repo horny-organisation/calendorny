@@ -1,7 +1,5 @@
 package ru.calendorny.taskservice.util;
 
-import java.time.DayOfWeek;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
