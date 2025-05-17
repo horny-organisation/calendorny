@@ -1,6 +1,8 @@
 package ru.calendorny.taskservice.util;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import lombok.experimental.UtilityClass;
 import org.dmfs.rfc5545.DateTime;
 import org.dmfs.rfc5545.recur.RecurrenceRule;
@@ -24,8 +26,10 @@ public class RruleCalculator {
         try {
 
             RecurrenceRule rule = new RecurrenceRule(rruleString);
-            DateTime start = new DateTime(fromDate.getYear(), fromDate.getMonthValue() - 1, fromDate.getDayOfMonth());
 
+            ZonedDateTime zdt = fromDate.atStartOfDay(ZoneOffset.UTC);
+            long millis = zdt.toInstant().toEpochMilli();
+            DateTime start = new DateTime(millis);
             RecurrenceRuleIterator it = rule.iterator(start);
 
             while (it.hasNext()) {

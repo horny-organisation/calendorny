@@ -4,43 +4,59 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.calendorny.taskservice.dto.request.*;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
+import ru.calendorny.taskservice.security.AuthenticatedUser;
 
 @RequestMapping("/api/v1/tasks")
 public interface TaskApi {
 
     @PostMapping
-    ResponseEntity<TaskResponse> createTask(
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-            @Valid @RequestBody CreateTaskRequest createTaskRequest);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.CREATED)
+    TaskResponse createTask(
+        @Valid @RequestBody CreateTaskRequest createTaskRequest,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 
     @GetMapping
-    ResponseEntity<List<TaskResponse>> getTasksByDateRange(
-            @RequestParam("from") LocalDate fromDate,
-            @RequestParam("to") LocalDate toDate,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.OK)
+    List<TaskResponse> getTasksByDateRange(
+        @RequestParam("from") LocalDate fromDate,
+        @RequestParam("to") LocalDate toDate,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 
     @GetMapping("/{taskId}")
-    ResponseEntity<TaskResponse> getTask(
-            @PathVariable("taskId") UUID taskId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.OK)
+    TaskResponse getTask(
+        @PathVariable("taskId") UUID taskId,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 
     @PutMapping("/{taskId}")
-    ResponseEntity<TaskResponse> updateTask(
-            @PathVariable("taskId") UUID taskId,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-            @Valid @RequestBody UpdateTaskRequest updateTaskRequest);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.OK)
+    TaskResponse updateTask(
+        @PathVariable("taskId") UUID taskId,
+        @Valid @RequestBody UpdateTaskRequest updateTaskRequest,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 
     @DeleteMapping("/{taskId}")
-    ResponseEntity<Void> deleteTask(
-            @PathVariable("taskId") UUID taskId, @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteTask(
+        @PathVariable("taskId") UUID taskId,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 
     @PatchMapping("/{taskId}/status")
-    ResponseEntity<TaskResponse> updateTaskStatus(
-            @PathVariable("taskId") UUID taskId,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken,
-            @Valid @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest);
+    @PreAuthorize("isAuthenticated()")
+    @ResponseStatus(HttpStatus.OK)
+    TaskResponse updateTaskStatus(
+        @PathVariable("taskId") UUID taskId,
+        @Valid @RequestBody UpdateTaskStatusRequest updateTaskStatusRequest,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser);
 }

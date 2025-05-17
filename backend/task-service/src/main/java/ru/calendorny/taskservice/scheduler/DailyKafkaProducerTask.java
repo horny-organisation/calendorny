@@ -15,22 +15,18 @@ import ru.calendorny.taskservice.util.RruleCalculator;
 import ru.calendorny.taskservice.util.RruleConverter;
 
 @Component
+@RequiredArgsConstructor
 public class DailyKafkaProducerTask {
 
     private final SingleTaskProcessor singleTaskProcessor;
 
     private final RecurTaskProcessor recurTaskProcessor;
 
+    private final RruleConverter rruleConverter;
+
     private final KafkaTaskEventProducer kafkaTaskEventProducer;
 
     private final TaskMapper mapper;
-
-    public DailyKafkaProducerTask(SingleTaskProcessor singleTaskProcessor, RecurTaskProcessor recurTaskProcessor, KafkaTaskEventProducer kafkaTaskEventProducer, TaskMapper mapper) {
-        this.singleTaskProcessor = singleTaskProcessor;
-        this.recurTaskProcessor = recurTaskProcessor;
-        this.kafkaTaskEventProducer = kafkaTaskEventProducer;
-        this.mapper = mapper;
-    }
 
     @Scheduled(cron = "0 0 0 * * *", zone = "UTC")
     public void runAtMidnightUTC() {
@@ -42,7 +38,7 @@ public class DailyKafkaProducerTask {
         recurTasks.stream().map(mapper::fromResponseToEvent).forEach(kafkaTaskEventProducer::send);
         recurTasks.forEach(t -> {
             singleTaskProcessor.createTask(t.getUserId(), t.getTitle(), t.getDescription(), t.getDueDate(), null);
-            String rruleString = RruleConverter.toRruleString(t.getRecurrenceRule());
+            String rruleString = rruleConverter.toRruleString(t.getRecurrenceRule());
             recurTaskProcessor.updateTask(
                 t.getId(),
                 t.getTitle(),

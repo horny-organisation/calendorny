@@ -1,53 +1,64 @@
 package ru.calendorny.taskservice.util;
 
 import java.time.DayOfWeek;
-import lombok.experimental.UtilityClass;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 
-@UtilityClass
+@Component
+@RequiredArgsConstructor
 public class RruleConverter {
 
     public static final String FREQUENCY_PREFIX = "FREQ";
 
-    public static final String BY_DAY_PREFIX = "BYDAY";
+    private final RruleHandlerRegistry rruleHandlerRegistry;
 
-    public static final String BY_MONTH_PREFIX = "BYMONTH";
 
     public String toRruleString(RruleDto rruleDto) {
         if (rruleDto == null) {
-            throw new InvalidRruleException("Rrule can not be null");
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-
-        RruleDto.Frequency frequency = rruleDto.getFrequency();
-
-        stringBuilder.append(FREQUENCY_PREFIX).append("=").append(frequency).append(";");
-
-        if (frequency.equals(RruleDto.Frequency.WEEKLY)) {
-            stringBuilder.append(BY_DAY_PREFIX).append("=").append(rruleDto.getDayOfWeek());
-        } else {
-            stringBuilder.append(BY_MONTH_PREFIX).append("=").append(rruleDto.getDayOfMonth());
+            throw new InvalidRruleException("RRULE cannot be null");
         }
 
-        return stringBuilder.toString();
+        StringBuilder sb = new StringBuilder();
+        RruleDto.Frequency frequency = rruleDto.frequency();
+
+        sb.append(FREQUENCY_PREFIX).append("=").append(frequency);
+
+        rruleHandlerRegistry.findHandler(frequency)
+                .ifPresent(handler -> handler.append(rruleDto, sb));
+
+        return sb.toString();
     }
 
     public RruleDto toRruleDto(String rruleString) {
-
-        RruleDto rruleDto = new RruleDto();
+        if (rruleString == null || rruleString.isBlank()) {
+            throw new InvalidRruleException("RRULE string cannot be null or empty");
+        }
 
         String[] parts = rruleString.split(";");
 
+        RruleDto.RruleDtoBuilder rruleDtoBuilder = RruleDto.builder();
+
+
         for (String part : parts) {
+            if (part.isBlank()) continue;
             String[] kv = part.split("=");
-            switch (kv[0]) {
-                case FREQUENCY_PREFIX -> rruleDto.setFrequency(RruleDto.Frequency.valueOf(kv[1]));
-                case BY_DAY_PREFIX -> rruleDto.setDayOfWeek(DayOfWeek.valueOf(kv[1]));
-                case BY_MONTH_PREFIX -> rruleDto.setDayOfMonth(Integer.parseInt(kv[1]));
-                default -> throw new InvalidRruleException("Can not parse RRULE with key: %s".formatted(kv[0]));
+            if (kv.length != 2) {
+                throw new InvalidRruleException("Invalid RRULE part: " + part);
+            }
+
+            String key = kv[0].trim();
+            String value = kv[1].trim();
+
+            if (key.equals(FREQUENCY_PREFIX)) {
+                rruleDtoBuilder.frequency(RruleDto.Frequency.valueOf(value));
+            } else {
+                rruleHandlerRegistry.setKeyValue(key, value, rruleDtoBuilder);
             }
         }
-        return rruleDto;
+
+        return rruleDtoBuilder.build();
     }
 }

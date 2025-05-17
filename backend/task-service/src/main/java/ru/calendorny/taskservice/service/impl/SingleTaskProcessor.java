@@ -3,6 +3,7 @@ package ru.calendorny.taskservice.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
@@ -14,16 +15,12 @@ import ru.calendorny.taskservice.repository.SingleTaskRepository;
 import ru.calendorny.taskservice.service.TaskProcessor;
 
 @Service
+@RequiredArgsConstructor
 public class SingleTaskProcessor implements TaskProcessor {
 
     private final SingleTaskRepository repository;
 
     private final TaskMapper mapper;
-
-    public SingleTaskProcessor(SingleTaskRepository repository, TaskMapper mapper) {
-        this.repository = repository;
-        this.mapper = mapper;
-    }
 
     @Override
     public boolean supports(UUID taskId) {

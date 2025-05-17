@@ -3,6 +3,7 @@ package ru.calendorny.taskservice.service.impl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
@@ -17,6 +18,7 @@ import ru.calendorny.taskservice.util.RruleConverter;
 import ru.calendorny.taskservice.util.SingleTaskHelper;
 
 @Service
+@RequiredArgsConstructor
 public class RecurTaskProcessor implements TaskProcessor {
 
     private final RecurTaskRepository repository;
@@ -25,11 +27,7 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     private final TaskMapper mapper;
 
-    public RecurTaskProcessor(RecurTaskRepository repository, SingleTaskHelper singleTaskHelper, TaskMapper mapper) {
-        this.repository = repository;
-        this.singleTaskHelper = singleTaskHelper;
-        this.mapper = mapper;
-    }
+    private final RruleConverter rruleConverter;
 
     @Override
     public boolean supports(UUID taskId) {
@@ -56,7 +54,7 @@ public class RecurTaskProcessor implements TaskProcessor {
                 .description(desc)
                 .userId(userId)
                 .nextDate(date)
-                .rrule(RruleConverter.toRruleString(rruleDto))
+                .rrule(rruleConverter.toRruleString(rruleDto))
                 .status(TaskStatus.PENDING)
                 .build();
 
@@ -70,7 +68,7 @@ public class RecurTaskProcessor implements TaskProcessor {
         if (rruleDto == null) {
             throw new IllegalStateException("Can't update RecurTask without recurrence rule");
         }
-        String rruleString = RruleConverter.toRruleString(rruleDto);
+        String rruleString = rruleConverter.toRruleString(rruleDto);
         RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
         task.setTitle(title);
         task.setDescription(desc);

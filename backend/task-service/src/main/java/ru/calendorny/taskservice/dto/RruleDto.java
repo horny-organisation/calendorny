@@ -1,21 +1,19 @@
 package ru.calendorny.taskservice.dto;
 
 import java.time.DayOfWeek;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
 
-@Getter
-@Setter
-public class RruleDto {
+
+@Builder
+public record RruleDto (Frequency frequency,
+
+    DayOfWeek dayOfWeek,
+
+    Integer dayOfMonth){
 
     public enum Frequency {
         WEEKLY,
         MONTHLY
     }
 
-    private Frequency frequency;
-
-    private DayOfWeek dayOfWeek;
-
-    private Integer dayOfMonth;
 }

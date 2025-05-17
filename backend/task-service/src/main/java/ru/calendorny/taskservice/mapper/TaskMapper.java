@@ -7,16 +7,14 @@ import ru.calendorny.taskservice.dto.event.TodayTaskEvent;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.RecurTaskEntity;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
+import ru.calendorny.taskservice.util.RruleConverter;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = RruleConverter.class)
 public interface TaskMapper {
 
     @Mappings({
         @Mapping(target = "dueDate", source = "nextDate"),
-        @Mapping(
-                target = "recurrenceRule",
-                expression =
-                        "java(ru.calendorny.taskservice.util.RruleConverter.toRruleDto(recurTaskEntity.getRrule()))")
+        @Mapping(target = "recurrenceRule", source = "rrule")
     })
     TaskResponse fromRecurTaskToResponse(RecurTaskEntity recurTaskEntity);
 
