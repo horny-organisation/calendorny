@@ -19,6 +19,8 @@ public class RruleConverter {
             throw new InvalidRruleException("RRULE cannot be null");
         }
 
+        rruleHandlerRegistry.validate(rruleDto);
+
         StringBuilder sb = new StringBuilder();
         RruleDto.Frequency frequency = rruleDto.frequency();
 
@@ -34,11 +36,10 @@ public class RruleConverter {
         if (rruleString == null || rruleString.isBlank()) {
             throw new InvalidRruleException("RRULE string cannot be null or empty");
         }
+        rruleHandlerRegistry.validateRruleString(rruleString);
 
         String[] parts = rruleString.split(";");
-
         RruleDto.RruleDtoBuilder rruleDtoBuilder = RruleDto.builder();
-
 
         for (String part : parts) {
             if (part.isBlank()) continue;
@@ -56,7 +57,9 @@ public class RruleConverter {
                 rruleHandlerRegistry.setKeyValue(key, value, rruleDtoBuilder);
             }
         }
+        RruleDto result = rruleDtoBuilder.build();
+        rruleHandlerRegistry.validate(result);
 
-        return rruleDtoBuilder.build();
+        return result;
     }
 }
