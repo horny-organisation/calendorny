@@ -12,11 +12,13 @@ public interface SingleTaskRepository extends JpaRepository<SingleTaskEntity, UU
 
     @Query(
         """
-        SELECT t FROM SingleTaskEntity t
-        WHERE t.userId = :userId
-        AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
-        AND t.dueDate BETWEEN :startDate AND :endDate
-        """)
+            SELECT t FROM SingleTaskEntity t
+            WHERE t.userId = :userId
+            AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
+            AND t.dueDate BETWEEN :startDate AND :endDate
+            ORDER BY t.dueDate ASC
+            LIMIT 100
+            """)
     List<SingleTaskEntity> findAllActiveByUserIdAndDateInterval(
             @Param("userId") UUID userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 

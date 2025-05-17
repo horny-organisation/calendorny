@@ -12,11 +12,13 @@ public interface RecurTaskRepository extends JpaRepository<RecurTaskEntity, UUID
 
     @Query(
             """
-        SELECT t FROM RecurTaskEntity t
-        WHERE t.userId = :userId
-        AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
-        AND t.nextDate BETWEEN :startDate AND :endDate
-        """)
+                SELECT t FROM RecurTaskEntity t
+                WHERE t.userId = :userId
+                AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
+                AND t.nextDate BETWEEN :startDate AND :endDate
+                ORDER BY t.nextDate ASC
+                LIMIT 100
+                """)
     List<RecurTaskEntity> findAllActiveByUserIdAndDateInterval(
             @Param("userId") UUID userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
