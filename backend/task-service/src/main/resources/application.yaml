@@ -22,12 +22,18 @@ spring:
     enabled: false
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:9092,localhost:9094,localhost:9095
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432
+
+task:
+  kafka:
+    task-notification-topic: task-topic
 
 auth:
   jwt:

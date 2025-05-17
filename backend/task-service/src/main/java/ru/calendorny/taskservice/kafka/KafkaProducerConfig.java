@@ -1,8 +1,7 @@
 package ru.calendorny.taskservice.kafka;
 
-import static ru.calendorny.taskservice.kafka.KafkaConstants.*;
-
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -11,25 +10,30 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import ru.calendorny.taskservice.dto.event.TodayTaskEvent;
 
 @Configuration
+@RequiredArgsConstructor
 public class KafkaProducerConfig {
 
+    private final KafkaConfigProperties kafkaConfigProperties;
+
     @Bean
-    public KafkaTemplate<String, TodayTaskEvent> kafkaTemplate(
-            ProducerFactory<String, TodayTaskEvent> producerFactory) {
+    public KafkaTemplate<String, Object> kafkaTemplate(
+            ProducerFactory<String, Object> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
     @Bean
-    public ProducerFactory<String, TodayTaskEvent> producerFactory(KafkaProperties kafkaProperties) {
+    public ProducerFactory<String, Object> producerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> config = kafkaProperties.buildProducerProperties();
         return new DefaultKafkaProducerFactory<>(config);
     }
 
     @Bean
     public NewTopic taskTopic() {
-        return TopicBuilder.name(TASK_TOPIC_NAME).partitions(1).replicas(1).build();
+        return TopicBuilder.name(kafkaConfigProperties.taskNotificationTopic())
+            .partitions(1)
+            .replicas(1)
+            .build();
     }
 }
