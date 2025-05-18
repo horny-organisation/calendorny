@@ -1,5 +1,12 @@
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
+    implementation platform('io.jsonwebtoken:jjwt-root:0.12.6')
+    implementation 'io.jsonwebtoken:jjwt-api'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation 'org.testcontainers:postgresql'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.register("prepareKotlinBuildScriptModel") {
