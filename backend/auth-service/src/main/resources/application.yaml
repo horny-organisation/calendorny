@@ -1,1 +1,21 @@
-spring.application.name=auth-service
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: ${AUTH_SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/authdb}
+    username: ${AUTH_SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${AUTH_SPRING_DATASOURCE_PASSWORD:postgres}
+
+  liquibase:
+    enabled: false
+
+server:
+  port: 8080
+
+auth:
+  jwt:
+    access-token-expiration-minutes: 15
+    refresh-token-expiration-days: 30
+    private-key: ${JWT_PRIVATE_KEY}
+    public-key: ${JWT_PUBLIC_KEY}
