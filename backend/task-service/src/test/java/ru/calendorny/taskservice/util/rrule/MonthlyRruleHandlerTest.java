@@ -1,16 +1,19 @@
 package ru.calendorny.taskservice.util.rrule;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MonthlyRruleHandlerTest {
 
     private static final String BY_MONTHDAY_PREFIX = "BYMONTHDAY";

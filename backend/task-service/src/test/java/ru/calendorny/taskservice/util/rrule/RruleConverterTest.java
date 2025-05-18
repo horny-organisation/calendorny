@@ -5,6 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.util.rrule.RruleConverter;
@@ -16,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RruleConverterTest {
 
     private static final String CORRECT_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=MONDAY";
@@ -25,13 +30,13 @@ class RruleConverterTest {
 
     private static final String INCORRECT_RRULE = "FREQ=WEEKLY;INVALID_PART";
 
-    @Mock
+    @MockitoBean
     private RruleHandlerRegistry rruleHandlerRegistry;
 
-    @Mock
-    private RruleHandler weeklyHandler;
+    @MockitoBean
+    private WeeklyRruleHandler weeklyHandler;
 
-    @InjectMocks
+    @Autowired
     private RruleConverter rruleConverter;
 
     @Test

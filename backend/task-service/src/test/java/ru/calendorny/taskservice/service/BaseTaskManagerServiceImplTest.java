@@ -1,17 +1,18 @@
 package ru.calendorny.taskservice.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.enums.TaskStatus;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.exception.TaskProcessorException;
 import ru.calendorny.taskservice.service.impl.BaseTaskManagerServiceImpl;
+import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
+import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
 
 import java.time.LocalDate;
 import java.time.DayOfWeek;
@@ -21,16 +22,17 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BaseTaskManagerServiceImplTest {
 
-    @Mock
-    private TaskProcessor singleTaskProcessor;
+    @MockitoBean
+    private SingleTaskProcessor singleTaskProcessor;
 
-    @Mock
-    private TaskProcessor recurTaskProcessor;
+    @MockitoBean
+    private RecurTaskProcessor recurTaskProcessor;
 
-    @InjectMocks
+    @Autowired
     private BaseTaskManagerServiceImpl taskManagerService;
 
     private final UUID taskId = UUID.randomUUID();
@@ -47,11 +49,6 @@ class BaseTaskManagerServiceImplTest {
         .dueDate(date)
         .status(TaskStatus.PENDING)
         .build();
-
-    @BeforeEach
-    void setUp() {
-        taskManagerService = new BaseTaskManagerServiceImpl(List.of(singleTaskProcessor, recurTaskProcessor));
-    }
 
     @Test
     void getTask_shouldReturnTaskWhenFound() {

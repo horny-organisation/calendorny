@@ -5,6 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
@@ -24,7 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SingleTaskProcessorTest {
 
     private static final UUID TASK_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
@@ -75,11 +80,11 @@ class SingleTaskProcessorTest {
         .status(COMPLETED_STATUS)
         .build();
 
-    @Mock
+    @MockitoBean
     private SingleTaskRepository repository;
-    @Mock
+    @MockitoBean
     private TaskMapper mapper;
-    @InjectMocks
+    @Autowired
     private SingleTaskProcessor singleTaskProcessor;
 
     @Test

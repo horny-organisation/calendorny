@@ -5,19 +5,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import java.time.DayOfWeek;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles(profiles = "test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WeeklyRruleHandlerTest {
 
     private static final String BY_DAY_PREFIX = "BYDAY";
     private static final String INVALID_PREFIX = "INVALID";
     private static final String VALID_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=MONDAY";
 
-    private final WeeklyRruleHandler handler = new WeeklyRruleHandler();
+    @Autowired
+    private WeeklyRruleHandler handler;
 
     @Test
     void testSupportsWithWeeklyFrequency() {
