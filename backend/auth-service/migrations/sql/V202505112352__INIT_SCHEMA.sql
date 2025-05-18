@@ -1,6 +1,5 @@
 --liquibase formatted sql
 
---changeset shcherbanev:202505112352-init-schema
 CREATE TABLE accounts
 (
     id            UUID PRIMARY KEY,
