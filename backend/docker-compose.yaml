@@ -1,0 +1,67 @@
+services:
+
+  krakend:
+    image: devopsfaith/krakend:2.4
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./krakend/krakend.yaml:/etc/krakend/krakend.yaml
+    command: [ "run", "-c", "/etc/krakend/krakend.yaml" ]
+    depends_on:
+      - auth-service
+    networks:
+      - backend
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    expose:
+      - "8080"
+    depends_on:
+      - db-auth
+      - liquibase-auth
+    environment:
+      - AUTH_SPRING_DATASOURCE_URL
+      - AUTH_SPRING_DATASOURCE_USERNAME
+      - AUTH_SPRING_DATASOURCE_PASSWORD
+      - JWT_PRIVATE_KEY
+      - JWT_PUBLIC_KEY
+    networks:
+      - auth-network
+      - backend
+
+  db-auth:
+    image: postgres:16-alpine
+    container_name: db-auth
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - auth-network
+
+  liquibase-auth:
+    image: liquibase/liquibase:4.29
+    container_name: liquibase-auth
+    depends_on:
+      - db-auth
+    volumes:
+      - ./auth-service/migrations:/changesets
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=changelog-master.yaml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://db-auth:5432/authdb
+      - --username=postgres
+      - --password=postgres
+      - update
+    networks:
+      - auth-network
+
+networks:
+  backend:
+  auth-network:
+
