@@ -15,5 +15,4 @@ public record RruleDto (Frequency frequency,
         WEEKLY,
         MONTHLY
     }
-
 }

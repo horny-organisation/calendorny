@@ -6,5 +6,4 @@ import lombok.Builder;
 public record ValidationError(
     String field,
     String message
-) {
-}
+) {}

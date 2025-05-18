@@ -123,7 +123,8 @@ public class TaskControllerIntegrationTest {
             .build()
     );
 
-    private static final UpdateTaskStatusRequest updateCompleteTaskStatusRequest = new UpdateTaskStatusRequest(TaskStatus.COMPLETED);
+    private static final UpdateTaskStatusRequest updateCompleteTaskStatusRequest = new UpdateTaskStatusRequest(
+        TaskStatus.COMPLETED);
 
     private static final CreateTaskRequest invalidcreateSingleTaskRequest = new CreateTaskRequest(
         null,

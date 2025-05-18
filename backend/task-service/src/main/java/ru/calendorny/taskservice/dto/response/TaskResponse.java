@@ -22,5 +22,4 @@ public record TaskResponse(
     TaskStatus status,
 
     RruleDto recurrenceRule
-) {
-}
+) {}

@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,13 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MonthlyRruleHandlerTest {
 
+    @Autowired
+    private MonthlyRruleHandler handler;
+
     private static final String BY_MONTHDAY_PREFIX = "BYMONTHDAY";
 
     private static final String INVALID_PREFIX = "INVALID";
 
     private static final String VALID_MONTHLY_RRULE = "FREQ=MONTHLY;BYMONTHDAY=1";
-
-    private final MonthlyRruleHandler handler = new MonthlyRruleHandler();
 
     @Test
     void testSupportsWithMonthlyFrequency() {

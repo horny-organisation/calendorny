@@ -15,7 +15,6 @@ import ru.calendorny.taskservice.kafka.KafkaConfigProperties;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -52,12 +51,13 @@ public class DailyKafkaProducerTaskIntegrationTest {
 
     private static final UUID USER_ID = UUID.randomUUID();
 
-    private static final TaskResponse taskResponse = new TaskResponse(TASK_ID, USER_ID, "Title", "Desc", LocalDate.now(), TaskStatus.PENDING, null);
-    private static final TodayTaskEvent todayTaskEvent = new TodayTaskEvent(TASK_ID, USER_ID, "Title", "Desc", LocalDate.now());
+    private static final TaskResponse taskResponse = new TaskResponse(
+        TASK_ID, USER_ID, "Title", "Desc", LocalDate.now(), TaskStatus.PENDING, null);
+    private static final TodayTaskEvent todayTaskEvent = new TodayTaskEvent(
+        TASK_ID, USER_ID, "Title", "Desc", LocalDate.now());
 
     @Test
     void testRunAtMidnightUTC_sendsKafkaEvents() {
-
         when(singleTaskProcessor.getPendingTasksByDate(LocalDate.now(UTC)))
             .thenReturn(List.of(taskResponse));
         when(recurTaskProcessor.getPendingTasksByDate(LocalDate.now(UTC)))
@@ -68,6 +68,5 @@ public class DailyKafkaProducerTaskIntegrationTest {
 
         verify(kafkaTemplate, times(1)).send(kafkaConfigProperties.taskNotificationTopic(), todayTaskEvent);
     }
-
 
 }

@@ -38,18 +38,41 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RecurTaskProcessorTest {
 
-    private static final UUID TASK_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
-    private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    @MockitoBean
+    private RecurTaskRepository repository;
+    @MockitoBean
+    private SingleTaskHelper singleTaskHelper;
+    @MockitoBean
+    private TaskMapper mapper;
+    @MockitoBean
+    private RruleConverter rruleConverter;
+    @MockitoBean
+    private RruleCalculator rruleCalculator;
+
+    @Autowired
+    private RecurTaskProcessor recurTaskProcessor;
+
+    private static final UUID TASK_ID = UUID.randomUUID();
+
+    private static final UUID USER_ID = UUID.randomUUID();
+
     private static final LocalDate NOW = LocalDate.of(2023, 1, 1);
+
     private static final LocalDate NEXT_DATE = NOW.plusDays(7);
+
     private static final String TITLE = "Test Task";
+
     private static final String DESCRIPTION = "Test Description";
+
     private static final RruleDto RRULE_DTO = RruleDto.builder()
         .frequency(RruleDto.Frequency.WEEKLY)
         .dayOfWeek(DayOfWeek.MONDAY)
         .build();
+
     private static final String RRULE_STRING = "FREQ=WEEKLY;BYDAY=MO";
+
     private static final TaskStatus PENDING_STATUS = TaskStatus.PENDING;
+
     private static final TaskStatus COMPLETED_STATUS = TaskStatus.COMPLETED;
 
     private static final RecurTaskEntity RECUR_TASK_ENTITY = RecurTaskEntity.builder()
@@ -91,20 +114,6 @@ class RecurTaskProcessorTest {
         .status(COMPLETED_STATUS)
         .recurrenceRule(RRULE_DTO)
         .build();
-
-    @MockitoBean
-    private RecurTaskRepository repository;
-    @MockitoBean
-    private SingleTaskHelper singleTaskHelper;
-    @MockitoBean
-    private TaskMapper mapper;
-    @MockitoBean
-    private RruleConverter rruleConverter;
-    @MockitoBean
-    private RruleCalculator rruleCalculator;
-
-    @Autowired
-    private RecurTaskProcessor recurTaskProcessor;
 
     @Test
     void testSupportsWhenTaskExists() {

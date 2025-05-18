@@ -22,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class WeeklyRruleHandlerTest {
 
     private static final String BY_DAY_PREFIX = "BYDAY";
+
     private static final String INVALID_PREFIX = "INVALID";
+
     private static final String VALID_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=MONDAY";
 
     @Autowired

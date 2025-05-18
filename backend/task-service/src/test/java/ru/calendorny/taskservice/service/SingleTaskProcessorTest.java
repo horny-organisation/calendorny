@@ -35,13 +35,29 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SingleTaskProcessorTest {
 
-    private static final UUID TASK_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
-    private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    @MockitoBean
+    private SingleTaskRepository repository;
+
+    @MockitoBean
+    private TaskMapper mapper;
+
+    @Autowired
+    private SingleTaskProcessor singleTaskProcessor;
+
+    private static final UUID TASK_ID = UUID.randomUUID();
+
+    private static final UUID USER_ID = UUID.randomUUID();
+
     private static final LocalDate NOW = LocalDate.of(2023, 1, 1);
+
     private static final String TITLE = "Test Task";
+
     private static final String DESCRIPTION = "Test Description";
+
     private static final TaskStatus PENDING_STATUS = TaskStatus.PENDING;
+
     private static final TaskStatus COMPLETED_STATUS = TaskStatus.COMPLETED;
+
     private static final RruleDto RRULE_DTO = RruleDto.builder()
         .frequency(RruleDto.Frequency.WEEKLY)
         .dayOfWeek(DayOfWeek.MONDAY)
@@ -82,13 +98,6 @@ class SingleTaskProcessorTest {
         .dueDate(NOW)
         .status(COMPLETED_STATUS)
         .build();
-
-    @MockitoBean
-    private SingleTaskRepository repository;
-    @MockitoBean
-    private TaskMapper mapper;
-    @Autowired
-    private SingleTaskProcessor singleTaskProcessor;
 
     @Test
     void testSupportsWhenTaskExists() {
