@@ -1,6 +1,5 @@
 package ru.calendorny.taskservice;
 
-import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +7,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.kafka.KafkaContainer;
+
 import javax.sql.DataSource;
 
 @TestConfiguration
@@ -18,8 +19,11 @@ public class TestContainersConfiguration {
         .withUsername("testuser")
         .withPassword("testpass");
 
+    private static final KafkaContainer kafkaContainer = new KafkaContainer("apache/kafka:4.0.0");
+
     static {
         postgresContainer.start();
+        kafkaContainer.start();
     }
 
     @DynamicPropertySource
@@ -27,6 +31,8 @@ public class TestContainersConfiguration {
         registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
         registry.add("spring.datasource.username", postgresContainer::getUsername);
         registry.add("spring.datasource.password", postgresContainer::getPassword);
+
+        registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
     }
 
     @Bean
@@ -40,7 +46,7 @@ public class TestContainersConfiguration {
     }
 
     @Bean(initMethod = "afterPropertiesSet")
-    public SpringLiquibase liquibase(DataSource liquibaseDataSource) throws LiquibaseException {
+    public SpringLiquibase liquibase(DataSource liquibaseDataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(liquibaseDataSource);
         liquibase.setChangeLog("classpath:changelog/db-changelog-master.yml");
