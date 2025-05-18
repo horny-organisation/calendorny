@@ -21,7 +21,9 @@ import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.request.CreateTaskRequest;
 import ru.calendorny.taskservice.dto.request.UpdateTaskRequest;
 import ru.calendorny.taskservice.dto.request.UpdateTaskStatusRequest;
+import ru.calendorny.taskservice.dto.response.ApiErrorResponse;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
+import ru.calendorny.taskservice.dto.response.ValidationErrorResponse;
 import ru.calendorny.taskservice.entity.RecurTaskEntity;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
 import ru.calendorny.taskservice.enums.TaskStatus;
@@ -32,7 +34,6 @@ import ru.calendorny.taskservice.util.rrule.RruleCalculator;
 import ru.calendorny.taskservice.util.rrule.RruleConverter;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -79,14 +80,14 @@ public class TaskControllerIntegrationTest {
     private static final CreateTaskRequest createSingleTaskRequest = new CreateTaskRequest(
         "New single task",
         "new single task description",
-        LocalDate.now(ZoneOffset.UTC),
+        LocalDate.now(),
         null
         );
 
     private static final CreateTaskRequest createWeeklyRecurTaskRequest = new CreateTaskRequest(
         "New weekly recur task",
         "new weekly task description",
-        LocalDate.now(ZoneOffset.UTC),
+        LocalDate.now(),
         RruleDto.builder()
             .frequency(RruleDto.Frequency.WEEKLY)
             .dayOfWeek(DayOfWeek.MONDAY)
@@ -96,7 +97,7 @@ public class TaskControllerIntegrationTest {
     private static final CreateTaskRequest createMonthlyRecurTaskRequest = new CreateTaskRequest(
         "New monthly recur task",
         null,
-        LocalDate.now(ZoneOffset.UTC).plusDays(10),
+        LocalDate.now().plusDays(10),
         RruleDto.builder()
             .frequency(RruleDto.Frequency.MONTHLY)
             .dayOfMonth(15)
@@ -106,7 +107,7 @@ public class TaskControllerIntegrationTest {
     private static final UpdateTaskRequest updateSingleTaskRequest = new UpdateTaskRequest(
         "Updated single task",
         "Updated single task description",
-        LocalDate.now(ZoneOffset.UTC),
+        LocalDate.now(),
         TaskStatus.PENDING,
         null
     );
@@ -114,7 +115,7 @@ public class TaskControllerIntegrationTest {
     private static final UpdateTaskRequest updateRecurTaskRequest = new UpdateTaskRequest(
         "Updated recur task",
         "Updated recur task description",
-        LocalDate.now(ZoneOffset.UTC),
+        LocalDate.now(),
         TaskStatus.PENDING,
         RruleDto.builder()
             .frequency(RruleDto.Frequency.WEEKLY)
@@ -123,6 +124,13 @@ public class TaskControllerIntegrationTest {
     );
 
     private static final UpdateTaskStatusRequest updateCompleteTaskStatusRequest = new UpdateTaskStatusRequest(TaskStatus.COMPLETED);
+
+    private static final CreateTaskRequest invalidcreateSingleTaskRequest = new CreateTaskRequest(
+        null,
+        "Desc",
+        LocalDate.now().minusDays(3),
+        null
+    );
 
 
     @BeforeEach
@@ -263,8 +271,8 @@ public class TaskControllerIntegrationTest {
         headers.setBearerAuth(accessToken);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String from = LocalDate.now(ZoneOffset.UTC).toString();
-        String to = LocalDate.now(ZoneOffset.UTC).plusDays(2).toString();
+        String from = LocalDate.now().toString();
+        String to = LocalDate.now().plusDays(2).toString();
 
         ResponseEntity<TaskResponse[]> response = restTemplate.exchange(
             TASK_API_BASE_URL + "?from=" + from + "&to=" + to,
@@ -676,6 +684,78 @@ public class TaskControllerIntegrationTest {
 
         assertTrue(recurTaskRepository.findById(weeklyRecurTaskId).isPresent());
         assertEquals(TaskStatus.CANCELLED, recurTaskRepository.findById(weeklyRecurTaskId).get().getStatus());
+    }
+
+    @Test
+    @Order(16)
+    void testValidationExceptionDuringTaskCreation() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(invalidcreateSingleTaskRequest, headers);
+
+        ResponseEntity<ValidationErrorResponse> response = restTemplate.exchange(
+            TASK_API_BASE_URL,
+            HttpMethod.POST,
+            httpEntity,
+            ValidationErrorResponse.class
+        );
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        ValidationErrorResponse errorResponse = response.getBody();
+
+        assertEquals("Validation failed for uri=" + TASK_API_BASE_URL, errorResponse.description());
+        assertEquals("400", errorResponse.code());
+        assertEquals("MethodArgumentNotValidException", errorResponse.exceptionName());
+        assertEquals("Invalid request data", errorResponse.exceptionMessage());
+
+        assertNotNull(errorResponse.validationErrors());
+        assertEquals(3, errorResponse.validationErrors().size());
+
+        assertTrue(errorResponse.validationErrors().stream()
+            .anyMatch(error ->
+                "title".equals(error.field()) &&
+                "Task's title can not be null".equals(error.message())));
+
+        assertTrue(errorResponse.validationErrors().stream()
+            .anyMatch(error ->
+                "dueDate".equals(error.field()) &&
+                "Task's date can not be in past".equals(error.message())));
+
+        assertTrue(errorResponse.validationErrors().stream()
+            .anyMatch(error ->
+                "title".equals(error.field()) &&
+                "Task's title can not be empty".equals(error.message())));
+
+    }
+
+    @Test
+    void testNotFoundExceptionHandling() {
+        UUID nonExistentTaskId = UUID.randomUUID();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<ApiErrorResponse> response = restTemplate.exchange(
+            TASK_API_BASE_URL + "/" + nonExistentTaskId.toString(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            ApiErrorResponse.class
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+
+        ApiErrorResponse errorResponse = response.getBody();
+        assertNotNull(errorResponse);
+        assertEquals("Task not found", errorResponse.description());
+        assertEquals("404", errorResponse.code());
+        assertEquals("TaskNotFoundException", errorResponse.exceptionName());
+        assertEquals("Task not found", errorResponse.exceptionMessage());
     }
 
 }

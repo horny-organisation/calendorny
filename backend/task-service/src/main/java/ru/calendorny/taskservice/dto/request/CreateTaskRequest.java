@@ -12,8 +12,6 @@ public record CreateTaskRequest (
     @NotBlank(message = "Task's title can not be empty")
     String title,
 
-    @NotNull(message = "Task's description can not be null")
-    @NotBlank(message = "Task's description can not be empty")
     String description,
 
     @NotNull(message = "Task's date can not be null")
