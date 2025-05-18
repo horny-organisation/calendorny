@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202505112352-init-schema
+      author: shcherbanev
+      changes:
+        - sqlFile:
+            path: sql/V202505112352__INIT_SCHEMA.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            endDelimiter: ";"
+            encoding: UTF-8
+
+  - changeSet:
+      id: 202505120126-add-refresh-token-table
+      author: shcherbanev
+      changes:
+        - sqlFile:
+            path: sql/V202505120126__ADD_REFRESH_TOKEN_TABLE.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            endDelimiter: ";"
+            encoding: UTF-8
