@@ -83,7 +83,7 @@ services:
       - kafka-3-data:/var/lib/kafka/data
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka-2:9092 || exit 1" ]
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server kafka-3:9092 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,7 +94,7 @@ services:
     image: postgres:16-alpine
     container_name: task-service-postgres
     ports:
-      - "5437:5432"
+      - "5433:5432"
     env_file:
       - .env
     environment:
@@ -126,12 +126,28 @@ services:
       - ./task-service/db/changelog:/liquibase/changelog
     command:
       [
-        "--url=jdbc:postgresql://task-service-postgres/${TASK_SERVICE_POSTGRES_DB}",
+        "--url=jdbc:postgresql://task-service-postgres:5432/${TASK_SERVICE_POSTGRES_DB}",
         "--username=${TASK_SERVICE_POSTGRES_USER}",
         "--password=${TASK_SERVICE_POSTGRES_PASSWORD}",
         "--changeLogFile=changelog/db-changelog-master.yml",
         "update"
       ]
+    networks:
+      - task-service
+
+  task-service:
+    build:
+      context: ./task-service
+      dockerfile: Dockerfile
+    container_name: task-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - task-service-postgres
+      - task-service-liquibase
+    env_file:
+      - .env
+    restart: unless-stopped
     networks:
       - task-service
 

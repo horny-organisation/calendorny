@@ -4,9 +4,9 @@ spring:
     name: task-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5437/task_service_db
-    username: postgres
-    password: password
+    url: ${TASK_SERVICE_POSTGRES_URL}
+    username: ${TASK_SERVICE_POSTGRES_USER}
+    password: ${TASK_SERVICE_POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,7 +22,7 @@ spring:
     enabled: false
 
   kafka:
-    bootstrap-servers: localhost:9092,localhost:9094,localhost:9095
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -38,3 +38,6 @@ task:
 auth:
   jwt:
     public-key: ${JWT_PUBLIC_KEY}
+    access-token-expiration-minutes: 15
+    refresh-token-expiration-days: 30
+    private-key: ${JWT_PRIVATE_KEY}
