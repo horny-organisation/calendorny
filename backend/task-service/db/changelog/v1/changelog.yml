@@ -1,8 +1,7 @@
 databaseChangeLog:
   - include:
-      file: DDL/V1_2025_05_06_SCHEMA_INITIALIZATION.sql
+      file: "DDL/V1_2025_05_06_SCHEMA_INITIALIZATION.sql"
       relativeToChangelogFile: true
-
   - include:
-      file: DDL/V1_2025_05_14_ADD_INDEXES.sql
+      file: "DDL/V1_2025_05_14_ADD_INDEXES.sql"
       relativeToChangelogFile: true

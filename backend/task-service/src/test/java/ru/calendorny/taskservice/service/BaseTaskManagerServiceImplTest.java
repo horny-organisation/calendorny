@@ -3,8 +3,10 @@ package ru.calendorny.taskservice.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.enums.TaskStatus;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ActiveProfiles(profiles = "test")
+@Import(TestContainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BaseTaskManagerServiceImplTest {
 

@@ -7,7 +7,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import java.time.DayOfWeek;
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles(profiles = "test")
+@Import(TestContainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WeeklyRruleHandlerTest {
 

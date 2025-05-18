@@ -45,23 +45,6 @@ public class JwtService {
             .compact();
     }
 
-    public String generateRefreshToken(String subject) {
-        Instant now = Instant.now();
-        Instant expiry = now.plusSeconds(jwtProperties.refreshTokenExpirationDays() * 24 * 60 * 60L);
-
-        return Jwts.builder()
-            .subject(subject)
-            .issuedAt(Date.from(now))
-            .expiration(Date.from(expiry))
-            .signWith(privateKey, Jwts.SIG.RS256)
-            .compact();
-    }
-
-    public String extractSubject(String token) {
-        Jws<Claims> jws = parser.parseSignedClaims(token);
-        return jws.getPayload().getSubject();
-    }
-
     public Claims extractAllClaims(String token) {
         Jws<Claims> jws = parser.parseSignedClaims(token);
         return jws.getPayload();

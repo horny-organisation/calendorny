@@ -1,5 +1,3 @@
-CREATE TYPE task_status_enum AS ENUM ('PENDING', 'COMPLETED', 'CANCELLED');
-
 CREATE TABLE single_tasks
 (
     id          UUID PRIMARY KEY,
@@ -7,7 +5,7 @@ CREATE TABLE single_tasks
     title       VARCHAR(255),
     description TEXT,
     due_date    DATE,
-    status      task_status_enum,
+    status      VARCHAR,
     -----------------------------------------------------------
     CONSTRAINT tasks_user_id_nn CHECK (user_id IS NOT NULL),
     CONSTRAINT tasks_title_nn CHECK (title IS NOT NULL),
@@ -21,7 +19,7 @@ CREATE TABLE recurrence_tasks
     user_id     UUID,
     title       VARCHAR(255),
     description TEXT,
-    status      task_status_enum,
+    status      VARCHAR,
     rrule       VARCHAR(255),
     next_date   DATE,
     --------------------------------------------------------------------
