@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import ru.calendorny.authservice.config.JwtProperties;
 
@@ -37,12 +38,12 @@ public class JwtService {
         Instant expiry = now.plusSeconds(jwtProperties.accessTokenExpirationMinutes() * 60L);
 
         return Jwts.builder()
-                .claims(claims)
-                .subject(subject)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(expiry))
-                .signWith(privateKey, Jwts.SIG.RS256)
-                .compact();
+            .claims(claims)
+            .subject(subject)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expiry))
+            .signWith(privateKey, Jwts.SIG.RS256)
+            .compact();
     }
 
     public String generateRefreshToken(String subject) {
@@ -50,11 +51,12 @@ public class JwtService {
         Instant expiry = now.plusSeconds(jwtProperties.refreshTokenExpirationDays() * 24L * 60L * 60L);
 
         return Jwts.builder()
-                .subject(subject)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(expiry))
-                .signWith(privateKey, Jwts.SIG.RS256)
-                .compact();
+            .subject(subject)
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expiry))
+            .claim("jti", UUID.randomUUID().toString())
+            .signWith(privateKey, Jwts.SIG.RS256)
+            .compact();
     }
 
     public String extractSubject(String token) {
