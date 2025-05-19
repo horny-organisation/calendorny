@@ -40,6 +40,8 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
+    volumes:
+      - db-auth-data:/var/lib/postgresql/data
     networks:
       - auth-network
 
@@ -60,6 +62,9 @@ services:
       - update
     networks:
       - auth-network
+
+volumes:
+  db-auth-data:
 
 networks:
   backend:
