@@ -15,8 +15,8 @@ COMMENT ON COLUMN accounts.created_at IS 'Do not write about commenting columns 
 CREATE TABLE profiles
 (
     user_id      UUID PRIMARY KEY REFERENCES accounts (id),
-    first_name   VARCHAR(100) NOT NULL,
-    last_name    VARCHAR(100) NOT NULL,
+    first_name   VARCHAR(100),
+    last_name    VARCHAR(100),
     birth_date   DATE,
     phone_number VARCHAR(20),
     telegram     VARCHAR(100),
