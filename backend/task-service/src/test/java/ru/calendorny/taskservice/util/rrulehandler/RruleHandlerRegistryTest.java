@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util.rrule;
+package ru.calendorny.taskservice.util.rrulehandler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
+import ru.calendorny.taskservice.util.rrulehandler.MonthlyRruleHandler;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandler;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
+import ru.calendorny.taskservice.util.rrulehandler.WeeklyRruleHandler;
 
 import java.util.Arrays;
 import java.util.List;

@@ -8,18 +8,12 @@ import ru.calendorny.taskservice.enums.TaskStatus;
 
 @Builder
 public record TaskResponse(
-
     UUID id,
-
     UUID userId,
-
     String title,
-
     String description,
-
     LocalDate dueDate,
-
     TaskStatus status,
-
     RruleDto recurrenceRule
-) {}
+) {
+}

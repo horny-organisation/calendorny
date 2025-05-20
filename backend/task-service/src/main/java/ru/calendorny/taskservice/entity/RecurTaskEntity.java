@@ -16,10 +16,10 @@ import org.hibernate.annotations.UuidGenerator;
 import ru.calendorny.taskservice.enums.TaskStatus;
 
 @Data
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "recurrence_tasks")
 public class RecurTaskEntity {
 

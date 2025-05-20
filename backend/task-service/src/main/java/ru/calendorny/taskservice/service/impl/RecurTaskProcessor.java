@@ -43,62 +43,69 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     @Override
     public TaskResponse getTask(UUID taskId) {
-        return repository.findById(taskId).map(mapper::fromRecurTaskToResponse).orElseThrow(TaskNotFoundException::new);
+        return repository.findById(taskId)
+            .map(mapper::fromRecurTaskToResponse)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
     }
 
     @Override
-    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
+    public TaskResponse createTask(UUID userId, String title, String description, LocalDate dueDate, RruleDto rruleDto) {
         if (rruleDto == null) {
             throw new IllegalStateException("Can't update RecurTask without recurrence rule");
         }
         RecurTaskEntity newTask = RecurTaskEntity.builder()
-                .title(title)
-                .description(desc)
-                .userId(userId)
-                .nextDate(date)
-                .rrule(rruleConverter.toRruleString(rruleDto))
-                .status(TaskStatus.PENDING)
-                .build();
+            .userId(userId)
+            .title(title)
+            .description(description)
+            .nextDate(dueDate)
+            .rrule(rruleConverter.toRruleString(rruleDto))
+            .status(TaskStatus.PENDING)
+            .build();
 
         RecurTaskEntity savedTask = repository.save(newTask);
+
         return mapper.fromRecurTaskToResponse(savedTask);
     }
 
     @Override
-    public TaskResponse updateTask(
-            UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse updateTask(UUID taskId, String title, String description, LocalDate dueDate,
+                                   TaskStatus status, RruleDto rruleDto) {
         if (rruleDto == null) {
             throw new IllegalStateException("Can't update RecurTask without recurrence rule");
         }
         String rruleString = rruleConverter.toRruleString(rruleDto);
-        RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        RecurTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
         task.setTitle(title);
-        task.setDescription(desc);
+        task.setDescription(description);
         task.setStatus(status);
         task.setRrule(rruleString);
-        task.setNextDate(date);
-
+        task.setNextDate(dueDate);
         RecurTaskEntity savedTask = repository.save(task);
         return mapper.fromRecurTaskToResponse(savedTask);
     }
 
     @Override
     public void deleteTask(UUID taskId) {
-
-        RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        RecurTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
         task.setStatus(TaskStatus.CANCELLED);
         repository.save(task);
     }
 
     @Override
     public TaskResponse updateStatus(UUID taskId, TaskStatus status) {
-        RecurTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        RecurTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
+
         LocalDate prevDate = task.getNextDate();
-        if (status.equals(TaskStatus.COMPLETED)) {
+        if (status == TaskStatus.COMPLETED) {
             singleTaskHelper.createCompletedSingleTask(
-                    task.getTitle(), task.getDescription(), task.getUserId(), prevDate);
+                task.getTitle(), task.getDescription(), task.getUserId(), prevDate);
+            task.setNextDate(rruleCalculator.findNextDate(task.getRrule(), prevDate));
+        } else if (status == TaskStatus.CANCELLED) {
+            task.setStatus(TaskStatus.CANCELLED);
         }
-        task.setNextDate(rruleCalculator.findNextDate(task.getRrule(), prevDate));
         RecurTaskEntity savedTask = repository.save(task);
         return mapper.fromRecurTaskToResponse(savedTask);
     }
@@ -110,14 +117,17 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     @Override
     public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
-
         List<RecurTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
-        return tasks.stream().map(mapper::fromRecurTaskToResponse).toList();
+        return tasks.stream()
+            .map(mapper::fromRecurTaskToResponse)
+            .toList();
     }
 
     @Override
     public List<TaskResponse> getPendingTasksByDate(LocalDate date) {
         List<RecurTaskEntity> tasks = repository.findAllPendingByNextDate(date);
-        return tasks.stream().map(mapper::fromRecurTaskToResponse).toList();
+        return tasks.stream()
+            .map(mapper::fromRecurTaskToResponse)
+            .toList();
     }
 }

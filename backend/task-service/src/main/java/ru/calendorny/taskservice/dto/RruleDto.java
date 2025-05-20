@@ -5,12 +5,11 @@ import lombok.Builder;
 
 
 @Builder
-public record RruleDto (Frequency frequency,
-
+public record RruleDto(
+    Frequency frequency,
     DayOfWeek dayOfWeek,
-
-    Integer dayOfMonth){
-
+    Integer dayOfMonth
+) {
     public enum Frequency {
         WEEKLY,
         MONTHLY

@@ -54,7 +54,7 @@ class BaseTaskManagerServiceImplTest {
         .build();
 
     @Test
-    void getTask_shouldReturnTaskWhenFound() {
+    void testGetTaskSuccess() {
         when(recurTaskProcessor.supports(taskId)).thenReturn(true);
         when(recurTaskProcessor.getTask(taskId)).thenReturn(taskResponse);
 
@@ -66,7 +66,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void getTask_shouldThrowExceptionWhenTaskNotFound() {
+    void testGetTaskWhenTaskNotFound() {
         when(singleTaskProcessor.supports(taskId)).thenReturn(false);
         when(recurTaskProcessor.supports(taskId)).thenReturn(false);
 
@@ -74,7 +74,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void createTask_shouldUseSingleTaskProcessorWhenNoRecurrence() {
+    void testCreateTaskUseSingleTaskProcessor() {
         when(singleTaskProcessor.supportsRecurTask(false)).thenReturn(true);
         when(singleTaskProcessor.createTask(userId, title, description, date, null))
             .thenReturn(taskResponse);
@@ -87,7 +87,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void createTask_shouldUseRecurTaskProcessorWhenRecurrenceExists() {
+    void testCreateTaskUseRecurTaskProcessor() {
         when(recurTaskProcessor.supportsRecurTask(true)).thenReturn(true);
         when(recurTaskProcessor.createTask(userId, title, description, date, rruleDto))
             .thenReturn(taskResponse);
@@ -100,7 +100,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void createTask_shouldThrowExceptionWhenNoSuitableProcessorFound() {
+    void testCreateTaskNoProcessorFound() {
         when(singleTaskProcessor.supportsRecurTask(true)).thenReturn(false);
         when(recurTaskProcessor.supportsRecurTask(true)).thenReturn(false);
 
@@ -109,7 +109,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void updateTask_shouldUpdateWithSameProcessorWhenRecurrenceNotChanged() {
+    void testUpdateTaskWhenRecurrenceNotChanged() {
         when(recurTaskProcessor.supports(taskId)).thenReturn(true);
         when(recurTaskProcessor.supportsRecurTask(true)).thenReturn(true);
         when(recurTaskProcessor.updateTask(taskId, title, description, date, TaskStatus.PENDING, rruleDto))
@@ -124,8 +124,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void updateTask_shouldSwitchProcessorWhenRecurrenceChanged() {
-        // Current processor is single task processor
+    void testUpdateTaskWhenRecurrenceChanged() {
         when(singleTaskProcessor.supports(taskId)).thenReturn(true);
         when(recurTaskProcessor.supportsRecurTask(true)).thenReturn(true);
         when(recurTaskProcessor.createTask(userId, title, description, date, rruleDto))
@@ -140,7 +139,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void deleteTask_shouldCallProcessorDeleteMethod() {
+    void testDeleteTaskSuccess() {
         when(singleTaskProcessor.supports(taskId)).thenReturn(true);
         doNothing().when(singleTaskProcessor).deleteTask(taskId);
 
@@ -151,7 +150,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void updateStatus_shouldCallProcessorUpdateStatusMethod() {
+    void testUpdateStatusSuccess() {
         when(recurTaskProcessor.supports(taskId)).thenReturn(true);
         when(recurTaskProcessor.updateStatus(taskId, TaskStatus.COMPLETED))
             .thenReturn(taskResponse);
@@ -164,7 +163,7 @@ class BaseTaskManagerServiceImplTest {
     }
 
     @Test
-    void getTasksByDateRange_shouldCombineResultsFromAllProcessors() {
+    void testGetTasksByDateRangeCombineResultsFromAllProcessors() {
         when(singleTaskProcessor.getTasksByDateRange(userId, date, date.plusDays(1)))
             .thenReturn(List.of(taskResponse));
         when(recurTaskProcessor.getTasksByDateRange(userId, date, date.plusDays(1)))

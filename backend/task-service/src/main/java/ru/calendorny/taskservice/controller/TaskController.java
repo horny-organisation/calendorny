@@ -3,9 +3,7 @@ package ru.calendorny.taskservice.controller;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import ru.calendorny.taskservice.api.TaskApi;
 import ru.calendorny.taskservice.dto.request.CreateTaskRequest;
@@ -22,16 +20,21 @@ public class TaskController implements TaskApi {
     private final TaskManagerService taskManagerService;
 
     @Override
-    public TaskResponse createTask(CreateTaskRequest request, AuthenticatedUser authenticatedUser) {
+    public TaskResponse createTask(CreateTaskRequest createTaskRequest, AuthenticatedUser authenticatedUser) {
         UUID userId = authenticatedUser.id();
         return taskManagerService.createTask(
-            userId, request.title(), request.description(), request.dueDate(), request.rrule());
+            userId,
+            createTaskRequest.title(),
+            createTaskRequest.description(),
+            createTaskRequest.dueDate(),
+            createTaskRequest.rrule()
+        );
     }
 
     @Override
-    public List<TaskResponse> getTasksByDateRange(LocalDate from, LocalDate to, AuthenticatedUser authenticatedUser) {
+    public List<TaskResponse> getTasksByDateRange(LocalDate fromDate, LocalDate toDate, AuthenticatedUser authenticatedUser) {
         UUID userId = authenticatedUser.id();
-        return taskManagerService.getTasksByDateRange(userId, from, to);
+        return taskManagerService.getTasksByDateRange(userId, fromDate, toDate);
     }
 
     @Override
@@ -40,16 +43,17 @@ public class TaskController implements TaskApi {
     }
 
     @Override
-    public TaskResponse updateTask(UUID taskId, UpdateTaskRequest request, AuthenticatedUser authenticatedUser) {
+    public TaskResponse updateTask(UUID taskId, UpdateTaskRequest updateTaskRequest, AuthenticatedUser authenticatedUser) {
         UUID userId = authenticatedUser.id();
         return taskManagerService.updateTask(
             taskId,
             userId,
-            request.title(),
-            request.description(),
-            request.dueDate(),
-            request.status(),
-            request.rrule());
+            updateTaskRequest.title(),
+            updateTaskRequest.description(),
+            updateTaskRequest.dueDate(),
+            updateTaskRequest.status(),
+            updateTaskRequest.rrule()
+        );
     }
 
     @Override
@@ -58,7 +62,8 @@ public class TaskController implements TaskApi {
     }
 
     @Override
-    public TaskResponse updateTaskStatus(UUID taskId, UpdateTaskStatusRequest request, AuthenticatedUser authenticatedUser) {
-        return taskManagerService.updateStatus(taskId, request.status());
+    public TaskResponse updateTaskStatus(UUID taskId, UpdateTaskStatusRequest updateTaskStatusRequest,
+                                         AuthenticatedUser authenticatedUser) {
+        return taskManagerService.updateStatus(taskId, updateTaskStatusRequest.status());
     }
 }

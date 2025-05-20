@@ -21,7 +21,10 @@ public class BaseTaskManagerServiceImpl implements TaskManagerService {
     private final List<TaskProcessor> processors;
 
     private TaskProcessor getProcessor(UUID taskId) {
-        return processors.stream().filter(p -> p.supports(taskId)).findFirst().orElseThrow(TaskNotFoundException::new);
+        return processors.stream()
+            .filter(p -> p.supports(taskId))
+            .findFirst()
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
     }
 
     @Override
@@ -30,25 +33,24 @@ public class BaseTaskManagerServiceImpl implements TaskManagerService {
     }
 
     @Override
-    public TaskResponse updateTask(
-            UUID taskId, UUID userId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse updateTask(UUID taskId, UUID userId, String title, String description, LocalDate dueDate,
+                                   TaskStatus status, RruleDto rruleDto) {
 
         TaskProcessor currentProcessor = getProcessor(taskId);
-
         boolean shouldBeRecur = rruleDto != null;
         boolean isCurrentlyRecur = currentProcessor.supportsRecurTask(true);
 
         if (shouldBeRecur != isCurrentlyRecur) {
-            currentProcessor.hardDeleteTask(taskId);
 
+            currentProcessor.hardDeleteTask(taskId);
             TaskProcessor newProcessor = processors.stream()
                     .filter(p -> p.supportsRecurTask(shouldBeRecur))
                     .findFirst()
                     .orElseThrow(TaskProcessorException::new);
 
-            return newProcessor.createTask(userId, title, desc, date, rruleDto);
+            return newProcessor.createTask(userId, title, description, dueDate, rruleDto);
         }
-        return currentProcessor.updateTask(taskId, title, desc, date, status, rruleDto);
+        return currentProcessor.updateTask(taskId, title, description, dueDate, status, rruleDto);
     }
 
     @Override
@@ -62,22 +64,22 @@ public class BaseTaskManagerServiceImpl implements TaskManagerService {
     }
 
     @Override
-    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
+    public TaskResponse createTask(UUID userId, String title, String description, LocalDate dueDate, RruleDto rruleDto) {
 
         TaskProcessor currentProcessor = processors.stream()
                 .filter(p -> p.supportsRecurTask(rruleDto != null))
                 .findFirst()
                 .orElseThrow(TaskProcessorException::new);
 
-        return currentProcessor.createTask(userId, title, desc, date, rruleDto);
+        return currentProcessor.createTask(userId, title, description, dueDate, rruleDto);
     }
 
     @Override
-    public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate from, LocalDate to) {
+    public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
 
         List<TaskResponse> tasks = new ArrayList<>();
         for (TaskProcessor processor : processors) {
-            tasks.addAll(processor.getTasksByDateRange(userId, from, to));
+            tasks.addAll(processor.getTasksByDateRange(userId, fromDate, toDate));
         }
         return tasks;
     }

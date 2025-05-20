@@ -65,11 +65,17 @@ public class TaskControllerIntegrationTest {
 
     private String accessToken;
 
+    private HttpHeaders httpHeaders;
+
     private static UUID singleTaskId;
 
     private static UUID weeklyRecurTaskId;
 
     private static UUID monthlyRecurTaskId;
+
+    private static String taskIdBaseUrl = "/api/v1/tasks/%s";
+
+    private static String taskStatusBaseUrl = "/api/v1/tasks/%s/status";
 
     private static final String TASK_API_BASE_URL = "/api/v1/tasks";
 
@@ -126,7 +132,7 @@ public class TaskControllerIntegrationTest {
     private static final UpdateTaskStatusRequest updateCompleteTaskStatusRequest = new UpdateTaskStatusRequest(
         TaskStatus.COMPLETED);
 
-    private static final CreateTaskRequest invalidcreateSingleTaskRequest = new CreateTaskRequest(
+    private static final CreateTaskRequest invalidCreateSingleTaskRequest = new CreateTaskRequest(
         null,
         "Desc",
         LocalDate.now().minusDays(3),
@@ -142,16 +148,17 @@ public class TaskControllerIntegrationTest {
                 "email", USER_EMAIL,
                 "id", USER_ID)
         );
+
+        httpHeaders = new HttpHeaders();
+        httpHeaders.setBearerAuth(accessToken);
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 
     @Test
     @Order(1)
     void testCreateTaskWithSingleTaskRequestSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createSingleTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createSingleTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -186,11 +193,7 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(2)
     void testCreateTaskWithWeeklyTaskRequestSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createWeeklyRecurTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createWeeklyRecurTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -227,11 +230,7 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(3)
     void testCreateTaskWithMonthlyTaskRequestSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createMonthlyRecurTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(createMonthlyRecurTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -268,17 +267,13 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(4)
     void testGetTasksByDateRangeSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         String from = LocalDate.now().toString();
         String to = LocalDate.now().plusDays(2).toString();
 
         ResponseEntity<TaskResponse[]> response = restTemplate.exchange(
             TASK_API_BASE_URL + "?from=" + from + "&to=" + to,
             HttpMethod.GET,
-            new HttpEntity<>(headers),
+            new HttpEntity<>(httpHeaders),
             TaskResponse[].class
         );
 
@@ -301,14 +296,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(5)
     void testGetIdWithSingleTaskSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         ResponseEntity<TaskResponse> getResponse = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + singleTaskId.toString(),
+            taskIdBaseUrl.formatted(singleTaskId),
             HttpMethod.GET,
-            new HttpEntity<>(headers),
+            new HttpEntity<>(httpHeaders),
             TaskResponse.class
         );
 
@@ -327,14 +318,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(6)
     void testGetIdWithWeeklyRecurTaskSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         ResponseEntity<TaskResponse> getResponse = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + weeklyRecurTaskId.toString(),
+            taskIdBaseUrl.formatted(weeklyRecurTaskId),
             HttpMethod.GET,
-            new HttpEntity<>(headers),
+            new HttpEntity<>(httpHeaders),
             TaskResponse.class
         );
 
@@ -353,14 +340,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(7)
     void testGetIdWithMonthlyRecurTaskSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         ResponseEntity<TaskResponse> getResponse = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + monthlyRecurTaskId.toString(),
+            taskIdBaseUrl.formatted(monthlyRecurTaskId),
             HttpMethod.GET,
-            new HttpEntity<>(headers),
+            new HttpEntity<>(httpHeaders),
             TaskResponse.class
         );
 
@@ -379,14 +362,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(8)
     void testUpdateTaskFromSingleToSingleSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateSingleTaskRequest, headers);
+        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateSingleTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + singleTaskId.toString(),
+            taskIdBaseUrl.formatted(singleTaskId),
             HttpMethod.PUT,
             httpEntity,
             TaskResponse.class
@@ -419,14 +398,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(9)
     void testUpdateTaskFromRecurToRecurSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateRecurTaskRequest, headers);
+        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateRecurTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + monthlyRecurTaskId.toString(),
+            taskIdBaseUrl.formatted(monthlyRecurTaskId),
             HttpMethod.PUT,
             httpEntity,
             TaskResponse.class
@@ -460,14 +435,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(10)
     void testUpdateTaskFromSingleToRecurSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateRecurTaskRequest, headers);
+        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateRecurTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + singleTaskId.toString(),
+            taskIdBaseUrl.formatted(singleTaskId),
             HttpMethod.PUT,
             httpEntity,
             TaskResponse.class
@@ -500,14 +471,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(11)
     void testUpdateTaskFromRecurToSingleSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateSingleTaskRequest, headers);
+        HttpEntity<UpdateTaskRequest> httpEntity = new HttpEntity<>(updateSingleTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + monthlyRecurTaskId.toString(),
+            taskIdBaseUrl.formatted(monthlyRecurTaskId),
             HttpMethod.PUT,
             httpEntity,
             TaskResponse.class
@@ -539,11 +506,7 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(12)
     void testUpdateSingleTaskStatusRequest() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<CreateTaskRequest> createHttpEntity = new HttpEntity<>(createSingleTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> createHttpEntity = new HttpEntity<>(createSingleTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> createResponse = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -554,10 +517,10 @@ public class TaskControllerIntegrationTest {
 
         UUID taskId = createResponse.getBody().id();
 
-        HttpEntity<UpdateTaskStatusRequest> updateHttpEntity = new HttpEntity<>(updateCompleteTaskStatusRequest, headers);
+        HttpEntity<UpdateTaskStatusRequest> updateHttpEntity = new HttpEntity<>(updateCompleteTaskStatusRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + taskId.toString() + "/status",
+            taskStatusBaseUrl.formatted(taskId),
             HttpMethod.PATCH,
             updateHttpEntity,
             TaskResponse.class
@@ -589,11 +552,7 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(13)
     void testUpdateRecurTaskStatusRequest() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<CreateTaskRequest> createHttpEntity = new HttpEntity<>(createWeeklyRecurTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> createHttpEntity = new HttpEntity<>(createWeeklyRecurTaskRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> createResponse = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -604,10 +563,10 @@ public class TaskControllerIntegrationTest {
 
         UUID taskId = createResponse.getBody().id();
 
-        HttpEntity<UpdateTaskStatusRequest> updateHttpEntity = new HttpEntity<>(updateCompleteTaskStatusRequest, headers);
+        HttpEntity<UpdateTaskStatusRequest> updateHttpEntity = new HttpEntity<>(updateCompleteTaskStatusRequest, httpHeaders);
 
         ResponseEntity<TaskResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + taskId.toString() + "/status",
+            taskStatusBaseUrl.formatted(taskId),
             HttpMethod.PATCH,
             updateHttpEntity,
             TaskResponse.class
@@ -644,14 +603,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(14)
     void testDeleteSingleTaskSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(httpHeaders);
 
         ResponseEntity<Void> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + singleTaskId,
+            taskIdBaseUrl.formatted(singleTaskId),
             HttpMethod.DELETE,
             httpEntity,
             Void.TYPE
@@ -667,14 +622,10 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(15)
     void testDeleteRecurTaskSuccess() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(httpHeaders);
 
         ResponseEntity<Void> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + weeklyRecurTaskId,
+            taskIdBaseUrl.formatted(weeklyRecurTaskId),
             HttpMethod.DELETE,
             httpEntity,
             Void.TYPE
@@ -690,11 +641,7 @@ public class TaskControllerIntegrationTest {
     @Test
     @Order(16)
     void testValidationExceptionDuringTaskCreation() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(invalidcreateSingleTaskRequest, headers);
+        HttpEntity<CreateTaskRequest> httpEntity = new HttpEntity<>(invalidCreateSingleTaskRequest, httpHeaders);
 
         ResponseEntity<ValidationErrorResponse> response = restTemplate.exchange(
             TASK_API_BASE_URL,
@@ -708,10 +655,8 @@ public class TaskControllerIntegrationTest {
 
         ValidationErrorResponse errorResponse = response.getBody();
 
-        assertEquals("Validation failed for uri=" + TASK_API_BASE_URL, errorResponse.description());
-        assertEquals("400", errorResponse.code());
+        assertEquals(400, errorResponse.code());
         assertEquals("MethodArgumentNotValidException", errorResponse.exceptionName());
-        assertEquals("Invalid request data", errorResponse.exceptionMessage());
 
         assertNotNull(errorResponse.validationErrors());
         assertEquals(3, errorResponse.validationErrors().size());
@@ -737,14 +682,10 @@ public class TaskControllerIntegrationTest {
     void testNotFoundExceptionHandling() {
         UUID nonExistentTaskId = UUID.randomUUID();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
         ResponseEntity<ApiErrorResponse> response = restTemplate.exchange(
-            TASK_API_BASE_URL + "/" + nonExistentTaskId.toString(),
+            taskIdBaseUrl.formatted(nonExistentTaskId),
             HttpMethod.GET,
-            new HttpEntity<>(headers),
+            new HttpEntity<>(httpHeaders),
             ApiErrorResponse.class
         );
 
@@ -753,10 +694,9 @@ public class TaskControllerIntegrationTest {
 
         ApiErrorResponse errorResponse = response.getBody();
         assertNotNull(errorResponse);
-        assertEquals("Task not found", errorResponse.description());
-        assertEquals("404", errorResponse.code());
+        assertEquals(404, errorResponse.code());
         assertEquals("TaskNotFoundException", errorResponse.exceptionName());
-        assertEquals("Task not found", errorResponse.exceptionMessage());
+        assertEquals("Task with id: %s not found".formatted(nonExistentTaskId), errorResponse.exceptionMessage());
     }
 
 }

@@ -34,10 +34,17 @@ public class DailyKafkaProducerTask {
     public void runAtMidnightUTC() {
 
         List<TaskResponse> singleTasks = singleTaskProcessor.getPendingTasksByDate(LocalDate.now(ZoneOffset.UTC));
-        singleTasks.stream().map(mapper::fromResponseToEvent).forEach(kafkaTaskEventProducer::send);
+
+        singleTasks.stream()
+            .map(mapper::fromResponseToEvent)
+            .forEach(kafkaTaskEventProducer::send);
 
         List<TaskResponse> recurTasks = recurTaskProcessor.getPendingTasksByDate(LocalDate.now(ZoneOffset.UTC));
-        recurTasks.stream().map(mapper::fromResponseToEvent).forEach(kafkaTaskEventProducer::send);
+
+        recurTasks.stream()
+            .map(mapper::fromResponseToEvent)
+            .forEach(kafkaTaskEventProducer::send);
+
         recurTasks.forEach(t -> {
             singleTaskProcessor.createTask(t.userId(), t.title(), t.description(), t.dueDate(), null);
             String rruleString = rruleConverter.toRruleString(t.recurrenceRule());

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import ru.calendorny.taskservice.dto.RruleDto;
 
-public record CreateTaskRequest (
+public record CreateTaskRequest(
 
     @NotNull(message = "Task's title can not be null")
     @NotBlank(message = "Task's title can not be empty")
@@ -19,4 +19,5 @@ public record CreateTaskRequest (
     LocalDate dueDate,
 
     RruleDto rrule
-) {}
+) {
+}

@@ -1,7 +1,6 @@
-package ru.calendorny.taskservice.util.rrule;
+package ru.calendorny.taskservice.util.rrulehandler;
 
 import ru.calendorny.taskservice.dto.RruleDto;
-import ru.calendorny.taskservice.exception.InvalidRruleException;
 
 public interface RruleHandler {
 
@@ -11,7 +10,7 @@ public interface RruleHandler {
 
     void setToDto(String key, String value, RruleDto.RruleDtoBuilder rruleDtoBuilder);
 
-    void validate(RruleDto rruleDto) throws InvalidRruleException;
+    void validate(RruleDto rruleDto);
 
-    void validateRruleString(String rruleString) throws InvalidRruleException;
+    void validateRruleString(String rruleString);
 }

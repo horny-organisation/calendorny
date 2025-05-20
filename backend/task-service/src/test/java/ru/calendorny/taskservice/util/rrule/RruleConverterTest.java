@@ -9,6 +9,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
+import ru.calendorny.taskservice.util.rrulehandler.WeeklyRruleHandler;
 
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;

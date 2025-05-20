@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.enums.TaskStatus;
 
-public record UpdateTaskRequest (
+public record UpdateTaskRequest(
 
     @NotNull(message = "Task's title can not be null")
     @NotBlank(message = "Task's title can not be empty")
@@ -22,5 +22,6 @@ public record UpdateTaskRequest (
     @NotNull(message = "Task's status can not be null")
     TaskStatus status,
 
-     RruleDto rrule
-){}
+    RruleDto rrule
+) {
+}

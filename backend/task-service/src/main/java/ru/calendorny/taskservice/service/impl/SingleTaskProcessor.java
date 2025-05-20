@@ -34,55 +34,59 @@ public class SingleTaskProcessor implements TaskProcessor {
 
     @Override
     public TaskResponse getTask(UUID taskId) {
-        return repository
-                .findById(taskId)
-                .map(mapper::fromSingleTaskToResponse)
-                .orElseThrow(TaskNotFoundException::new);
+        return repository.findById(taskId)
+            .map(mapper::fromSingleTaskToResponse)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
     }
 
     @Override
-    public TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto) {
+    public TaskResponse createTask(UUID userId, String title, String description, LocalDate dueDate, RruleDto rruleDto) {
         if (rruleDto != null) {
             throw new IllegalArgumentException("SingleTask cannot have recurrence rule");
         }
         SingleTaskEntity newTask = SingleTaskEntity.builder()
-                .title(title)
-                .description(desc)
-                .userId(userId)
-                .dueDate(date)
-                .status(TaskStatus.PENDING)
-                .build();
+            .title(title)
+            .description(description)
+            .userId(userId)
+            .dueDate(dueDate)
+            .status(TaskStatus.PENDING)
+            .build();
 
         SingleTaskEntity savedTask = repository.save(newTask);
+
         return mapper.fromSingleTaskToResponse(savedTask);
     }
 
     @Override
-    public TaskResponse updateTask(
-            UUID taskId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto) {
+    public TaskResponse updateTask(UUID taskId, String title, String description, LocalDate dueDate,
+                                   TaskStatus status, RruleDto rruleDto) {
         if (rruleDto != null) {
             throw new IllegalArgumentException("Can't update SingleTask with recurrence rule");
         }
-        SingleTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        SingleTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
         task.setTitle(title);
-        task.setDescription(desc);
-        task.setDueDate(date);
+        task.setDescription(description);
+        task.setDueDate(dueDate);
         task.setStatus(status);
 
         SingleTaskEntity savedTask = repository.save(task);
+
         return mapper.fromSingleTaskToResponse(savedTask);
     }
 
     @Override
     public void deleteTask(UUID taskId) {
-        SingleTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        SingleTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
         task.setStatus(TaskStatus.CANCELLED);
         repository.save(task);
     }
 
     @Override
     public TaskResponse updateStatus(UUID taskId, TaskStatus status) {
-        SingleTaskEntity task = repository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        SingleTaskEntity task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(taskId));
         task.setStatus(status);
         SingleTaskEntity savedTask = repository.save(task);
         return mapper.fromSingleTaskToResponse(savedTask);
@@ -96,12 +100,16 @@ public class SingleTaskProcessor implements TaskProcessor {
     @Override
     public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
         List<SingleTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
-        return tasks.stream().map(mapper::fromSingleTaskToResponse).toList();
+        return tasks.stream()
+            .map(mapper::fromSingleTaskToResponse)
+            .toList();
     }
 
     @Override
     public List<TaskResponse> getPendingTasksByDate(LocalDate date) {
         List<SingleTaskEntity> tasks = repository.findAllPendingByDueDate(date);
-        return tasks.stream().map(mapper::fromSingleTaskToResponse).toList();
+        return tasks.stream()
+            .map(mapper::fromSingleTaskToResponse)
+            .toList();
     }
 }

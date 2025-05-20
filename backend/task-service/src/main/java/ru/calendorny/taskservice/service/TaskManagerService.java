@@ -9,14 +9,14 @@ import ru.calendorny.taskservice.enums.TaskStatus;
 
 public interface TaskManagerService {
 
-    TaskResponse createTask(UUID userId, String title, String desc, LocalDate date, RruleDto rruleDto);
+    TaskResponse createTask(UUID userId, String title, String description, LocalDate dueDate, RruleDto rruleDto);
 
-    List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate from, LocalDate to);
+    List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate);
 
     TaskResponse getTask(UUID taskId);
 
-    TaskResponse updateTask(
-            UUID taskId, UUID userId, String title, String desc, LocalDate date, TaskStatus status, RruleDto rruleDto);
+    TaskResponse updateTask(UUID taskId, UUID userId, String title, String description, LocalDate dueDate,
+                            TaskStatus status, RruleDto rruleDto);
 
     void deleteTask(UUID taskId);
 

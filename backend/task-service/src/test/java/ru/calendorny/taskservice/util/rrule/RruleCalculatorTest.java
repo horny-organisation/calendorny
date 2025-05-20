@@ -12,6 +12,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.exception.RruleParsingException;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;

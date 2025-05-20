@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import ru.calendorny.taskservice.dto.response.ApiErrorResponse;
-import ru.calendorny.taskservice.dto.response.ValidationError;
 import ru.calendorny.taskservice.dto.response.ValidationErrorResponse;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.exception.TaskProcessorException;
@@ -22,10 +21,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationException(
-        MethodArgumentNotValidException ex, WebRequest request) {
+        MethodArgumentNotValidException ex, WebRequest webRequest) {
 
-        List<ValidationError> validationErrors = ex.getBindingResult().getFieldErrors().stream()
-            .map(fieldError -> ValidationError.builder()
+        List<ValidationErrorResponse.ValidationError> validationErrors = ex.getBindingResult().getFieldErrors().stream()
+            .map(fieldError -> ValidationErrorResponse.ValidationError.builder()
                 .field(fieldError.getField())
                 .message(fieldError.getDefaultMessage())
                 .build())
@@ -36,67 +35,40 @@ public class GlobalExceptionHandler {
                 {}
                 Errors: {}
                 Stack trace: {}""",
-            request.getDescription(false),
+            webRequest.getDescription(false),
             validationErrors,
             getFormattedStackTrace(ex));
 
-        ValidationErrorResponse response = ValidationErrorResponse.builder()
-            .description("Validation failed for " + request.getDescription(false))
-            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+        ValidationErrorResponse validationErrorResponse = ValidationErrorResponse.builder()
+            .code(HttpStatus.BAD_REQUEST.value())
             .exceptionName(ex.getClass().getSimpleName())
-            .exceptionMessage("Invalid request data")
+            .exceptionMessage(ex.getMessage())
             .validationErrors(validationErrors)
             .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationErrorResponse);
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleTaskNotFoundException(
-        TaskNotFoundException ex, WebRequest request) {
+        TaskNotFoundException ex, WebRequest webRequest) {
 
         log.error("""
                 Task not found:
                 {}
                 Error: {}
                 Stack trace: {}""",
-            request.getDescription(false),
+            webRequest.getDescription(false),
             ex.getMessage(),
             getFormattedStackTrace(ex));
 
-        ApiErrorResponse response = ApiErrorResponse.builder()
-            .description("Task not found")
-            .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+            .code(HttpStatus.NOT_FOUND.value())
             .exceptionName(ex.getClass().getSimpleName())
             .exceptionMessage(ex.getMessage())
             .build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(TaskProcessorException.class)
-    public ResponseEntity<ApiErrorResponse> handleTaskProcessorException(
-        TaskProcessorException ex, WebRequest request) {
-
-        log.error("""
-                Task processing failed:
-                {}
-                Error: {}
-                Root cause: {}
-                Stack trace: {}""",
-            request.getDescription(false),
-            ex.getMessage(),
-            ex.getCause() != null ? ex.getCause().getMessage() : "none",
-            getFormattedStackTrace(ex));
-
-        ApiErrorResponse response = ApiErrorResponse.builder()
-            .description("Task processing error")
-            .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-            .exceptionName(ex.getClass().getSimpleName())
-            .exceptionMessage(ex.getMessage())
-            .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
     }
 
     @ExceptionHandler(Exception.class)
@@ -115,8 +87,7 @@ public class GlobalExceptionHandler {
             getFormattedStackTrace(ex));
 
         ApiErrorResponse response = ApiErrorResponse.builder()
-            .description("Internal server error")
-            .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
             .exceptionName(ex.getClass().getSimpleName())
             .exceptionMessage(ex.getMessage())
             .build();

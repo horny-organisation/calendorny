@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
+
+import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 
 @Component
 @RequiredArgsConstructor
 public class RruleConverter {
-
-    public static final String FREQUENCY_PREFIX = "FREQ";
 
     private final RruleHandlerRegistry rruleHandlerRegistry;
 
@@ -24,7 +25,7 @@ public class RruleConverter {
         StringBuilder sb = new StringBuilder();
         RruleDto.Frequency frequency = rruleDto.frequency();
 
-        sb.append(FREQUENCY_PREFIX).append("=").append(frequency);
+        sb.append(FREQUENCY_PREFIX).append(frequency);
 
         rruleHandlerRegistry.findHandler(frequency)
                 .ifPresent(handler -> handler.append(rruleDto, sb));
@@ -51,7 +52,7 @@ public class RruleConverter {
             String key = kv[0].trim();
             String value = kv[1].trim();
 
-            if (key.equals(FREQUENCY_PREFIX)) {
+            if (key.equals(FREQUENCY_KEY)) {
                 rruleDtoBuilder.frequency(RruleDto.Frequency.valueOf(value));
             } else {
                 rruleHandlerRegistry.setKeyValue(key, value, rruleDtoBuilder);

@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.util.rrule;
+package ru.calendorny.taskservice.util.rrulehandler;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,64 +12,54 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
+import ru.calendorny.taskservice.util.rrulehandler.WeeklyRruleHandler;
+
+import java.time.DayOfWeek;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 
 @ActiveProfiles(profiles = "test")
 @Import(TestContainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MonthlyRruleHandlerTest {
+public class WeeklyRruleHandlerTest {
 
     @Autowired
-    private MonthlyRruleHandler handler;
-
-    private static final String BY_MONTHDAY_PREFIX = "BYMONTHDAY";
+    private WeeklyRruleHandler handler;
 
     private static final String INVALID_PREFIX = "INVALID";
 
-    private static final String VALID_MONTHLY_RRULE = "FREQ=MONTHLY;BYMONTHDAY=1";
+    private static final String VALID_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=MONDAY";
 
     @Test
-    void testSupportsWithMonthlyFrequency() {
-        assertTrue(handler.supports(RruleDto.Frequency.MONTHLY));
+    void testSupportsWithWeeklyFrequency() {
+        assertTrue(handler.supports(RruleDto.Frequency.WEEKLY));
     }
 
     @Test
-    void testSupportsWithNonMonthlyFrequency() {
-        assertFalse(handler.supports(RruleDto.Frequency.WEEKLY));
+    void testSupportsWithNonWeeklyFrequency() {
+        assertFalse(handler.supports(RruleDto.Frequency.MONTHLY));
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 15, 31})
-    void testAppendWithValidDay(int day) {
+    @ValueSource(strings = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"})
+    void testAppendWithValidDay(String day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(day)
+            .frequency(RruleDto.Frequency.WEEKLY)
+            .dayOfWeek(DayOfWeek.valueOf(day))
             .build();
 
         StringBuilder sb = new StringBuilder();
         handler.append(dto, sb);
 
-        assertEquals(";BYMONTHDAY=%s".formatted(day), sb.toString());
-    }
-
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 0, 32})
-    void testAppendWithInvalidDay(int invalidDay) {
-        RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(invalidDay)
-            .build();
-
-        assertThrows(IllegalArgumentException.class,
-            () -> handler.append(dto, new StringBuilder()));
+        assertEquals(";BYDAY=%s".formatted(day), sb.toString());
     }
 
     @Test
     void testAppendWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(null)
+            .frequency(RruleDto.Frequency.WEEKLY)
+            .dayOfWeek(null)
             .build();
 
         assertThrows(IllegalArgumentException.class,
@@ -79,10 +69,10 @@ public class MonthlyRruleHandlerTest {
     @Test
     void testSetToDtoCorrect() {
         RruleDto.RruleDtoBuilder builder = RruleDto.builder();
-        handler.setToDto(BY_MONTHDAY_PREFIX, "15", builder);
+        handler.setToDto(BY_DAY_KEY, "MONDAY", builder);
 
         RruleDto result = builder.build();
-        assertEquals(15, result.dayOfMonth());
+        assertEquals(DayOfWeek.MONDAY, result.dayOfWeek());
     }
 
     @Test
@@ -91,36 +81,25 @@ public class MonthlyRruleHandlerTest {
         handler.setToDto(INVALID_PREFIX, "value", builder);
 
         RruleDto result = builder.build();
-        assertNull(result.dayOfMonth());
+        assertNull(result.dayOfWeek());
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 15, 31})
-    void testValidateWithValidDay(int day) {
+    @ValueSource(strings = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"})
+    void testValidateWithValidDay(String day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(day)
+            .frequency(RruleDto.Frequency.WEEKLY)
+            .dayOfWeek(DayOfWeek.valueOf(day))
             .build();
 
         assertDoesNotThrow(() -> handler.validate(dto));
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 0, 32})
-    void testValidateWithInvalidDay(int invalidDay) {
-        RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(invalidDay)
-            .build();
-
-        assertThrows(InvalidRruleException.class, () -> handler.validate(dto));
-    }
-
     @Test
     void testValidateWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
-            .dayOfMonth(null)
+            .frequency(RruleDto.Frequency.WEEKLY)
+            .dayOfWeek(null)
             .build();
 
         assertThrows(InvalidRruleException.class, () -> handler.validate(dto));
@@ -128,11 +107,11 @@ public class MonthlyRruleHandlerTest {
 
     @Test
     void testValidateRruleStringWithValidRrule() {
-        assertDoesNotThrow(() -> handler.validateRruleString(VALID_MONTHLY_RRULE));
+        assertDoesNotThrow(() -> handler.validateRruleString(VALID_WEEKLY_RRULE));
     }
 
     @ParameterizedTest
-    @MethodSource("provideInvalidMonthlyRrules")
+    @MethodSource("provideInvalidWeeklyRrules")
     void testValidateRruleStringWithInvalidRrule(String invalidRrule, Class<? extends Exception> expectedException, String expectedMessagePart) {
         Exception exception = assertThrows(expectedException,
             () -> handler.validateRruleString(invalidRrule));
@@ -142,28 +121,20 @@ public class MonthlyRruleHandlerTest {
             "Exception message should contain: " + expectedMessagePart + " but was: " + exception.getMessage());
     }
 
-    private static Stream<Arguments> provideInvalidMonthlyRrules() {
+    private static Stream<Arguments> provideInvalidWeeklyRrules() {
         return Stream.of(
             Arguments.of(
-                "FREQ=MONTHLY",
+                "FREQ=WEEKLY",
                 InvalidRruleException.class,
-                "requires BYMONTHDAY parameter"),
+                "requires BYDAY parameter"),
             Arguments.of(
-                "FREQ=MONTHLY;BYMONTHDAY=32",
+                "FREQ=WEEKLY;BYDAY=INVALID_DAY",
                 InvalidRruleException.class,
-                "must be between 1 and 31"),
+                "Invalid BYDAY value"),
             Arguments.of(
-                "FREQ=MONTHLY;BYMONTHDAY=0",
+                "FREQ=WEEKLY;BYDAY=",
                 InvalidRruleException.class,
-                "must be between 1 and 31"),
-            Arguments.of(
-                "FREQ=MONTHLY;BYMONTHDAY=invalid",
-                InvalidRruleException.class,
-                "must be a number"),
-            Arguments.of(
-                "FREQ=MONTHLY;BYMONTHDAY=",
-                InvalidRruleException.class,
-                "Invalid BYMONTHDAY format")
+                "Invalid BYDAY value")
         );
     }
 }

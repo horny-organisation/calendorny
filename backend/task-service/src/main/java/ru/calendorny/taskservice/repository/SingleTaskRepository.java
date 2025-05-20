@@ -18,10 +18,19 @@ public interface SingleTaskRepository extends JpaRepository<SingleTaskEntity, UU
             AND t.dueDate BETWEEN :startDate AND :endDate
             ORDER BY t.dueDate ASC
             LIMIT 100
-            """)
+        """
+    )
     List<SingleTaskEntity> findAllActiveByUserIdAndDateInterval(
-            @Param("userId") UUID userId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+        @Param("userId") UUID userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
 
-    @Query("SELECT t FROM SingleTaskEntity t WHERE t.status = 'PENDING' AND t.dueDate = :date")
+    @Query(
+        """
+        SELECT t FROM SingleTaskEntity t
+        WHERE t.status = 'PENDING' AND t.dueDate = :date
+        """
+    )
     List<SingleTaskEntity> findAllPendingByDueDate(LocalDate dueDate);
 }

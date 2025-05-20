@@ -1,6 +1,5 @@
 package ru.calendorny.taskservice.security;
 
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;

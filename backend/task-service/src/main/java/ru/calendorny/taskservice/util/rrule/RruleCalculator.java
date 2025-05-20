@@ -10,6 +10,7 @@ import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.exception.RruleParsingException;
+import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
 
 @Component
 @RequiredArgsConstructor

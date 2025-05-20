@@ -51,10 +51,10 @@ public class DailyKafkaProducerTaskIntegrationTest {
 
     private static final UUID USER_ID = UUID.randomUUID();
 
-    private static final TaskResponse taskResponse = new TaskResponse(
-        TASK_ID, USER_ID, "Title", "Desc", LocalDate.now(), TaskStatus.PENDING, null);
-    private static final TodayTaskEvent todayTaskEvent = new TodayTaskEvent(
-        TASK_ID, USER_ID, "Title", "Desc", LocalDate.now());
+    private static final TaskResponse taskResponse = new TaskResponse(TASK_ID, USER_ID, "Title", "Desc",
+        LocalDate.now(), TaskStatus.PENDING, null);
+    private static final TodayTaskEvent todayTaskEvent = new TodayTaskEvent(TASK_ID, USER_ID, "Title",
+        "Desc", LocalDate.now());
 
     @Test
     void testRunAtMidnightUTC_sendsKafkaEvents() {

@@ -1,13 +1,14 @@
-package ru.calendorny.taskservice.util.rrule;
+package ru.calendorny.taskservice.util.rrulehandler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrule.RruleHandler;
 
 import java.util.List;
 import java.util.Optional;
+
+import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 
 @Component
 @RequiredArgsConstructor
@@ -33,11 +34,11 @@ public class RruleHandlerRegistry {
     }
 
     public void validateRruleString(String rruleString) throws InvalidRruleException {
-        if (!rruleString.startsWith("FREQ=")) {
+        if (!rruleString.startsWith(FREQUENCY_PREFIX)) {
             throw new InvalidRruleException("RRULE must start with FREQ=");
         }
 
-        String freqPart = rruleString.split("FREQ=")[1].split(";")[0];
+        String freqPart = rruleString.split(FREQUENCY_PREFIX)[1].split(";")[0];
         RruleDto.Frequency frequency;
         try {
             frequency = RruleDto.Frequency.valueOf(freqPart);
