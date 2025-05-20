@@ -32,8 +32,6 @@ public class ProfileService {
         );
     }
 
-//    public void update()
-
     public void save(UUID id, UserProfileEdit userProfileEdit) {
         Profile profile = convertToProfile(userProfileEdit, id);
         profileRepository.save(profile);

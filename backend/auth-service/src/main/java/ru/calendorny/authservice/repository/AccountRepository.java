@@ -17,21 +17,40 @@ public class AccountRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private static final String SQL_FIND_BY_EMAIL = """
-        SELECT * FROM accounts WHERE email = ? LIMIT 1
-        """;
-    private static final String SQL_FIND_BY_ID = """
-        SELECT * FROM accounts WHERE id = ? LIMIT 1
-        """;
-    private static final String SQL_SAVE = """
-        INSERT INTO accounts (id, email, password_hash) VALUES (?, ?, ?)
-        """;
-    private static final String SQL_FIND_BY_ID_WITH_PROFILE = """
-        SELECT * FROM accounts a JOIN profiles p ON a.id = p.user_id WHERE id = ? LIMIT 1
-        """;
-    private static final String SQL_UPDATE = """
-        UPDATE accounts SET email = ?, password_hash = ? WHERE id = ?
-        """;
+    private static final String SQL_FIND_BY_EMAIL =
+            """
+            SELECT *
+            FROM accounts
+            WHERE email = ?
+            LIMIT 1
+            """;
+    private static final String SQL_FIND_BY_ID =
+            """
+            SELECT *
+            FROM accounts
+            WHERE id = ?
+            LIMIT 1
+            """;
+    private static final String SQL_SAVE =
+            """
+            INSERT INTO accounts
+            (id, email, password_hash)
+            VALUES (?, ?, ?)
+            """;
+    private static final String SQL_FIND_BY_ID_WITH_PROFILE =
+            """
+            SELECT *
+            FROM accounts a
+            JOIN profiles p ON a.id = p.user_id
+            WHERE id = ?
+            LIMIT 1
+            """;
+    private static final String SQL_UPDATE =
+            """
+            UPDATE accounts
+            SET email = ?, password_hash = ?
+            WHERE id = ?
+            """;
 
 
     private RowMapper<Account> accountRowMapper() {

@@ -21,46 +21,51 @@ public class ProfileRepository {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private static final String SQL_FIND_BY_USER_ID =
-        """
-                SELECT * FROM profiles WHERE user_id = ? LIMIT 1
+            """
+            SELECT *
+            FROM profiles
+            WHERE user_id = ?
+            LIMIT 1
             """;
     private static final String SQL_SAVE =
-        """
-                INSERT INTO profiles (user_id, first_name, last_name, birth_date, phone_number, telegram, timezone, language)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            INSERT INTO profiles
+            (user_id, first_name, last_name, birth_date, phone_number, telegram, timezone, language)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
-    private static final String SQL_MERGE = """
-        MERGE INTO profiles AS target
-        USING (VALUES (
-            :userId::uuid,
-            :firstName::text,
-            :lastName::text,
-            :birthDate::date,
-            :phoneNumber::text,
-            :telegram::text,
-            :timezone::text,
-            :language::text
-        )) AS source (
-            user_id,
-            first_name,
-            last_name,
-            birth_date,
-            phone_number,
-            telegram,
-            timezone,
-            language
-        )
-        ON target.user_id = source.user_id
-        WHEN MATCHED THEN
-            UPDATE SET
-                first_name   = COALESCE(source.first_name, target.first_name),
-                last_name    = COALESCE(source.last_name, target.last_name),
-                birth_date   = COALESCE(source.birth_date, target.birth_date),
-                phone_number = COALESCE(source.phone_number, target.phone_number),
-                telegram     = COALESCE(source.telegram, target.telegram),
-                timezone     = COALESCE(source.timezone, target.timezone),
-                language     = COALESCE(source.language, target.language)
-        """;
+    private static final String SQL_MERGE =
+            """
+            MERGE INTO profiles AS target
+            USING (VALUES (
+                :userId::uuid,
+                :firstName::text,
+                :lastName::text,
+                :birthDate::date,
+                :phoneNumber::text,
+                :telegram::text,
+                :timezone::text,
+                :language::text
+            )) AS source (
+                user_id,
+                first_name,
+                last_name,
+                birth_date,
+                phone_number,
+                telegram,
+                timezone,
+                language
+            )
+            ON target.user_id = source.user_id
+            WHEN MATCHED THEN
+                UPDATE SET
+                    first_name   = COALESCE(source.first_name, target.first_name),
+                    last_name    = COALESCE(source.last_name, target.last_name),
+                    birth_date   = COALESCE(source.birth_date, target.birth_date),
+                    phone_number = COALESCE(source.phone_number, target.phone_number),
+                    telegram     = COALESCE(source.telegram, target.telegram),
+                    timezone     = COALESCE(source.timezone, target.timezone),
+                    language     = COALESCE(source.language, target.language)
+            """;
 
 
     private RowMapper<Profile> profileRowMapper() {

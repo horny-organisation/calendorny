@@ -14,18 +14,24 @@ public class RefreshTokenRepository {
 
     private static final String SQL_FIND_BY_TOKEN =
             """
-            SELECT * FROM refresh_tokens WHERE token = ? LIMIT 1
-        """;
+            SELECT *
+            FROM refresh_tokens
+            WHERE token = ?
+            LIMIT 1
+            """;
 
     private static final String SQL_SAVE =
             """
-            INSERT INTO refresh_tokens (token, user_id) VALUES (?, ?)
-        """;
+            INSERT INTO refresh_tokens
+            (token, user_id)
+            VALUES (?, ?)
+            """;
 
     private static final String SQL_DELETE_BY_TOKEN =
             """
-            DELETE FROM refresh_tokens WHERE token = ?
-        """;
+            DELETE FROM refresh_tokens
+           WHERE token = ?
+            """;
 
     private final JdbcTemplate jdbcTemplate;
 

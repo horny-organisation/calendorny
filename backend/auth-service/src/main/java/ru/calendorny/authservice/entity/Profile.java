@@ -18,12 +18,6 @@ public class Profile {
     private String timezone;
     private String language;
 
-    public Profile(UUID userId, String firstName, String lastName) {
-        this.userId = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
     public Profile(
             UUID userId,
             String firstName,
