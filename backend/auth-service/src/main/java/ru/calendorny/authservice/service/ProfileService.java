@@ -1,11 +1,12 @@
 package ru.calendorny.authservice.service;
 
 import java.util.UUID;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.calendorny.authservice.dto.request.UserProfileEdit;
 import ru.calendorny.authservice.dto.response.UserProfile;
+import ru.calendorny.authservice.entity.Account;
 import ru.calendorny.authservice.entity.Profile;
 import ru.calendorny.authservice.exception.NotFoundException;
 import ru.calendorny.authservice.repository.AccountRepository;
@@ -21,12 +22,14 @@ public class ProfileService {
     public UserProfile getUserProfile(UUID id) {
         Profile profile = profileRepository.findByUserId(id)
             .orElseThrow(() -> new NotFoundException("Profile by id=%s not found".formatted(id.toString())));
+        Account account = accountRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Account by id=%s not found".formatted(id.toString())));
         return new UserProfile(
             profile.getFirstName(),
             profile.getLastName(),
             profile.getBirthDate(),
             profile.getPhoneNumber(),
-            profile.getPhoneNumber()
+            account.getEmail()
         );
     }
 
@@ -50,4 +53,21 @@ public class ProfileService {
             .build();
     }
 
+    public UserProfileEdit getUserProfileEdit(UUID id) {
+        Profile profile = profileRepository.findByUserId(id)
+            .orElseThrow(() -> new NotFoundException("Profile by id=%s not found".formatted(id.toString())));
+        return new UserProfileEdit(
+            profile.getFirstName(),
+            profile.getFirstName(),
+            profile.getBirthDate(),
+            profile.getPhoneNumber(),
+            profile.getTimezone(),
+            profile.getLanguage(),
+            profile.getTelegram()
+        );
+    }
+
+    public void updateProfile(UUID id, UserProfileEdit userProfileEdit) {
+        profileRepository.merge(id, userProfileEdit);
+    }
 }
