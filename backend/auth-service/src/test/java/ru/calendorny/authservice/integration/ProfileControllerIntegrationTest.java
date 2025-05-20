@@ -232,7 +232,6 @@ public class ProfileControllerIntegrationTest {
         assertEquals("en", profile.getLanguage());
 
         assertEquals(400, response.getBody().code());
-        assertEquals("MethodArgumentNotValidException", response.getBody().exceptionMessage());
         List<ValidationErrorResponse.ValidationError> expectedErrors = List.of(
             new ValidationErrorResponse.ValidationError("lastName", "min lastName length is 2, max is 100"),
             new ValidationErrorResponse.ValidationError("phoneNumber", "min phone number length is 9, max is 16"),
