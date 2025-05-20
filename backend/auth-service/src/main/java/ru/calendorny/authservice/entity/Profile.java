@@ -2,9 +2,11 @@ package ru.calendorny.authservice.entity;
 
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class Profile {
 
     private final UUID userId;
