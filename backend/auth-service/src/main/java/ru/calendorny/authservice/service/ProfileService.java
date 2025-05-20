@@ -1,7 +1,6 @@
 package ru.calendorny.authservice.service;
 
 import java.util.UUID;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.calendorny.authservice.dto.request.UserProfileEdit;
