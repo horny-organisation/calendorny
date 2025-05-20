@@ -2,9 +2,11 @@ package ru.calendorny.authservice.integration;
 
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import ru.calendorny.authservice.TestcontainersConfiguration;
 import ru.calendorny.authservice.dto.request.LoginRequest;
@@ -35,7 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AuthControllerIntegrationTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -49,7 +56,10 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    String accessToken = null;
+    @BeforeAll
+    void cleanDatabase() {
+        jdbcTemplate.execute("TRUNCATE TABLE refresh_tokens, profiles, accounts RESTART IDENTITY CASCADE");
+    }
 
     @Test
     @Order(1)
@@ -130,8 +140,6 @@ public class AuthControllerIntegrationTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse(response.getBody().accessToken().isEmpty());
-
-        accessToken = response.getBody().accessToken();
     }
 
     @Test
@@ -196,7 +204,6 @@ public class AuthControllerIntegrationTest {
         assertNotNull(refreshResponse.getBody());
         assertNotNull(refreshResponse.getBody().accessToken());
         assertFalse(refreshResponse.getBody().accessToken().isEmpty());
-        accessToken = refreshResponse.getBody().accessToken();
     }
 
     @Test
