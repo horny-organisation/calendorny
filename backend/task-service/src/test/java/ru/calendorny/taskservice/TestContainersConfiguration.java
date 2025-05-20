@@ -1,56 +1,64 @@
 package ru.calendorny.taskservice;
 
-import liquibase.integration.spring.SpringLiquibase;
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.kafka.KafkaContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.DockerImageName;
 
-import javax.sql.DataSource;
-
-@TestConfiguration
+@TestConfiguration(proxyBeanMethods = false)
 public class TestContainersConfiguration {
 
-    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:14")
-        .withDatabaseName("testdb")
-        .withUsername("testuser")
-        .withPassword("testpass");
-
-    private static final KafkaContainer kafkaContainer = new KafkaContainer("apache/kafka:4.0.0");
-
-    static {
-        postgresContainer.start();
-        kafkaContainer.start();
-    }
-
-    @DynamicPropertySource
-    static void overrideProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgresContainer::getUsername);
-        registry.add("spring.datasource.password", postgresContainer::getPassword);
-
-        registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
+    @Bean
+    Network network() {
+        return Network.newNetwork();
     }
 
     @Bean
-    public DataSource liquibaseDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(postgresContainer.getDriverClassName());
-        dataSource.setUrl(postgresContainer.getJdbcUrl());
-        dataSource.setUsername(postgresContainer.getUsername());
-        dataSource.setPassword(postgresContainer.getPassword());
-        return dataSource;
+    @ServiceConnection
+    PostgreSQLContainer<?> postgresContainer(Network network) {
+        return new PostgreSQLContainer<>("postgres:17-alpine")
+            .withExposedPorts(5432)
+            .withDatabaseName("local")
+            .withUsername("postgres")
+            .withPassword("test")
+            .withNetwork(network)
+            .withNetworkAliases("postgres");
     }
 
-    @Bean(initMethod = "afterPropertiesSet")
-    public SpringLiquibase liquibase(DataSource liquibaseDataSource) {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(liquibaseDataSource);
-        liquibase.setChangeLog("classpath:changelog/db-changelog-master.yml");
-        liquibase.setShouldRun(true);
-        return liquibase;
+    @Bean
+    GenericContainer<?> liquibaseContainer(PostgreSQLContainer<?> postgresContainer, Network network) {
+        File migrationsDir = new File("./db/changelog");
+        String migrationsPath = null;
+        try {
+            migrationsPath = migrationsDir.getCanonicalPath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(migrationsPath);
+        GenericContainer<?> container = new GenericContainer<>(DockerImageName.parse("liquibase/liquibase:4.29"))
+            .withNetwork(network)
+            .withFileSystemBind(migrationsPath, "/changesets", BindMode.READ_WRITE)
+            .withCommand(
+                "--searchPath=/changesets",
+                "--changelog-file=db-changelog-master.yml",
+                "--driver=org.postgresql.Driver",
+                "--url=jdbc:postgresql://postgres:5432/local",
+                "--username=" + postgresContainer.getUsername(),
+                "--password=" + postgresContainer.getPassword(),
+                "update")
+            .waitingFor(Wait.forLogMessage(".*Liquibase command 'update' was executed successfully.*", 1))
+            .withStartupTimeout(Duration.ofSeconds(15))
+            .dependsOn(postgresContainer);
+
+        return container;
     }
+
 }
