@@ -1,5 +1,6 @@
 package ru.calendorny.authservice.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.calendorny.authservice.dto.response.ApiErrorResponse;
 import ru.calendorny.authservice.security.JwtAuthenticationFilter;
 
 @Configuration
@@ -42,7 +44,17 @@ public class WebSecurityConfig {
                 .permitAll())
             .exceptionHandling(eh -> eh
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+
+                    ApiErrorResponse error = new ApiErrorResponse(
+                        401,
+                        authException.getClass().getSimpleName(),
+                        authException.getMessage()
+                    );
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    response.getWriter().write(mapper.writeValueAsString(error));
                 })
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
