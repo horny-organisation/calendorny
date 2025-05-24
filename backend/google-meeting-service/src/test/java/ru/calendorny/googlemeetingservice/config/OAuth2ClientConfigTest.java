@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -34,9 +33,6 @@ public class OAuth2ClientConfigTest {
     private ClientRegistrationRepository clientRegistrationRepository;
 
     @Mock
-    private JdbcOperations jdbcOperations;
-
-    @Mock
     private OAuth2AuthorizedClientService authorizedClientService;
 
     @Mock
@@ -45,9 +41,10 @@ public class OAuth2ClientConfigTest {
     @Test
     void testAuthorizedClientService() {
         lenient().when(properties.clientRegistrationId()).thenReturn(CLIENT_REGISTRATION_ID);
+        lenient().when(properties.fileName()).thenReturn("test-tokens.json");
         OAuth2AuthorizedClientService clientService =
-                oAuth2ClientConfig.authorizedClientService(jdbcOperations, clientRegistrationRepository);
-        assertThat(clientService).isInstanceOf(JdbcOAuth2AuthorizedClientService.class);
+                oAuth2ClientConfig.authorizedClientService(clientRegistrationRepository, null);
+        assertThat(clientService).isInstanceOf(FileOAuth2AuthorizedClientService.class);
     }
 
     @Test

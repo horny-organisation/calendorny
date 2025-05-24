@@ -1,6 +1,8 @@
 package ru.calendorny.googlemeetingservice.consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +16,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.calendorny.googlemeetingservice.TestcontainersConfiguration;
 import ru.calendorny.googlemeetingservice.dto.request.MeetingCreateRequest;
@@ -23,13 +26,18 @@ import ru.calendorny.googlemeetingservice.properties.GoogleOauthProperties;
 import ru.calendorny.googlemeetingservice.service.SpaceCreatingService;
 
 @SpringBootTest
+@TestPropertySource(
+    properties = {
+        "app.google.oauth.principalName=testPrincipal",
+        "app.google.oauth.clientRegistrationId=testClientRegistrationId",
+        "app.google.oauth.fileName=test-oauth-tokens.json",
+        "encryption.aes.key=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0",
+        "app.rabbit.googleMeetQueue=googleMeetQueue"
+    })
 @Import(TestcontainersConfiguration.class)
 public class RabbitConsumerIntegrationTest {
 
     private static final Long TEST_EVENT_ID = 123L;
-    private static final String TEST_PRINCIPAL = "testPrincipal";
-    private static final String TEST_CLIENT_REGISTRATION_ID = "testClientRegistrationId";
-    private static final String EXPECTED_MEET_LINK = "https://meet.google.com/abc-xyz";
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -38,23 +46,13 @@ public class RabbitConsumerIntegrationTest {
     private Queue googleMeetQueue;
 
     @MockitoBean
-    private GoogleOauthProperties properties;
-
-    @MockitoBean
     private SpaceCreatingService creatingService;
-
-    @MockitoBean
-    private RabbitProducerService producerService;
 
     private MeetingCreateRequest meetingCreateRequest;
 
     @BeforeEach
     void setUp() {
         meetingCreateRequest = new MeetingCreateRequest(TEST_EVENT_ID, null);
-
-        when(properties.principalName()).thenReturn(TEST_PRINCIPAL);
-        when(properties.clientRegistrationId()).thenReturn(TEST_CLIENT_REGISTRATION_ID);
-        when(creatingService.createMeetSpace()).thenReturn(EXPECTED_MEET_LINK);
     }
 
     @Test
@@ -63,13 +61,6 @@ public class RabbitConsumerIntegrationTest {
 
         rabbitTemplate.convertAndSend(googleMeetQueue.getName(), meetingCreateRequest);
 
-        ArgumentCaptor<MeetingResponse> responseCaptor = ArgumentCaptor.forClass(MeetingResponse.class);
-
-        verify(producerService, timeout(5000).times(1)).sendMessage(responseCaptor.capture());
-
-        MeetingResponse capturedResponse = responseCaptor.getValue();
-
-        assertEquals(TEST_EVENT_ID, capturedResponse.eventId());
-        assertEquals(EXPECTED_MEET_LINK, capturedResponse.link());
+        verify(creatingService, timeout(5000).times(1)).createMeetSpace(eq(TEST_EVENT_ID));
     }
 }

@@ -21,6 +21,8 @@ import ru.calendorny.googlemeetingservice.properties.RabbitProperties;
 public class RabbitConfig {
 
     private final RabbitProperties properties;
+    private static final String X_DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+    private static final String X_DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
 
     @Bean
     public MessageConverter jsonMessageConverter() {
@@ -36,12 +38,20 @@ public class RabbitConfig {
 
     @Bean
     public Queue googleMeetQueue() {
-        return QueueBuilder.durable(properties.googleMeetQueue()).build();
+        return QueueBuilder.durable(properties.googleMeetQueue())
+            .withArgument(X_DEAD_LETTER_EXCHANGE, properties.deadLetterExchange())
+            .withArgument(X_DEAD_LETTER_ROUTING_KEY, properties.googleMeetDlqRoutingKey())
+            .build();
     }
 
     @Bean
     public Queue meetingLinksQueue() {
         return QueueBuilder.durable(properties.meetingLinksQueue()).build();
+    }
+
+    @Bean
+    public Queue googleMeetDeadLetterQueue() {
+        return QueueBuilder.durable(properties.googleMeetDlq()).build();
     }
 
     @Bean
@@ -59,6 +69,13 @@ public class RabbitConfig {
     }
 
     @Bean
+    public DirectExchange deadLetterExchange() {
+        return ExchangeBuilder.directExchange(properties.deadLetterExchange())
+            .durable(true)
+            .build();
+    }
+
+    @Bean
     public Binding googleMeetBinding(Queue googleMeetQueue, DirectExchange meetingCreateExchange) {
         return BindingBuilder.bind(googleMeetQueue).to(meetingCreateExchange).with(properties.googleMeetRoutingKey());
     }
@@ -66,5 +83,12 @@ public class RabbitConfig {
     @Bean
     public Binding meetingLinkBinding(Queue meetingLinksQueue, DirectExchange meetingLinksExchange) {
         return BindingBuilder.bind(meetingLinksQueue).to(meetingLinksExchange).with(properties.meetingLinkRoutingKey());
+    }
+
+    @Bean
+    public Binding googleMeetDLQBinding(Queue googleMeetDeadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(googleMeetDeadLetterQueue)
+            .to(deadLetterExchange)
+            .with(properties.googleMeetDlqRoutingKey());
     }
 }

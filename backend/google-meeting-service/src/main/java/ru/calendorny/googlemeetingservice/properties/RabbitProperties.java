@@ -9,4 +9,7 @@ public record RabbitProperties(
         String meetingCreateExchange,
         String meetingLinksExchange,
         String googleMeetRoutingKey,
-        String meetingLinkRoutingKey) {}
+        String meetingLinkRoutingKey,
+        String deadLetterExchange,
+        String googleMeetDlq,
+        String googleMeetDlqRoutingKey) {}

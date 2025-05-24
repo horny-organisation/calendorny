@@ -18,13 +18,10 @@ import ru.calendorny.googlemeetingservice.service.SpaceCreatingService;
 public class RabbitConsumerTest {
 
     private static final Long EVENT_ID = 123L;
-    private static final String EXPECTED_LINK = "https://meet.google.com/test";
 
     @Mock
     private SpaceCreatingService creatingService;
 
-    @Mock
-    private RabbitProducerService producerService;
 
     @InjectMocks
     private RabbitConsumer rabbitConsumer;
@@ -34,11 +31,8 @@ public class RabbitConsumerTest {
         LocalDateTime startTime = LocalDateTime.now(ZoneId.systemDefault());
         MeetingCreateRequest request = new MeetingCreateRequest(EVENT_ID, startTime);
 
-        when(creatingService.createMeetSpace()).thenReturn(EXPECTED_LINK);
-
         rabbitConsumer.processQueue(request);
 
-        verify(creatingService).createMeetSpace();
-        verify(producerService).sendMessage(new MeetingResponse(EVENT_ID, EXPECTED_LINK));
+        verify(creatingService).createMeetSpace(EVENT_ID);
     }
 }

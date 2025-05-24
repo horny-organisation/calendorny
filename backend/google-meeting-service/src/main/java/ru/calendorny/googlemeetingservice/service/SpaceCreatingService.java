@@ -11,9 +11,12 @@ import java.util.Date;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.stereotype.Service;
+import ru.calendorny.googlemeetingservice.dto.response.MeetingResponse;
 import ru.calendorny.googlemeetingservice.factory.MeetClientFactory;
+import ru.calendorny.googlemeetingservice.producer.RabbitProducerService;
 
 @Slf4j
 @Service
@@ -21,17 +24,16 @@ import ru.calendorny.googlemeetingservice.factory.MeetClientFactory;
 public class SpaceCreatingService {
 
     private final MeetClientFactory meetClientFactory;
-    private final OAuth2AuthorizedClient client;
+    private final ObjectFactory<OAuth2AuthorizedClient> authorizedClientFactory;
+    private final RabbitProducerService producerService;
 
-    public String createMeetSpace() {
-        if (client == null) {
-            log.error("Client is null");
-            return "Error: Unauthorized";
-        }
+    public void createMeetSpace(Long eventId) {
+        OAuth2AuthorizedClient client = authorizedClientFactory.getObject();
 
         Credentials credentials = toGoogleCredentials(client);
-
-        return doCreateSpace(credentials).map(Space::getMeetingUri).orElse("Error creating space");
+        String link = doCreateSpace(credentials).map(Space::getMeetingUri).orElse("Error creating space");
+        MeetingResponse response = new MeetingResponse(eventId, link);
+        producerService.sendMessage(response);
     }
 
     private Credentials toGoogleCredentials(OAuth2AuthorizedClient client) {
