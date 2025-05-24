@@ -70,7 +70,7 @@ public class MeetingCreatingServiceTest {
     }
 
     @Test
-    void shouldSendMeetingResponse_whenApiCallIsSuccessful() {
+    void shouldSendMeetingResponseWhenApiCallIsSuccessful() {
         when(zoomWebClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(MEETING_CREATE_URL)).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
@@ -91,7 +91,7 @@ public class MeetingCreatingServiceTest {
     }
 
     @Test
-    void shouldSendErrorMessage_whenApiCallFails() {
+    void shouldSendErrorMessageWhenApiCallFails() {
         when(zoomWebClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(MEETING_CREATE_URL)).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
@@ -110,7 +110,7 @@ public class MeetingCreatingServiceTest {
     }
 
     @Test
-    void shouldSendErrorMessage_whenJoinUrlIsNull() {
+    void shouldSendErrorMessageWhenJoinUrlIsNull() {
         when(zoomWebClient.post()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(MEETING_CREATE_URL)).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);

@@ -2,22 +2,22 @@ app:
   rabbit:
     zoomMeetQueue: zoomMeetQueue
     meetingLinksQueue: meetingLinksQueue
-    zoom-meet-dlq: zoomMeetDlq
+    zoomMeetDlq: zoomMeetDlq
     meetingCreateExchange: meetingCreateExchange
     meetingLinksExchange: meetingLinksExchange
-    dead-letter-exchange: zoomDeadLetterExchange
+    deadLetterExchange: zoomDeadLetterExchange
     zoomMeetRoutingKey: zoomMeet
     meetingLinkRoutingKey: meetingLink
-    zoom-meet-dlq-routing-key: zoomMeetDlqRoutingKey
+    zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
 
   zoom:
-    file-name: zoom-token.json
-    principal-name: ${ZOOM_OAUTH_PRINCIPAL_NAME}
-    client-registration-id: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
-    base-url: https://api.zoom.us/v2
-    meeting-create-url: /users/me/meetings
+    fileName: zoom-token.json
+    principalName: ${ZOOM_OAUTH_PRINCIPAL_NAME}
+    clientRegistrationId: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
+    baseUrl: https://api.zoom.us/v2
+    meetingCreateUrl: /users/me/meetings
     timezone: UTC
-    date-time-pattern: yyyy-MM-dd HH:mm
+    dateTimePattern: yyyy-MM-dd HH:mm
 
 encryption:
   aes:
@@ -52,8 +52,3 @@ spring:
 
 server:
   port: 8080
-
-logging:
-  level:
-    org.springframework.security.oauth2: DEBUG
-    org.springframework.web.client: DEBUG
