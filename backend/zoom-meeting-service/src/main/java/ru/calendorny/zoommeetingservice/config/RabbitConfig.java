@@ -21,6 +21,8 @@ import ru.calendorny.zoommeetingservice.properties.RabbitProperties;
 public class RabbitConfig {
 
     private final RabbitProperties properties;
+    private static final String X_DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
+    private static final String X_DEAD_LETTER_ROUTING_KEY = "x-dead-letter-routing-key";
 
     @Bean
     public MessageConverter jsonMessageConverter() {
@@ -36,12 +38,20 @@ public class RabbitConfig {
 
     @Bean
     public Queue zoomMeetQueue() {
-        return QueueBuilder.durable(properties.zoomMeetQueue()).build();
+        return QueueBuilder.durable(properties.zoomMeetQueue())
+                .withArgument(X_DEAD_LETTER_EXCHANGE, properties.deadLetterExchange())
+                .withArgument(X_DEAD_LETTER_ROUTING_KEY, properties.zoomMeetDlqRoutingKey())
+                .build();
     }
 
     @Bean
     public Queue meetingLinksQueue() {
         return QueueBuilder.durable(properties.meetingLinksQueue()).build();
+    }
+
+    @Bean
+    public Queue zoomMeetDeadLetterQueue() {
+        return QueueBuilder.durable(properties.zoomMeetDlq()).build();
     }
 
     @Bean
@@ -59,6 +69,13 @@ public class RabbitConfig {
     }
 
     @Bean
+    public DirectExchange deadLetterExchange() {
+        return ExchangeBuilder.directExchange(properties.deadLetterExchange())
+                .durable(true)
+                .build();
+    }
+
+    @Bean
     public Binding zoomMeetBinding(Queue zoomMeetQueue, DirectExchange meetingCreateExchange) {
         return BindingBuilder.bind(zoomMeetQueue).to(meetingCreateExchange).with(properties.zoomMeetRoutingKey());
     }
@@ -66,5 +83,12 @@ public class RabbitConfig {
     @Bean
     public Binding meetingLinkBinding(Queue meetingLinksQueue, DirectExchange meetingLinksExchange) {
         return BindingBuilder.bind(meetingLinksQueue).to(meetingLinksExchange).with(properties.meetingLinkRoutingKey());
+    }
+
+    @Bean
+    public Binding zoomMeetDLQBinding(Queue zoomMeetDeadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder.bind(zoomMeetDeadLetterQueue)
+                .to(deadLetterExchange)
+                .with(properties.zoomMeetDlqRoutingKey());
     }
 }

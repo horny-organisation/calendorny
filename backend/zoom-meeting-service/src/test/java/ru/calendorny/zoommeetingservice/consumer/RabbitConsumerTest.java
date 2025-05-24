@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.calendorny.zoommeetingservice.dto.request.MeetingCreateRequest;
-import ru.calendorny.zoommeetingservice.dto.response.MeetingResponse;
 import ru.calendorny.zoommeetingservice.producer.RabbitProducerService;
 import ru.calendorny.zoommeetingservice.service.MeetingCreatingService;
 
@@ -35,11 +34,8 @@ public class RabbitConsumerTest {
         LocalDateTime startTime = LocalDateTime.now(ZoneId.systemDefault());
         MeetingCreateRequest request = new MeetingCreateRequest(EVENT_ID, startTime);
 
-        when(creatingService.createMeeting(startTime)).thenReturn(EXPECTED_LINK);
-
         rabbitConsumer.processQueue(request);
 
-        verify(creatingService).createMeeting(startTime);
-        verify(producerService).sendMessage(new MeetingResponse(EVENT_ID, EXPECTED_LINK));
+        verify(creatingService).createMeeting(123L, startTime);
     }
 }
