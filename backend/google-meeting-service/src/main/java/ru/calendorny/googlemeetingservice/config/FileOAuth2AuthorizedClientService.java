@@ -4,11 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -22,6 +17,12 @@ import ru.calendorny.googlemeetingservice.dto.oauth.OAuth2AuthorizedClientDTO;
 import ru.calendorny.googlemeetingservice.properties.GoogleOauthProperties;
 import ru.calendorny.googlemeetingservice.service.AesEncryptionService;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 @Service
 public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClientService {
 
@@ -29,15 +30,16 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, OAuth2AuthorizedClient> clientCache = new ConcurrentHashMap<>();
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final AesEncryptionService encryptionService;
 
     public FileOAuth2AuthorizedClientService(
         GoogleOauthProperties properties,
         ClientRegistrationRepository clientRegistrationRepository,
         AesEncryptionService encryptionService) {
+
         this.storageFile = new File(properties.fileName());
         this.clientRegistrationRepository = clientRegistrationRepository;
-
-        OAuth2AuthorizedClientDTO.setEncryptionService(encryptionService);
+        this.encryptionService = encryptionService;
 
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -68,7 +70,10 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
     private void saveToFile() {
         try {
             Map<String, OAuth2AuthorizedClientDTO> dtoMap = clientCache.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> new OAuth2AuthorizedClientDTO(e.getValue())));
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> new OAuth2AuthorizedClientDTO(e.getValue(), encryptionService)
+                ));
             objectMapper.writeValue(storageFile, dtoMap);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save OAuth2 token to file", e);
@@ -88,7 +93,6 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
                 if (registration == null) continue;
 
                 OAuth2AuthorizedClient client = getClient(dto, registration);
-
                 clientCache.put(entry.getKey(), client);
             }
         } catch (IOException e) {
@@ -96,17 +100,22 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
         }
     }
 
-    private static @NotNull OAuth2AuthorizedClient getClient(
+    private @NotNull OAuth2AuthorizedClient getClient(
         OAuth2AuthorizedClientDTO dto, ClientRegistration registration) {
+
         OAuth2AccessToken accessToken = new OAuth2AccessToken(
             OAuth2AccessToken.TokenType.BEARER,
-            dto.getAccessTokenValue(),
+            dto.getAccessTokenValue(encryptionService),
             dto.getAccessTokenIssuedAt(),
-            dto.getAccessTokenExpiresAt());
+            dto.getAccessTokenExpiresAt()
+        );
 
         OAuth2RefreshToken refreshToken = null;
         if (dto.getRefreshTokenValue() != null) {
-            refreshToken = new OAuth2RefreshToken(dto.getRefreshTokenValue(), dto.getRefreshTokenIssuedAt());
+            refreshToken = new OAuth2RefreshToken(
+                dto.getRefreshTokenValue(encryptionService),
+                dto.getRefreshTokenIssuedAt()
+            );
         }
 
         return new OAuth2AuthorizedClient(registration, dto.getPrincipalName(), accessToken, refreshToken);

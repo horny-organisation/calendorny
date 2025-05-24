@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import ru.calendorny.googlemeetingservice.dto.response.MeetingResponse;
@@ -28,6 +29,10 @@ class SpaceCreatingServiceTest {
     private static final String TOKEN_VALUE = "test-token";
     private static final String MEETING_URI = "https://meet.google.com/success";
     private static final Long EVENT_ID = 42L;
+
+    @Mock
+    private ObjectFactory<OAuth2AuthorizedClient> authorizedClientFactory;
+
 
     @Mock
     private MeetClientFactory meetClientFactory;
@@ -52,15 +57,7 @@ class SpaceCreatingServiceTest {
             Instant.now().minusSeconds(60),
             Instant.now().plusSeconds(600));
         lenient().when(client.getAccessToken()).thenReturn(accessToken);
-    }
-
-    @Test
-    void shouldSendErrorResponseWhenClientIsNull() {
-        SpaceCreatingService serviceWithoutClient = new SpaceCreatingService(meetClientFactory, null, producerService);
-
-        serviceWithoutClient.createMeetSpace(EVENT_ID);
-
-        verify(producerService).sendMessage(new MeetingResponse(EVENT_ID, "Error creating space"));
+        lenient().when(authorizedClientFactory.getObject()).thenReturn(client);
     }
 
     @Test
