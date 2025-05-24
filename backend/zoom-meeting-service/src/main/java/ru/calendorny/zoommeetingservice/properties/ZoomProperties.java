@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "app.zoom")
 public record ZoomProperties(
+        String fileName,
         String principalName,
         String clientRegistrationId,
         String baseUrl,

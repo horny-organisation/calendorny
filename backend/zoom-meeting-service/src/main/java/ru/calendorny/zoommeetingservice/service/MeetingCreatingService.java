@@ -14,6 +14,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.calendorny.zoommeetingservice.dto.meeting.ZoomMeetingRequest;
 import ru.calendorny.zoommeetingservice.dto.meeting.ZoomMeetingResponse;
 import ru.calendorny.zoommeetingservice.dto.meeting.ZoomMeetingSettings;
+import ru.calendorny.zoommeetingservice.dto.response.MeetingResponse;
+import ru.calendorny.zoommeetingservice.producer.RabbitProducerService;
 import ru.calendorny.zoommeetingservice.properties.ZoomProperties;
 
 @Slf4j
@@ -26,15 +28,18 @@ public class MeetingCreatingService {
 
     private final ObjectFactory<WebClient> zoomWebClientFactory;
     private final ZoomProperties properties;
+    private final RabbitProducerService producerService;
 
-    public String createMeeting(LocalDateTime startTime) {
+    public void createMeeting(Long id, LocalDateTime startTime) {
         String formattedStartTime = getFormattedStartTime(startTime);
 
         ZoomMeetingRequest request = createMeetingRequest(formattedStartTime, startTime);
 
         ZoomMeetingResponse response = callZoomApi(request);
 
-        return extractJoinUrl(response);
+        String url = extractJoinUrl(response);
+
+        producerService.sendMessage(new MeetingResponse(id, url));
     }
 
     private String getFormattedStartTime(LocalDateTime startTime) {

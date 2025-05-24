@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpHeaders;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -19,6 +17,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.calendorny.zoommeetingservice.properties.ZoomProperties;
+import ru.calendorny.zoommeetingservice.service.AesEncryptionService;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,8 +29,8 @@ public class OAuth2ClientConfig {
 
     @Bean
     public OAuth2AuthorizedClientService authorizedClientService(
-            JdbcOperations jdbcOperations, ClientRegistrationRepository clientRegistrationRepository) {
-        return new JdbcOAuth2AuthorizedClientService(jdbcOperations, clientRegistrationRepository);
+            ClientRegistrationRepository clientRegistrationRepository, AesEncryptionService service) {
+        return new FileOAuth2AuthorizedClientService(properties, clientRegistrationRepository, service);
     }
 
     @Bean
