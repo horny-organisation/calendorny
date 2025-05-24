@@ -1,3 +1,4 @@
 rootProject.name = 'backend'
 
 include 'test-service'
+include 'zoom-meeting-service'
