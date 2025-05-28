@@ -11,26 +11,30 @@ import ru.calendorny.taskservice.entity.SingleTaskEntity;
 public interface SingleTaskRepository extends JpaRepository<SingleTaskEntity, UUID> {
 
     @Query(
-        """
-            SELECT t FROM SingleTaskEntity t
-            WHERE t.userId = :userId
-            AND t.status IN (ru.calendorny.taskservice.enums.TaskStatus.PENDING, ru.calendorny.taskservice.enums.TaskStatus.COMPLETED)
-            AND t.dueDate BETWEEN :startDate AND :endDate
-            ORDER BY t.dueDate ASC
-            LIMIT 100
-        """
+        value = """
+                SELECT * FROM single_tasks
+                WHERE user_id = :userId
+                  AND status IN ('PENDING', 'COMPLETED')
+                  AND due_date BETWEEN :startDate AND :endDate
+                ORDER BY due_date ASC
+                LIMIT :limit
+            """,
+        nativeQuery = true
     )
     List<SingleTaskEntity> findAllActiveByUserIdAndDateInterval(
         @Param("userId") UUID userId,
         @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate
+        @Param("endDate") LocalDate endDate,
+        @Param("limit") int limit
     );
 
     @Query(
-        """
-        SELECT t FROM SingleTaskEntity t
-        WHERE t.status = 'PENDING' AND t.dueDate = :date
-        """
+        value = """
+                SELECT * FROM single_tasks
+                WHERE status = 'PENDING'
+                  AND due_date = :date
+            """,
+        nativeQuery = true
     )
-    List<SingleTaskEntity> findAllPendingByDueDate(LocalDate dueDate);
+    List<SingleTaskEntity> findAllPendingByDueDate(@Param("date") LocalDate dueDate);
 }

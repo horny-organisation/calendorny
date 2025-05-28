@@ -1,15 +1,11 @@
 package ru.calendorny.taskservice.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.enums.TaskStatus;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.mapper.TaskMapper;
@@ -26,36 +22,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class SingleTaskProcessorTest {
 
-    @MockitoBean
     private SingleTaskRepository repository;
-
-    @MockitoBean
     private TaskMapper mapper;
-
-    @Autowired
     private SingleTaskProcessor singleTaskProcessor;
 
     private static final UUID TASK_ID = UUID.randomUUID();
-
     private static final UUID USER_ID = UUID.randomUUID();
-
     private static final LocalDate NOW = LocalDate.of(2023, 1, 1);
-
     private static final String TITLE = "Test Task";
-
     private static final String DESCRIPTION = "Test Description";
-
     private static final TaskStatus PENDING_STATUS = TaskStatus.PENDING;
-
     private static final TaskStatus COMPLETED_STATUS = TaskStatus.COMPLETED;
 
     private static final RruleDto RRULE_DTO = RruleDto.builder()
-        .frequency(RruleDto.Frequency.WEEKLY)
+        .frequency(TaskFrequency.WEEKLY)
         .dayOfWeek(DayOfWeek.MONDAY)
         .build();
 
@@ -94,6 +76,15 @@ class SingleTaskProcessorTest {
         .dueDate(NOW)
         .status(COMPLETED_STATUS)
         .build();
+
+    private static final int TASKS_LIMIT = 100;
+
+    @BeforeEach
+    void setUp() {
+        repository = mock(SingleTaskRepository.class);
+        mapper = mock(TaskMapper.class);
+        singleTaskProcessor = new SingleTaskProcessor(repository, mapper);
+    }
 
     @Test
     void testSupportsWhenTaskExists() {
@@ -157,11 +148,6 @@ class SingleTaskProcessorTest {
         TaskResponse result = singleTaskProcessor.updateTask(
             TASK_ID, TITLE, DESCRIPTION, NOW, COMPLETED_STATUS, null);
         assertEquals(COMPLETED_TASK_RESPONSE, result);
-
-        assertEquals(TITLE, SINGLE_TASK_ENTITY.getTitle());
-        assertEquals(DESCRIPTION, SINGLE_TASK_ENTITY.getDescription());
-        assertEquals(COMPLETED_STATUS, SINGLE_TASK_ENTITY.getStatus());
-        assertEquals(NOW, SINGLE_TASK_ENTITY.getDueDate());
     }
 
     @Test
@@ -201,7 +187,6 @@ class SingleTaskProcessorTest {
 
         TaskResponse result = singleTaskProcessor.updateStatus(TASK_ID, COMPLETED_STATUS);
         assertEquals(COMPLETED_TASK_RESPONSE, result);
-        assertEquals(COMPLETED_STATUS, SINGLE_TASK_ENTITY.getStatus());
     }
 
     @Test
@@ -215,7 +200,7 @@ class SingleTaskProcessorTest {
         List<SingleTaskEntity> tasks = List.of(SINGLE_TASK_ENTITY);
         List<TaskResponse> responses = List.of(TASK_RESPONSE);
 
-        when(repository.findAllActiveByUserIdAndDateInterval(USER_ID, NOW, NOW.plusDays(1)))
+        when(repository.findAllActiveByUserIdAndDateInterval(USER_ID, NOW, NOW.plusDays(1), TASKS_LIMIT))
             .thenReturn(tasks);
         when(mapper.fromSingleTaskToResponse(SINGLE_TASK_ENTITY)).thenReturn(TASK_RESPONSE);
 

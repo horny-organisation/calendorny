@@ -2,6 +2,7 @@ package ru.calendorny.taskservice.util.rrulehandler;
 
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import java.time.DayOfWeek;
 
@@ -11,8 +12,8 @@ import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 public class WeeklyRruleHandler implements RruleHandler {
 
     @Override
-    public boolean supports(RruleDto.Frequency frequency) {
-        return frequency == RruleDto.Frequency.WEEKLY;
+    public boolean supports(TaskFrequency frequency) {
+        return frequency == TaskFrequency.WEEKLY;
     }
 
     @Override

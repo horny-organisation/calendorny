@@ -1,51 +1,49 @@
 package ru.calendorny.taskservice.util.rrulehandler;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.WeeklyRruleHandler;
 
 import java.time.DayOfWeek;
 import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WeeklyRruleHandlerTest {
 
-    @Autowired
     private WeeklyRruleHandler handler;
 
     private static final String INVALID_PREFIX = "INVALID";
 
     private static final String VALID_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=MONDAY";
 
+    @BeforeEach
+    void setUp() {
+        handler = new WeeklyRruleHandler();
+    }
+
     @Test
     void testSupportsWithWeeklyFrequency() {
-        assertTrue(handler.supports(RruleDto.Frequency.WEEKLY));
+        assertTrue(handler.supports(TaskFrequency.WEEKLY));
     }
 
     @Test
     void testSupportsWithNonWeeklyFrequency() {
-        assertFalse(handler.supports(RruleDto.Frequency.MONTHLY));
+        assertFalse(handler.supports(TaskFrequency.MONTHLY));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"})
     void testAppendWithValidDay(String day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(DayOfWeek.valueOf(day))
             .build();
 
@@ -58,7 +56,7 @@ public class WeeklyRruleHandlerTest {
     @Test
     void testAppendWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(null)
             .build();
 
@@ -88,7 +86,7 @@ public class WeeklyRruleHandlerTest {
     @ValueSource(strings = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"})
     void testValidateWithValidDay(String day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(DayOfWeek.valueOf(day))
             .build();
 
@@ -98,7 +96,7 @@ public class WeeklyRruleHandlerTest {
     @Test
     void testValidateWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(null)
             .build();
 

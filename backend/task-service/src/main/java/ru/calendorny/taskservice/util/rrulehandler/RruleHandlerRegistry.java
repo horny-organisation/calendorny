@@ -3,6 +3,7 @@ package ru.calendorny.taskservice.util.rrulehandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class RruleHandlerRegistry {
 
     private final List<RruleHandler> handlers;
 
-    public Optional<RruleHandler> findHandler(RruleDto.Frequency frequency) {
+    public Optional<RruleHandler> findHandler(TaskFrequency frequency) {
         return handlers.stream()
             .filter(handler -> handler.supports(frequency))
             .findFirst();
@@ -39,9 +40,9 @@ public class RruleHandlerRegistry {
         }
 
         String freqPart = rruleString.split(FREQUENCY_PREFIX)[1].split(";")[0];
-        RruleDto.Frequency frequency;
+        TaskFrequency frequency;
         try {
-            frequency = RruleDto.Frequency.valueOf(freqPart);
+            frequency = TaskFrequency.valueOf(freqPart);
         } catch (Exception e) {
             throw new InvalidRruleException("Invalid frequency in RRULE");
         }

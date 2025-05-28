@@ -24,7 +24,7 @@ public class TestContainersConfiguration {
     @Bean
     @ServiceConnection
     PostgreSQLContainer<?> postgresContainer(Network network) {
-        return new PostgreSQLContainer<>("postgres:17-alpine")
+        return new PostgreSQLContainer<>("postgres:16-alpine")
             .withExposedPorts(5432)
             .withDatabaseName("local")
             .withUsername("postgres")

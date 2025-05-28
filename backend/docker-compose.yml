@@ -28,7 +28,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - task-service
+      - backend
 
   kafka-2:
     image: apache/kafka:4.0.0
@@ -58,7 +58,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - task-service
+      - backend
 
   kafka-3:
     image: apache/kafka:4.0.0
@@ -88,7 +88,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - task-service
+      - backend
 
   task-service-postgres:
     image: postgres:16-alpine
@@ -150,6 +150,7 @@ services:
     restart: unless-stopped
     networks:
       - task-service
+      - backend
 
 volumes:
   kafka-1-data:
@@ -160,3 +161,4 @@ volumes:
 networks:
   task-service:
     driver: bridge
+  backend:

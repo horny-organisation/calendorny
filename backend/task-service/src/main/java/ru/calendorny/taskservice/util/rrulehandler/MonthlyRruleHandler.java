@@ -2,6 +2,7 @@ package ru.calendorny.taskservice.util.rrulehandler;
 
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 
 import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
@@ -10,8 +11,8 @@ import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 public class MonthlyRruleHandler implements RruleHandler {
 
     @Override
-    public boolean supports(RruleDto.Frequency frequency) {
-        return frequency == RruleDto.Frequency.MONTHLY;
+    public boolean supports(TaskFrequency frequency) {
+        return frequency == TaskFrequency.MONTHLY;
     }
 
     @Override

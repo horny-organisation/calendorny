@@ -3,6 +3,7 @@ package ru.calendorny.taskservice.util.rrule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
 
@@ -23,7 +24,7 @@ public class RruleConverter {
         rruleHandlerRegistry.validate(rruleDto);
 
         StringBuilder sb = new StringBuilder();
-        RruleDto.Frequency frequency = rruleDto.frequency();
+        TaskFrequency frequency = rruleDto.frequency();
 
         sb.append(FREQUENCY_PREFIX).append(frequency);
 
@@ -53,7 +54,7 @@ public class RruleConverter {
             String value = kv[1].trim();
 
             if (key.equals(FREQUENCY_KEY)) {
-                rruleDtoBuilder.frequency(RruleDto.Frequency.valueOf(value));
+                rruleDtoBuilder.frequency(TaskFrequency.valueOf(value));
             } else {
                 rruleHandlerRegistry.setKeyValue(key, value, rruleDtoBuilder);
             }

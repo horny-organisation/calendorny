@@ -1,10 +1,11 @@
 package ru.calendorny.taskservice.util.rrulehandler;
 
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 
 public interface RruleHandler {
 
-    boolean supports(RruleDto.Frequency frequency);
+    boolean supports(TaskFrequency frequency);
 
     void append(RruleDto rruleDto, StringBuilder sb);
 

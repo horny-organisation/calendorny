@@ -31,6 +31,8 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     private final RruleCalculator rruleCalculator;
 
+    private static final int tasksLimit = 150;
+
     @Override
     public boolean supports(UUID taskId) {
         return repository.existsById(taskId);
@@ -117,7 +119,7 @@ public class RecurTaskProcessor implements TaskProcessor {
 
     @Override
     public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
-        List<RecurTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
+        List<RecurTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate, tasksLimit);
         return tasks.stream()
             .map(mapper::fromRecurTaskToResponse)
             .toList();

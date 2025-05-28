@@ -22,6 +22,8 @@ public class SingleTaskProcessor implements TaskProcessor {
 
     private final TaskMapper mapper;
 
+    private static final int tasksLimit = 100;
+
     @Override
     public boolean supports(UUID taskId) {
         return repository.existsById(taskId);
@@ -99,7 +101,7 @@ public class SingleTaskProcessor implements TaskProcessor {
 
     @Override
     public List<TaskResponse> getTasksByDateRange(UUID userId, LocalDate fromDate, LocalDate toDate) {
-        List<SingleTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate);
+        List<SingleTaskEntity> tasks = repository.findAllActiveByUserIdAndDateInterval(userId, fromDate, toDate, tasksLimit);
         return tasks.stream()
             .map(mapper::fromSingleTaskToResponse)
             .toList();

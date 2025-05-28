@@ -1,15 +1,10 @@
 package ru.calendorny.taskservice.util.rrule;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
 import ru.calendorny.taskservice.exception.RruleParsingException;
 import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
@@ -20,22 +15,20 @@ import java.time.ZoneOffset;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RruleCalculatorTest {
 
-    @MockitoBean
     private RruleHandlerRegistry rruleHandlerRegistry;
-
-    @Autowired
     private RruleCalculator rruleCalculator;
 
     private static final String CORRECT_WEEKLY_RRULE = "FREQ=WEEKLY;BYDAY=TU";
-
     private static final String CORRECT_MONTHLY_RRULE = "FREQ=MONTHLY;BYMONTHDAY=15";
-
     private static final String INCORRECT_RRULE = "INCORRECT";
+
+    @BeforeEach
+    void setUp() {
+        rruleHandlerRegistry = mock(RruleHandlerRegistry.class);
+        rruleCalculator = new RruleCalculator(rruleHandlerRegistry);
+    }
 
     @Test
     void testFindNextDateWithCorrectWeeklyRrule() {

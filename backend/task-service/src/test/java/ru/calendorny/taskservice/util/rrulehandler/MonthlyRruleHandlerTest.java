@@ -5,26 +5,18 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.MonthlyRruleHandler;
 
 import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.calendorny.taskservice.util.constant.RruleConstants.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class MonthlyRruleHandlerTest {
 
-    @Autowired
-    private MonthlyRruleHandler handler;
+    private final MonthlyRruleHandler handler = new MonthlyRruleHandler();
 
     private static final String INVALID_PREFIX = "INVALID";
 
@@ -32,19 +24,19 @@ public class MonthlyRruleHandlerTest {
 
     @Test
     void testSupportsWithMonthlyFrequency() {
-        assertTrue(handler.supports(RruleDto.Frequency.MONTHLY));
+        assertTrue(handler.supports(TaskFrequency.MONTHLY));
     }
 
     @Test
     void testSupportsWithNonMonthlyFrequency() {
-        assertFalse(handler.supports(RruleDto.Frequency.WEEKLY));
+        assertFalse(handler.supports(TaskFrequency.WEEKLY));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 15, 31})
     void testAppendWithValidDay(int day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(day)
             .build();
 
@@ -58,7 +50,7 @@ public class MonthlyRruleHandlerTest {
     @ValueSource(ints = {-1, 0, 32})
     void testAppendWithInvalidDay(int invalidDay) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(invalidDay)
             .build();
 
@@ -69,7 +61,7 @@ public class MonthlyRruleHandlerTest {
     @Test
     void testAppendWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(null)
             .build();
 
@@ -99,7 +91,7 @@ public class MonthlyRruleHandlerTest {
     @ValueSource(ints = {1, 15, 31})
     void testValidateWithValidDay(int day) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(day)
             .build();
 
@@ -110,7 +102,7 @@ public class MonthlyRruleHandlerTest {
     @ValueSource(ints = {-1, 0, 32})
     void testValidateWithInvalidDay(int invalidDay) {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(invalidDay)
             .build();
 
@@ -120,7 +112,7 @@ public class MonthlyRruleHandlerTest {
     @Test
     void testValidateWithNullDay() {
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(null)
             .build();
 

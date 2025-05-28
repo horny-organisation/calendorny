@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import ru.calendorny.taskservice.dto.error.ValidationError;
 import ru.calendorny.taskservice.dto.response.ApiErrorResponse;
 import ru.calendorny.taskservice.dto.response.ValidationErrorResponse;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
@@ -23,8 +24,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ValidationErrorResponse> handleValidationException(
         MethodArgumentNotValidException ex, WebRequest webRequest) {
 
-        List<ValidationErrorResponse.ValidationError> validationErrors = ex.getBindingResult().getFieldErrors().stream()
-            .map(fieldError -> ValidationErrorResponse.ValidationError.builder()
+        List<ValidationError> validationErrors = ex.getBindingResult().getFieldErrors().stream()
+            .map(fieldError -> ValidationError.builder()
                 .field(fieldError.getField())
                 .message(fieldError.getDefaultMessage())
                 .build())
@@ -69,30 +70,6 @@ public class GlobalExceptionHandler {
             .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGenericException(
-        Exception ex, WebRequest request) {
-
-        log.error("""
-                Unexpected error occurred:
-                {}
-                Error type: {}
-                Error message: {}
-                Stack trace: {}""",
-            request.getDescription(false),
-            ex.getClass().getName(),
-            ex.getMessage(),
-            getFormattedStackTrace(ex));
-
-        ApiErrorResponse response = ApiErrorResponse.builder()
-            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .exceptionName(ex.getClass().getSimpleName())
-            .exceptionMessage(ex.getMessage())
-            .build();
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     private String getFormattedStackTrace(Throwable ex) {

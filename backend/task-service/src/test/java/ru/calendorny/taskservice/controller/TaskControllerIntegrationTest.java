@@ -26,6 +26,7 @@ import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.dto.response.ValidationErrorResponse;
 import ru.calendorny.taskservice.entity.RecurTaskEntity;
 import ru.calendorny.taskservice.entity.SingleTaskEntity;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.enums.TaskStatus;
 import ru.calendorny.taskservice.repository.RecurTaskRepository;
 import ru.calendorny.taskservice.repository.SingleTaskRepository;
@@ -95,7 +96,7 @@ public class TaskControllerIntegrationTest {
         "new weekly task description",
         LocalDate.now(),
         RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(DayOfWeek.MONDAY)
             .build()
     );
@@ -105,7 +106,7 @@ public class TaskControllerIntegrationTest {
         null,
         LocalDate.now().plusDays(10),
         RruleDto.builder()
-            .frequency(RruleDto.Frequency.MONTHLY)
+            .frequency(TaskFrequency.MONTHLY)
             .dayOfMonth(15)
             .build()
     );
@@ -124,7 +125,7 @@ public class TaskControllerIntegrationTest {
         LocalDate.now(),
         TaskStatus.PENDING,
         RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .dayOfWeek(DayOfWeek.THURSDAY)
             .build()
     );

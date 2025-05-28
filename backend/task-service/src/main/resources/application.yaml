@@ -30,8 +30,6 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
-      batch-size: 16384
-      buffer-memory: 33554432
 
 task:
   kafka:
@@ -41,5 +39,4 @@ auth:
   jwt:
     public-key: ${JWT_PUBLIC_KEY}
     access-token-expiration-minutes: 15
-    refresh-token-expiration-days: 30
     private-key: ${JWT_PRIVATE_KEY}

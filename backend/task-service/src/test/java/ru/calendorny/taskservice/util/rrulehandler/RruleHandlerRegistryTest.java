@@ -2,18 +2,9 @@ package ru.calendorny.taskservice.util.rrulehandler;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.exception.InvalidRruleException;
-import ru.calendorny.taskservice.util.rrulehandler.MonthlyRruleHandler;
-import ru.calendorny.taskservice.util.rrulehandler.RruleHandler;
-import ru.calendorny.taskservice.util.rrulehandler.RruleHandlerRegistry;
-import ru.calendorny.taskservice.util.rrulehandler.WeeklyRruleHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,38 +13,33 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RruleHandlerRegistryTest {
 
-    @MockitoBean
     private WeeklyRruleHandler weeklyHandler;
-
-    @MockitoBean
     private MonthlyRruleHandler monthlyHandler;
-
-    @Autowired
     private RruleHandlerRegistry registry;
 
     @BeforeEach
     void beforeEach() {
+        weeklyHandler = mock(WeeklyRruleHandler.class);
+        monthlyHandler = mock(MonthlyRruleHandler.class);
+
         List<RruleHandler> handlers = Arrays.asList(weeklyHandler, monthlyHandler);
         registry = new RruleHandlerRegistry(handlers);
     }
 
     @Test
     void testFindHandlerWithWeeklyFrequency() {
-        when(weeklyHandler.supports(RruleDto.Frequency.WEEKLY)).thenReturn(true);
-        Optional<RruleHandler> result = registry.findHandler(RruleDto.Frequency.WEEKLY);
+        when(weeklyHandler.supports(TaskFrequency.WEEKLY)).thenReturn(true);
+        Optional<RruleHandler> result = registry.findHandler(TaskFrequency.WEEKLY);
         assertTrue(result.isPresent());
         assertEquals(weeklyHandler, result.get());
     }
 
     @Test
     void testFindHandlerWithMonthlyFrequency() {
-        when(monthlyHandler.supports(RruleDto.Frequency.MONTHLY)).thenReturn(true);
-        Optional<RruleHandler> result = registry.findHandler(RruleDto.Frequency.MONTHLY);
+        when(monthlyHandler.supports(TaskFrequency.MONTHLY)).thenReturn(true);
+        Optional<RruleHandler> result = registry.findHandler(TaskFrequency.MONTHLY);
         assertTrue(result.isPresent());
         assertEquals(monthlyHandler, result.get());
     }
@@ -78,10 +64,10 @@ class RruleHandlerRegistryTest {
 
     @Test
     void testValidate() throws InvalidRruleException {
-        when(weeklyHandler.supports(RruleDto.Frequency.WEEKLY)).thenReturn(true);
+        when(weeklyHandler.supports(TaskFrequency.WEEKLY)).thenReturn(true);
 
         RruleDto dto = RruleDto.builder()
-            .frequency(RruleDto.Frequency.WEEKLY)
+            .frequency(TaskFrequency.WEEKLY)
             .build();
 
         registry.validate(dto);
@@ -110,7 +96,7 @@ class RruleHandlerRegistryTest {
 
     @Test
     void testValidateRruleStringWithValidWeeklyRule() throws InvalidRruleException {
-        when(weeklyHandler.supports(RruleDto.Frequency.WEEKLY)).thenReturn(true);
+        when(weeklyHandler.supports(TaskFrequency.WEEKLY)).thenReturn(true);
         String validRrule = "FREQ=WEEKLY;BYDAY=MONDAY";
         registry.validateRruleString(validRrule);
         verify(weeklyHandler).validateRruleString(validRrule);
@@ -119,7 +105,7 @@ class RruleHandlerRegistryTest {
 
     @Test
     void testValidateRruleStringWithValidMonthlyRule() throws InvalidRruleException {
-        when(monthlyHandler.supports(RruleDto.Frequency.MONTHLY)).thenReturn(true);
+        when(monthlyHandler.supports(TaskFrequency.MONTHLY)).thenReturn(true);
         String validRrule = "FREQ=MONTHLY;BYMONTHDAY=15";
         registry.validateRruleString(validRrule);
         verify(monthlyHandler).validateRruleString(validRrule);

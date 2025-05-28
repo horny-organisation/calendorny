@@ -1,14 +1,10 @@
 package ru.calendorny.taskservice.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
+import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.enums.TaskStatus;
 import ru.calendorny.taskservice.exception.TaskNotFoundException;
 import ru.calendorny.taskservice.exception.TaskProcessorException;
@@ -16,26 +12,18 @@ import ru.calendorny.taskservice.service.impl.BaseTaskManagerServiceImpl;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
 
-import java.time.LocalDate;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BaseTaskManagerServiceImplTest {
 
-    @MockitoBean
     private SingleTaskProcessor singleTaskProcessor;
-
-    @MockitoBean
     private RecurTaskProcessor recurTaskProcessor;
-
-    @Autowired
     private BaseTaskManagerServiceImpl taskManagerService;
 
     private final UUID taskId = UUID.randomUUID();
@@ -43,7 +31,7 @@ class BaseTaskManagerServiceImplTest {
     private final String title = "Test Task";
     private final String description = "Test Description";
     private final LocalDate date = LocalDate.now();
-    private final RruleDto rruleDto = new RruleDto(RruleDto.Frequency.WEEKLY, DayOfWeek.MONDAY, null);
+    private final RruleDto rruleDto = new RruleDto(TaskFrequency.WEEKLY, DayOfWeek.MONDAY, null);
     private final TaskResponse taskResponse = TaskResponse.builder()
         .id(taskId)
         .userId(userId)
@@ -52,6 +40,13 @@ class BaseTaskManagerServiceImplTest {
         .dueDate(date)
         .status(TaskStatus.PENDING)
         .build();
+
+    @BeforeEach
+    void setUp() {
+        singleTaskProcessor = mock(SingleTaskProcessor.class);
+        recurTaskProcessor = mock(RecurTaskProcessor.class);
+        taskManagerService = new BaseTaskManagerServiceImpl(List.of(singleTaskProcessor, recurTaskProcessor));
+    }
 
     @Test
     void testGetTaskSuccess() {
