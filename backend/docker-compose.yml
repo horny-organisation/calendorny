@@ -9,7 +9,19 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - meeting
+      - backend
+
+  zoom-meeting-service:
+    build:
+      context: ./zoom-meeting-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: zoom-meeting-service
+    env_file:
+      - .env
+    networks:
+      - backend
 
 networks:
-  meeting:
+  backend:

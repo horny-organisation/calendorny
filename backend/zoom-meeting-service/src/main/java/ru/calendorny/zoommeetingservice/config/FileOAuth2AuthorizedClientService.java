@@ -29,15 +29,15 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, OAuth2AuthorizedClient> clientCache = new ConcurrentHashMap<>();
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private final AesEncryptionService encryptionService;
 
     public FileOAuth2AuthorizedClientService(
-            ZoomProperties properties,
-            ClientRegistrationRepository clientRegistrationRepository,
-            AesEncryptionService encryptionService) {
+        ZoomProperties properties,
+        ClientRegistrationRepository clientRegistrationRepository,
+        AesEncryptionService encryptionService) {
         this.storageFile = new File(properties.fileName());
         this.clientRegistrationRepository = clientRegistrationRepository;
-
-        OAuth2AuthorizedClientDTO.setEncryptionService(encryptionService);
+        this.encryptionService = encryptionService;
 
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -47,7 +47,7 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
 
     @Override
     public <T extends OAuth2AuthorizedClient> T loadAuthorizedClient(
-            String clientRegistrationId, String principalName) {
+        String clientRegistrationId, String principalName) {
         String key = key(clientRegistrationId, principalName);
         return (T) clientCache.get(key);
     }
@@ -68,7 +68,7 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
     private void saveToFile() {
         try {
             Map<String, OAuth2AuthorizedClientDTO> dtoMap = clientCache.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, e -> new OAuth2AuthorizedClientDTO(e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> convertToEncryptedDto(e.getValue())));
             objectMapper.writeValue(storageFile, dtoMap);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save OAuth2 token to file", e);
@@ -79,15 +79,11 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
         if (!storageFile.exists()) return;
         try {
             Map<String, OAuth2AuthorizedClientDTO> dtoMap =
-                    objectMapper.readValue(storageFile, new TypeReference<>() {});
+                objectMapper.readValue(storageFile, new TypeReference<>() {
+                });
 
             for (Map.Entry<String, OAuth2AuthorizedClientDTO> entry : dtoMap.entrySet()) {
-                OAuth2AuthorizedClientDTO dto = entry.getValue();
-                ClientRegistration registration =
-                        clientRegistrationRepository.findByRegistrationId(dto.getClientRegistrationId());
-                if (registration == null) continue;
-
-                OAuth2AuthorizedClient client = getClient(dto, registration);
+                OAuth2AuthorizedClient client = convertFromEncryptedDto(entry.getValue());
 
                 clientCache.put(entry.getKey(), client);
             }
@@ -97,22 +93,63 @@ public class FileOAuth2AuthorizedClientService implements OAuth2AuthorizedClient
     }
 
     private static @NotNull OAuth2AuthorizedClient getClient(
-            OAuth2AuthorizedClientDTO dto, ClientRegistration registration) {
+        OAuth2AuthorizedClientDTO dto, ClientRegistration registration) {
         OAuth2AccessToken accessToken = new OAuth2AccessToken(
-                OAuth2AccessToken.TokenType.BEARER,
-                dto.getAccessTokenValue(),
-                dto.getAccessTokenIssuedAt(),
-                dto.getAccessTokenExpiresAt());
+            OAuth2AccessToken.TokenType.BEARER,
+            dto.encryptedAccessTokenValue(),
+            dto.accessTokenIssuedAt(),
+            dto.accessTokenExpiresAt());
 
         OAuth2RefreshToken refreshToken = null;
-        if (dto.getRefreshTokenValue() != null) {
-            refreshToken = new OAuth2RefreshToken(dto.getRefreshTokenValue(), dto.getRefreshTokenIssuedAt());
+        if (dto.encryptedRefreshTokenValue() != null) {
+            refreshToken = new OAuth2RefreshToken(dto.encryptedRefreshTokenValue(), dto.refreshTokenIssuedAt());
         }
 
-        return new OAuth2AuthorizedClient(registration, dto.getPrincipalName(), accessToken, refreshToken);
+        return new OAuth2AuthorizedClient(registration, dto.principalName(), accessToken, refreshToken);
     }
 
     private String key(String clientRegistrationId, String principalName) {
         return clientRegistrationId + "::" + principalName;
+    }
+
+    private OAuth2AuthorizedClientDTO convertToEncryptedDto(OAuth2AuthorizedClient client) {
+        return new OAuth2AuthorizedClientDTO(
+            client.getClientRegistration().getRegistrationId(),
+            client.getPrincipalName(),
+            encryptionService.encrypt(client.getAccessToken().getTokenValue()),
+            client.getAccessToken().getIssuedAt(),
+            client.getAccessToken().getExpiresAt(),
+            client.getRefreshToken() != null
+                ? encryptionService.encrypt(client.getRefreshToken().getTokenValue())
+                : null,
+            client.getRefreshToken() != null ? client.getRefreshToken().getIssuedAt() : null
+        );
+    }
+
+    private OAuth2AuthorizedClient convertFromEncryptedDto(OAuth2AuthorizedClientDTO dto) {
+        ClientRegistration registration =
+            clientRegistrationRepository.findByRegistrationId(dto.clientRegistrationId());
+
+        if (registration == null) return null;
+
+        String decryptedAccessToken = encryptionService.decrypt(dto.encryptedAccessTokenValue());
+
+        String decryptedRefreshToken = dto.encryptedRefreshTokenValue() != null
+            ? encryptionService.decrypt(dto.encryptedRefreshTokenValue())
+            : null;
+
+        return new OAuth2AuthorizedClient(
+            registration,
+            dto.principalName(),
+            new OAuth2AccessToken(
+                OAuth2AccessToken.TokenType.BEARER,
+                decryptedAccessToken,
+                dto.accessTokenIssuedAt(),
+                dto.accessTokenExpiresAt()
+            ),
+            decryptedRefreshToken != null
+                ? new OAuth2RefreshToken(decryptedRefreshToken, dto.refreshTokenIssuedAt())
+                : null
+        );
     }
 }
