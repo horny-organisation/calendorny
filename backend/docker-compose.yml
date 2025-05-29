@@ -9,7 +9,19 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - meeting
+      - backend
+
+  google-meeting-service:
+    build:
+      context: ./google-meeting-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: google-meeting-service
+    env_file:
+      - .env
+    networks:
+      - backend
 
 networks:
-  meeting:
+  backend:
