@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.calendorny.authservice.dto.request.UserProfileEdit;
 import ru.calendorny.authservice.entity.Profile;
+import ru.calendorny.authservice.mapper.ProfileRowMapper;
 
 @Repository
 @RequiredArgsConstructor
@@ -68,24 +69,10 @@ public class ProfileRepository {
             """;
 
 
-    private RowMapper<Profile> profileRowMapper() {
-        return (rs, rowNum) -> mapProfile(rs);
-    }
-
-    private Profile mapProfile(ResultSet rs) throws SQLException {
-        return new Profile(
-            UUID.fromString(rs.getString("user_id")),
-            rs.getString("first_name"),
-            rs.getString("last_name"),
-            rs.getDate("birth_date") != null ? rs.getDate("birth_date").toLocalDate() : null,
-            rs.getString("phone_number"),
-            rs.getString("telegram"),
-            rs.getString("timezone"),
-            rs.getString("language"));
-    }
+    private final RowMapper<Profile> profileRowMapper = new ProfileRowMapper();
 
     public Optional<Profile> findByUserId(UUID userId) {
-        return jdbcTemplate.query(SQL_FIND_BY_USER_ID, profileRowMapper(), userId).stream()
+        return jdbcTemplate.query(SQL_FIND_BY_USER_ID, profileRowMapper, userId).stream()
             .findFirst();
     }
 

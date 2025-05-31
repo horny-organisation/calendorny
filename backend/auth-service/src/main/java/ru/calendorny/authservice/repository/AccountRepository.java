@@ -10,35 +10,37 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.calendorny.authservice.entity.Account;
 import ru.calendorny.authservice.entity.Profile;
+import ru.calendorny.authservice.mapper.ProfileRowMapper;
 
 @Repository
 @RequiredArgsConstructor
 public class AccountRepository {
 
     private final JdbcTemplate jdbcTemplate;
+    private final ProfileRowMapper profileRowMapper = new ProfileRowMapper();
 
     private static final String SQL_FIND_BY_EMAIL =
-            """
+        """
             SELECT *
             FROM accounts
             WHERE email = ?
             LIMIT 1
             """;
     private static final String SQL_FIND_BY_ID =
-            """
+        """
             SELECT *
             FROM accounts
             WHERE id = ?
             LIMIT 1
             """;
     private static final String SQL_SAVE =
-            """
+        """
             INSERT INTO accounts
             (id, email, password_hash)
             VALUES (?, ?, ?)
             """;
     private static final String SQL_FIND_BY_ID_WITH_PROFILE =
-            """
+        """
             SELECT *
             FROM accounts a
             JOIN profiles p ON a.id = p.user_id
@@ -46,7 +48,7 @@ public class AccountRepository {
             LIMIT 1
             """;
     private static final String SQL_UPDATE =
-            """
+        """
             UPDATE accounts
             SET email = ?, password_hash = ?
             WHERE id = ?
@@ -91,22 +93,13 @@ public class AccountRepository {
                 if (!rs.next()) {
                     return Optional.empty();
                 }
+
                 Account account = mapAccount(rs);
-                Profile profile = mapProfile(rs);
+                Profile profile = profileRowMapper.mapRow(rs, 1);
                 return Optional.of(new Account(account, profile));
             },
-            id);
+            id
+        );
     }
 
-    private Profile mapProfile(ResultSet rs) throws SQLException {
-        return new Profile(
-            UUID.fromString(rs.getString("user_id")),
-            rs.getString("first_name"),
-            rs.getString("last_name"),
-            rs.getDate("birth_date") != null ? rs.getDate("birth_date").toLocalDate() : null,
-            rs.getString("phone_number"),
-            rs.getString("telegram"),
-            rs.getString("timezone"),
-            rs.getString("language"));
-    }
 }
