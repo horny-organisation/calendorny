@@ -1,17 +1,33 @@
 package ru.calendorny.authservice.dto.request;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
 public record UserProfileEdit(
-    @Size(min = 2, max = 100, message = "min firstName length is 2, max is 100") String firstName,
-    @Size(min = 2, max = 100, message = "min lastName length is 2, max is 100") String lastName,
+    @Size(min = 2, max = 100, message = "firstName length must be between {min} and {max}")
+    String firstName,
+
+    @Size(min = 2, max = 100, message = "lastName length must be between {min} and {max}")
+    String lastName,
+
+    @NotNull(message = "birth date can not be null")
+    @Past(message = "birthdate must be in the past")
     LocalDate birthdate,
-    @Size(min = 9, max = 16, message = "min phone number length is 9, max is 16") String phoneNumber,
-    @Size(min = 2, max = 64, message = "min timezone length is 2, max is 64") String timezone,
-    @Size(min = 2, max = 16, message = "min language length is 2, max is 16") String language,
-    @Size(min = 5, max = 128, message = "min language length is 5, max is 128") String telegram
+
+    @Size(min = 9, max = 20, message = "phoneNumber length must be between {min} and {max}")
+    String phoneNumber,
+
+    @Size(min = 2, max = 50, message = "timezone length must be between {min} and {max}")
+    String timezone,
+
+    @Size(min = 2, max = 10, message = "language length must be between {min} and {max}")
+    String language,
+
+    @Size(min = 5, max = 100, message = "telegram length must be between {min} and {max}")
+    String telegram
 ) {
 }
