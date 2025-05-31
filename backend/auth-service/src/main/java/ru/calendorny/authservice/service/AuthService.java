@@ -31,9 +31,9 @@ public class AuthService {
 
     @Transactional
     public UUID register(RegisterRequest registerRequest) {
-        log.info("Registering account with email: {}", registerRequest.email());
+        log.debug("Registering account with email: {}", registerRequest.email());
         if (accountRepository.findByEmail(registerRequest.email()).isPresent()) {
-            log.info("User with email: {} already exists", registerRequest.email());
+            log.debug("User with email: {} already exists", registerRequest.email());
             throw new RegistrationException("User with this email already exists");
         }
 
@@ -60,23 +60,23 @@ public class AuthService {
     }
 
     public AuthTokens login(String email, String rawPassword) {
-        log.info("Trying to login with email: {}", email);
+        log.debug("Trying to login with email: {}", email);
         Account account =
             accountRepository.findByEmail(email).orElseThrow(() -> {
-                log.info("Account with email: {} not found", email);
+                log.debug("Account with email: {} not found", email);
                 return new LoginException("Invalid email or password");
             });
 
         if (!account.isActive()) {
-            log.info("User with email: {} is not active", email);
+            log.debug("User with email: {} is not active", email);
             throw new LoginException("Account is disabled");
         }
 
         if (!passwordService.matches(rawPassword, account.getPasswordHash())) {
-            log.info("User with email: {} does not match password", email);
+            log.debug("User with email: {} does not match password", email);
             throw new LoginException("Invalid email or password");
         }
-        log.info("Login successful");
+        log.debug("Login successful");
         return getAuthTokens(account);
     }
 
@@ -90,16 +90,16 @@ public class AuthService {
     }
 
     private AuthTokens updateAccessTokenByRefreshToken(UUID userId, String refreshToken) {
-        log.info("Trying to five access token for userId={}", userId);
+        log.debug("Trying to five access token for userId={}", userId);
         Account account = accountRepository.findById(userId).orElseThrow(() -> {
-            log.info("Account with id: {} not found", userId);
+            log.debug("Account with id: {} not found", userId);
             return new LoginException("Account not found");
         });
         return getAuthTokens(account, refreshToken);
     }
 
     private AuthTokens getAuthTokens(Account account, String refreshToken) {
-        log.info("generating access token for userId={} by refresh", account.getId());
+        log.debug("generating access token for userId={} by refresh", account.getId());
         String accessToken = jwtService.generateAccessToken(
             account.getId().toString(),
             Map.of(
@@ -110,19 +110,19 @@ public class AuthService {
     }
 
     private UUID validateRefreshToken(String refreshToken) {
-        log.info("trying to find refresh in db {}", refreshToken);
+        log.debug("trying to find refresh in db {}", refreshToken);
         RefreshToken token = refreshTokenRepository
             .findByToken(refreshToken)
             .orElseThrow(() -> {
-                log.info("Refresh token not found in database: {}", refreshToken);
+                log.warn("Refresh token not found in database: {}", refreshToken);
                 return new LoginException("Invalid refresh token");
             });
-        log.info("Refresh token validated");
+        log.debug("Refresh token validated");
         return token.getUserId();
     }
 
     private AuthTokens getAuthTokens(Account account) {
-        log.info("generating access token for userId={} by login and password", account.getId());
+        log.debug("generating access token for userId={} by login and password", account.getId());
         String accessToken = jwtService.generateAccessToken(
             account.getId().toString(),
             Map.of(
