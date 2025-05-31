@@ -173,6 +173,19 @@ services:
       - .env
     networks:
       - backend
+
+  zoom-meeting-service:
+    build:
+      context: ./zoom-meeting-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: zoom-meeting-service
+    env_file:
+      - .env
+    networks:
+      - backend
+
 volumes:
   kafka-1-data:
   kafka-2-data:
