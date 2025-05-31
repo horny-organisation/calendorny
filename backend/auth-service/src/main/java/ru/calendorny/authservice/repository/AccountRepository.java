@@ -1,7 +1,5 @@
 package ru.calendorny.authservice.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.calendorny.authservice.entity.Account;
 import ru.calendorny.authservice.entity.Profile;
+import ru.calendorny.authservice.mapper.AccountRowMapper;
 import ru.calendorny.authservice.mapper.ProfileRowMapper;
 
 @Repository
@@ -55,26 +54,16 @@ public class AccountRepository {
             """;
 
 
-    private RowMapper<Account> accountRowMapper() {
-        return (rs, rowNum) -> mapAccount(rs);
-    }
+    private final RowMapper<Account> accountRowMapper = new AccountRowMapper();
 
-    private Account mapAccount(ResultSet rs) throws SQLException {
-        return new Account(
-            UUID.fromString(rs.getString("id")),
-            rs.getString("email"),
-            rs.getString("password_hash"),
-            rs.getTimestamp("created_at").toInstant(),
-            rs.getBoolean("is_active"));
-    }
 
     public Optional<Account> findByEmail(String email) {
-        return jdbcTemplate.query(SQL_FIND_BY_EMAIL, accountRowMapper(), email).stream()
+        return jdbcTemplate.query(SQL_FIND_BY_EMAIL, accountRowMapper, email).stream()
             .findFirst();
     }
 
     public Optional<Account> findById(UUID id) {
-        return jdbcTemplate.query(SQL_FIND_BY_ID, accountRowMapper(), id).stream()
+        return jdbcTemplate.query(SQL_FIND_BY_ID, accountRowMapper, id).stream()
             .findFirst();
     }
 
@@ -94,7 +83,7 @@ public class AccountRepository {
                     return Optional.empty();
                 }
 
-                Account account = mapAccount(rs);
+                Account account = accountRowMapper.mapRow(rs, 1);
                 Profile profile = profileRowMapper.mapRow(rs, 1);
                 return Optional.of(new Account(account, profile));
             },
