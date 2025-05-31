@@ -90,7 +90,7 @@ public class AuthService {
     }
 
     private AuthTokens updateAccessTokenByRefreshToken(UUID userId, String refreshToken) {
-        log.debug("Trying to five access token for userId={}", userId);
+        log.debug("Trying to give access token for userId={}", userId);
         Account account = accountRepository.findById(userId).orElseThrow(() -> {
             log.debug("Account with id: {} not found", userId);
             return new LoginException("Account not found");
