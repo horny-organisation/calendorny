@@ -1,4 +1,4 @@
 rootProject.name = 'backend'
 
-include 'test-service'
 include 'auth-service'
+include 'task-service'
