@@ -233,10 +233,11 @@ public class ProfileControllerIntegrationTest {
 
         assertEquals(400, response.getBody().code());
         List<ValidationErrorResponse.ValidationError> expectedErrors = List.of(
-            new ValidationErrorResponse.ValidationError("lastName", "min lastName length is 2, max is 100"),
-            new ValidationErrorResponse.ValidationError("phoneNumber", "min phone number length is 9, max is 16"),
-            new ValidationErrorResponse.ValidationError("firstName", "min firstName length is 2, max is 100")
+            new ValidationErrorResponse.ValidationError("lastName", "lastName length must be between 2 and 100"),
+            new ValidationErrorResponse.ValidationError("phoneNumber", "phoneNumber length must be between 9 and 20"),
+            new ValidationErrorResponse.ValidationError("firstName", "firstName length must be between 2 and 100")
         );
+        System.out.println(response.getBody().validationErrors());
         assertTrue(expectedErrors.containsAll(response.getBody().validationErrors()));
         System.out.println(response.getBody());
     }
