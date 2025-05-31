@@ -2,11 +2,13 @@ package ru.calendorny.authservice.entity;
 
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class Profile {
 
     private final UUID userId;
@@ -18,22 +20,4 @@ public class Profile {
     private String timezone;
     private String language;
 
-    public Profile(
-            UUID userId,
-            String firstName,
-            String lastName,
-            LocalDate birthDate,
-            String phoneNumber,
-            String telegram,
-            String timezone,
-            String language) {
-        this.userId = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.phoneNumber = phoneNumber;
-        this.telegram = telegram;
-        this.timezone = timezone;
-        this.language = language;
-    }
 }
