@@ -1,5 +1,4 @@
 services:
-
   kafka-1:
     image: apache/kafka:4.0.0
     container_name: kafka-1
@@ -152,6 +151,28 @@ services:
       - task-service
       - backend
 
+  local-rabbit-mq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  google-meeting-service:
+    build:
+      context: ./google-meeting-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: google-meeting-service
+    env_file:
+      - .env
+    networks:
+      - backend
 volumes:
   kafka-1-data:
   kafka-2-data:
