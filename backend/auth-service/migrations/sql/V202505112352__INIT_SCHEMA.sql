@@ -3,7 +3,7 @@
 CREATE TABLE accounts
 (
     id            UUID PRIMARY KEY,
-    email         VARCHAR(100) UNIQUE NOT NULL,
+    email         VARCHAR(254) UNIQUE NOT NULL,
     password_hash TEXT                NOT NULL,
     created_at    TIMESTAMP                    DEFAULT CURRENT_TIMESTAMP,
     is_active     BOOLEAN             NOT NULL DEFAULT TRUE

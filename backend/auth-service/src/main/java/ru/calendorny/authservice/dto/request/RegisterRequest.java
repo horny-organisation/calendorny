@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 public record RegisterRequest(
     @Email(message = "incorrect email")
     @NotBlank(message = "email must not be blank")
-    @Size(max = 100, message = "email should be less then {max} chars")
+    @Size(max = 254, message = "email should be less then {max} chars")
     String email,
 
     @Size(min = 8, message = "min pass length is {min}")
