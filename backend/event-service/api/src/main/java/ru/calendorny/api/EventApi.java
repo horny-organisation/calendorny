@@ -72,7 +72,7 @@ public interface EventApi {
     @GetMapping("/invitations")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    EventDetailedResponse getAllEventInvitations(
+    List<EventDetailedResponse> getAllEventInvitations(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser
     );
 
