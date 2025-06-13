@@ -1,6 +1,10 @@
 dependencies {
     implementation project(":event-service:api")
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation platform('io.jsonwebtoken:jjwt-root:0.12.6')
+    implementation 'io.jsonwebtoken:jjwt-api'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
 }
 
 
