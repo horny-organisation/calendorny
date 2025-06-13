@@ -1,0 +1,9 @@
+dependencies {
+    implementation project(":event-service:api")
+}
+
+
+springBoot {
+    mainClass = 'ru.calendorny.EventServiceApplication'
+}
+

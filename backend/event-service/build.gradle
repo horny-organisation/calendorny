@@ -1,0 +1,12 @@
+tasks.register("prepareKotlinBuildScriptModel") {
+    doLast {
+    }
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
