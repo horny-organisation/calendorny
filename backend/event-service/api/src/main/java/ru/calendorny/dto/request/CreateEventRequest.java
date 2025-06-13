@@ -17,7 +17,7 @@ public record CreateEventRequest(
     @Size(max = 1000, message = "Event title should be longer than {} characters")
     String description,
 
-    @Size(max = 300, message = "Event title should be longer than {} characters")
+    @Size(max = 255, message = "Event title should be longer than {} characters")
     String location,
 
     @NotNull(message = "Event start should not be empty")
