@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.calendorny.dto.enums.ParticipantStatus;
 import ru.calendorny.dto.request.CreateEventRequest;
 import ru.calendorny.dto.request.UpdateEventRequest;
 import ru.calendorny.dto.response.EventDetailedResponse;
@@ -65,6 +67,22 @@ public interface EventApi {
     void deleteEventById(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
         @PathVariable("eventId") UUID eventId
+    );
+
+    @GetMapping("/invitations")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
+    EventDetailedResponse getAllEventInvitations(
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser
+    );
+
+    @PostMapping("/invitations/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
+    EventDetailedResponse answerInvitation(
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+        @PathVariable("eventId") UUID eventId,
+        @RequestParam("answer") ParticipantStatus participantStatus
     );
 
 }
