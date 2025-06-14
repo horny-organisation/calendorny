@@ -1,0 +1,42 @@
+spring:
+
+  application:
+    name: event-service
+
+  datasource:
+    url: ${EVENT_SERVICE_POSTGRES_URL}
+    username: ${EVENT_SERVICE_POSTGRES_USER}
+    password: ${EVENT_SERVICE_POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
+
+  liquibase:
+    enabled: false
+
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    properties:
+      org.quartz.scheduler.instanceName: QuartzScheduler
+      org.quartz.jobStore.isClustered: false
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.tablePrefix: QRTZ_
+
+auth:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY}
+    access-token-expiration-minutes: 15
+    private-key: ${JWT_PRIVATE_KEY}
+

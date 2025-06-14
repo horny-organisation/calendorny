@@ -26,7 +26,7 @@ public record CreateEventRequest(
     @NotNull(message = "Event end should not be empty")
     LocalDateTime endTime,
     RruleDto rrule,
-    Long labelId,
+    List<Long> labels,
     boolean isMeeting,
     MeetingType meetingType,
     List<String> participantEmails,

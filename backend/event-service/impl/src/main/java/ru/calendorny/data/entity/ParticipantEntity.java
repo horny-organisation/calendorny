@@ -3,6 +3,7 @@ package ru.calendorny.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import ru.calendorny.dto.enums.ParticipantStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,8 +29,12 @@ public class ParticipantEntity {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "email", nullable = false)
+    private String email;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private ParticipantStatus status;
 
     @Column(name = "invited_at", nullable = false)
     private LocalDateTime invitedAt;

@@ -9,15 +9,6 @@ CREATE TABLE event_labels
     CONSTRAINT ev_lab_color_nn CHECK ( color IS NOT NULL )
 );
 
-CREATE TABLE reminder_methods
-(
-    id   BIGINT GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(50),
-    -----------------------------------------------------
-    CONSTRAINT ren_meth_id_pk PRIMARY KEY (id),
-    CONSTRAINT rem_meth_name_nn CHECK ( name IS NOT NULL )
-);
-
 CREATE TABLE event
 (
     id                UUID,
@@ -28,29 +19,30 @@ CREATE TABLE event
     end_time          TIMESTAMP,
     rrule             VARCHAR(255),
     is_meeting        BOOLEAN DEFAULT FALSE,
+    meeting_type      VARCHAR(30),
     video_meeting_url VARCHAR(255),
     is_active         BOOLEAN,
+    organizer_id      UUId,
     ------------------------------------------------------------
     CONSTRAINT ev_id_pk PRIMARY KEY (id),
     CONSTRAINT ev_title_nn CHECK ( title IS NOT NULL ),
     CONSTRAINT ev_start_time_nn CHECK ( start_time IS NOT NULL ),
     CONSTRAINT ev_end_time_nn CHECK ( end_time IS NOT NULL ),
-    CONSTRAINT ev_is_active_nn CHECK ( is_active IS NOT NULL )
+    CONSTRAINT ev_is_active_nn CHECK ( is_active IS NOT NULL ),
+    CONSTRAINT ev_organizer_id_nn CHECK ( organizer_id IS NOT NULL )
 );
 
 CREATE TABLE reminders
 (
-    id              UUID,
-    event_id        UUID,
-    minutes_before  INTEGER,
-    reminder_method BIGINT,
+    id                  UUID,
+    event_id            UUID,
+    minutes_before      INTEGER,
+    notification_job_id VARCHAR,
     -----------------------------------------------------------------------------------------------
     CONSTRAINT rem_id_pk PRIMARY KEY (id),
     CONSTRAINT rem_event_id_nn CHECK ( event_id IS NOT NULL ),
     CONSTRAINT rem_event_id_fk FOREIGN KEY (event_id) REFERENCES event (id),
-    CONSTRAINT ren_minutes_before_nn CHECK ( minutes_before IS NOT NULL ),
-    CONSTRAINT rem_reminder_method_nn CHECK ( reminder_method IS NOT NULL ),
-    CONSTRAINT rem_reminder_method_fk FOREIGN KEY (reminder_method) REFERENCES reminder_methods (id)
+    CONSTRAINT ren_minutes_before_nn CHECK ( minutes_before IS NOT NULL )
 );
 
 CREATE TABLE event_label_links
@@ -70,6 +62,7 @@ CREATE TABLE participants
     id           UUID,
     event_id     UUID,
     user_id      UUID,
+    email        VARCHAR(100),
     status       VARCHAR(30),
     invited_at   TIMESTAMP,
     responded_at TIMESTAMP,
@@ -78,19 +71,8 @@ CREATE TABLE participants
     CONSTRAINT participant_event_id_nn CHECK ( event_id IS NOT NULL ),
     CONSTRAINT participant_event_id_fk FOREIGN KEY (event_id) REFERENCES event (id),
     CONSTRAINT participant_user_id_nn CHECK ( user_id IS NOT NULL ),
+    CONSTRAINT participant_email_nn CHECK ( email IS NOT NULL ),
     CONSTRAINT participant_status_nn CHECK ( status IS NOT NULL ),
     CONSTRAINT participant_invited_at_nn CHECK ( invited_at IS NOT NULL ),
     CONSTRAINT participant_responded_at_nn CHECK ( responded_at IS NOT NULL )
-);
-
-CREATE TABLE organizers
-(
-    id       UUID,
-    event_id UUID,
-    user_id  UUID,
-    -----------------------------------------------------------------------------
-    CONSTRAINT organizer_id_pk PRIMARY KEY (id),
-    CONSTRAINT organizer_event_id_nn CHECK ( event_id IS NOT NULL ),
-    CONSTRAINT organizer_event_id_fk FOREIGN KEY (event_id) REFERENCES event (id),
-    CONSTRAINT organizer_user_id_nn CHECK ( user_id IS NOT NULL )
 );

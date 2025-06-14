@@ -12,19 +12,18 @@ import java.util.UUID;
 @Builder
 public record EventDetailedResponse(
     UUID id,
-    UUID userId,
     String title,
     String description,
     String location,
     LocalDateTime startTime,
     LocalDateTime endTime,
     RruleDto rrule,
-    LabelDto label,
+    List<LabelDto> labels,
     boolean isMeeting,
     MeetingType meetingType,
     String videoMeetingUrl,
+    UUID organizerId,
     List<String> participantEmails,
-    ReminderDto reminder,
-    String organizerEmail
+    List<ReminderDto> reminder
 ) {
 }

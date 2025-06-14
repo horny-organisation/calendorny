@@ -3,10 +3,13 @@ package ru.calendorny.data.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 import ru.calendorny.dto.RruleDto;
+import ru.calendorny.dto.enums.MeetingType;
 import ru.calendorny.util.rrule.RruleConverter;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,6 +59,10 @@ public class EventEntity {
     @Column(name = "is_meeting")
     private boolean isMeeting;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "meeting_type")
+    private MeetingType meetingType;
+
     @Column(name = "video_meeting_url")
     private String videoMeetingUrl;
 
@@ -64,8 +72,8 @@ public class EventEntity {
     @OneToMany(mappedBy = "event")
     private List<ParticipantEntity> participants;
 
-    @OneToMany(mappedBy = "event")
-    private List<OrganizerEntity> organizers;
+    @Column(name = "organizer_id")
+    private UUID organizerId;
 
     @ManyToMany
     @JoinTable(

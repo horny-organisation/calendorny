@@ -27,7 +27,6 @@ public class ReminderEntity {
     @Column(name = "minutes_before", nullable = false)
     private Integer minutesBefore;
 
-    @ManyToOne
-    @JoinColumn(name = "reminder_method", nullable = false)
-    private ReminderMethodEntity reminderMethod;
+    @Column(name = "notification_job_id")
+    private String notificationJobId;
 }
