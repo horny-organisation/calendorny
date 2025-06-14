@@ -23,6 +23,20 @@ spring:
   liquibase:
     enabled: false
 
+  rabbitmq:
+    port: 5672
+    host: localhost
+    username: user
+    password: password
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -51,4 +65,7 @@ app:
     googleMeetRoutingKey: googleMeet
     meetingLinkRoutingKey: meetingLink
     googleMeetDlqRoutingKey: googleMeetDlqRoutingKey
+  kafka:
+    event-notification-topic: event.topic
+    event-notification-dlq-topic: event.topic.dlq
 
