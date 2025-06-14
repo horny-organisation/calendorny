@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: "DDL/V1_2025_06_13_SCHEMA_INITIALIZATION.sql"
       relativeToChangelogFile: true
+  - include:
+      file: "DDL/V1_2025_06_14_ADD_QUARTZ_TABLES.sql"
+      relativeToChangelogFile: true

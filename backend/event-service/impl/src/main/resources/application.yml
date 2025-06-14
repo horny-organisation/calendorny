@@ -40,7 +40,7 @@ spring:
   quartz:
     job-store-type: jdbc
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     properties:
       org.quartz.scheduler.instanceName: QuartzScheduler
       org.quartz.jobStore.isClustered: false

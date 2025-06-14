@@ -14,7 +14,7 @@ import ru.calendorny.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.exception.BadRequestException;
 import ru.calendorny.eventservice.exception.ForbiddenException;
 import ru.calendorny.eventservice.exception.NotFoundException;
-import ru.calendorny.eventservice.quartz.JobSchedulerService;
+import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
 import ru.calendorny.eventservice.repository.EventLabelRepository;
 import ru.calendorny.eventservice.repository.EventRepository;
 import ru.calendorny.eventservice.repository.ParticipantRepository;
