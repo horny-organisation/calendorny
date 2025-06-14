@@ -20,4 +20,6 @@ public interface EventManagementService {
     void updateEventById(AuthenticatedUser authenticatedUser, UUID eventId, UpdateEventRequest updateEventRequest);
 
     void deleteEventById(UUID eventId);
+
+    void setVideoMeetingLinkToEvent(Long eventId, String link);
 }

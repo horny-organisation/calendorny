@@ -11,7 +11,7 @@ CREATE TABLE event_labels
 
 CREATE TABLE event
 (
-    id                UUID,
+    id                BIGINT GENERATED ALWAYS AS IDENTITY,
     title             VARCHAR(200),
     description       TEXT,
     location          VARCHAR(255),
@@ -34,8 +34,8 @@ CREATE TABLE event
 
 CREATE TABLE reminders
 (
-    id                  UUID,
-    event_id            UUID,
+    id                  BIGINT GENERATED ALWAYS AS IDENTITY,
+    event_id            BIGINT,
     minutes_before      INTEGER,
     notification_job_id VARCHAR,
     -----------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ CREATE TABLE reminders
 
 CREATE TABLE event_label_links
 (
-    event_id UUID,
+    event_id BIGINT,
     label_id BIGINT,
     --------------------------------------------------------------------------------------
     CONSTRAINT ev_lab_link_pk PRIMARY KEY (event_id, label_id),
@@ -59,8 +59,8 @@ CREATE TABLE event_label_links
 
 CREATE TABLE participants
 (
-    id           UUID,
-    event_id     UUID,
+    id           BIGINT GENERATED ALWAYS AS IDENTITY,
+    event_id     BIGINT,
     user_id      UUID,
     email        VARCHAR(100),
     status       VARCHAR(30),

@@ -133,4 +133,9 @@ public class EventManagementServiceImpl implements EventManagementService {
             eventRepository.save(event);
         }
     }
+
+    @Override
+    public void setVideoMeetingLinkToEvent(Long eventId, String link) {
+
+    }
 }
