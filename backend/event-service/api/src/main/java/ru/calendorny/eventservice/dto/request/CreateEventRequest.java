@@ -1,11 +1,12 @@
-package ru.calendorny.dto.request;
+package ru.calendorny.eventservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import ru.calendorny.dto.ReminderDto;
-import ru.calendorny.dto.RruleDto;
-import ru.calendorny.dto.enums.MeetingType;
+import ru.calendorny.eventservice.dto.ReminderDto;
+import ru.calendorny.eventservice.dto.RruleDto;
+import ru.calendorny.eventservice.dto.enums.MeetingType;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

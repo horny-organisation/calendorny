@@ -1,4 +1,4 @@
-package ru.calendorny.api;
+package ru.calendorny.eventservice.api;
 
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import ru.calendorny.dto.enums.ParticipantStatus;
-import ru.calendorny.dto.request.CreateEventRequest;
-import ru.calendorny.dto.request.UpdateEventRequest;
-import ru.calendorny.dto.response.EventDetailedResponse;
-import ru.calendorny.dto.response.EventShortResponse;
+import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
+import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
+import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.security.AuthenticatedUser;
 import java.time.LocalDate;
 import java.util.List;
@@ -48,7 +48,7 @@ public interface EventApi {
     @PreAuthorize("isAuthenticated()")
     EventDetailedResponse getEventDetailedInfoById(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-        @PathVariable("eventId") UUID eventId
+        @PathVariable("eventId") Long eventId
     );
 
     @PutMapping("/{eventId}")
@@ -56,7 +56,7 @@ public interface EventApi {
     @PreAuthorize("isAuthenticated()")
     void updateEventById(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-        @PathVariable("eventId") UUID eventId,
+        @PathVariable("eventId") Long eventId,
         @Valid @RequestBody UpdateEventRequest updateEventRequest
     );
 
@@ -65,7 +65,7 @@ public interface EventApi {
     @PreAuthorize("isAuthenticated()")
     void deleteEventById(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-        @PathVariable("eventId") UUID eventId
+        @PathVariable("eventId") Long eventId
     );
 
     @GetMapping("/invitations")
@@ -80,7 +80,7 @@ public interface EventApi {
     @PreAuthorize("isAuthenticated()")
     EventDetailedResponse answerInvitation(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-        @PathVariable("eventId") UUID eventId,
+        @PathVariable("eventId") Long eventId,
         @RequestParam("answer") ParticipantStatus participantStatus
     );
 

@@ -1,14 +1,21 @@
 package ru.calendorny.eventservice.util.rrule;
 
+import lombok.RequiredArgsConstructor;
+import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
-import ru.calendorny.dto.RruleDto;
-import ru.calendorny.dto.enums.EventFrequency;
+import ru.calendorny.eventservice.dto.RruleDto;
+import ru.calendorny.eventservice.dto.enums.EventFrequency;
 import ru.calendorny.eventservice.exception.InvalidRruleException;
+import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
+import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
 import static ru.calendorny.eventservice.util.rrule.RruleConstants.BY_MONTHDAY_KEY;
 import static ru.calendorny.eventservice.util.rrule.RruleConstants.BY_MONTHDAY_PREFIX;
 
 @Component
+@RequiredArgsConstructor
 public class MonthlyRruleHandler implements RruleHandler {
+
+    private final JobSchedulerService jobSchedulerService;
 
     @Override
     public boolean supports(EventFrequency frequency) {
@@ -57,5 +64,10 @@ public class MonthlyRruleHandler implements RruleHandler {
         } catch (Exception e) {
             throw new InvalidRruleException("Invalid RRULE format: " + e.getMessage());
         }
+    }
+
+    @Override
+    public String schedule(EventNotificationRequest request, RruleDto rruleDto) throws SchedulerException {
+        return jobSchedulerService.scheduleMonthly(request, rruleDto.dayOfMonth(), request.start().toLocalTime());
     }
 }

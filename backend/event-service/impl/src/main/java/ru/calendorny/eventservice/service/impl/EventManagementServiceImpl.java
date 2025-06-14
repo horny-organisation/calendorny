@@ -6,19 +6,23 @@ import ru.calendorny.eventservice.data.entity.EventEntity;
 import ru.calendorny.eventservice.data.entity.EventLabelEntity;
 import ru.calendorny.eventservice.data.entity.ParticipantEntity;
 import ru.calendorny.eventservice.data.mapper.EventMapper;
-import ru.calendorny.dto.enums.ParticipantStatus;
-import ru.calendorny.dto.request.CreateEventRequest;
-import ru.calendorny.dto.request.UpdateEventRequest;
-import ru.calendorny.dto.response.EventDetailedResponse;
-import ru.calendorny.dto.response.EventShortResponse;
+import ru.calendorny.eventservice.dto.ReminderDto;
+import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
+import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
+import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.exception.BadRequestException;
 import ru.calendorny.eventservice.exception.ForbiddenException;
 import ru.calendorny.eventservice.exception.NotFoundException;
+import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
 import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
 import ru.calendorny.eventservice.repository.EventLabelRepository;
 import ru.calendorny.eventservice.repository.EventRepository;
 import ru.calendorny.eventservice.repository.ParticipantRepository;
 import ru.calendorny.eventservice.service.EventManagementService;
+import ru.calendorny.eventservice.service.EventSchedulingService;
+import ru.calendorny.eventservice.service.MeetingService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,7 +41,9 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     private final EventMapper eventMapper;
 
-    private final JobSchedulerService jobSchedulerService;
+    private final EventSchedulingService eventSchedulingService;
+
+    private final MeetingService meetingService;
 
     @Override
     public EventDetailedResponse createEvent(UUID userId, CreateEventRequest createEventRequest) {
@@ -46,10 +52,6 @@ public class EventManagementServiceImpl implements EventManagementService {
             EventLabelEntity eventLabelEntity = eventLabelRepository.findById(labelId)
                 .orElseThrow(() -> new BadRequestException("Label with id: %s was not found".formatted(labelId)));
             eventLabels.add(eventLabelEntity);
-        }
-
-        if (createEventRequest.isMeeting()){
-            //TODO: получение ссылки на видел конфу по meetingType
         }
 
         EventEntity newEvent = EventEntity.builder()
@@ -67,6 +69,10 @@ public class EventManagementServiceImpl implements EventManagementService {
             .build();
         EventEntity savedEvent = eventRepository.save(newEvent);
 
+        if (createEventRequest.isMeeting()) {
+            meetingService.sendMeetingRequest(createEventRequest.meetingType(), savedEvent.getId(), createEventRequest.startTime());
+        }
+
         List<String> participantEmails = createEventRequest.participantEmails();
         if (!participantEmails.isEmpty()) {
             for (String email : participantEmails) {
@@ -82,7 +88,19 @@ public class EventManagementServiceImpl implements EventManagementService {
                 participantRepository.save(participant);
             }
         }
-        //TODO: запланировать отправку уведомлений
+
+        ReminderDto reminderDto = createEventRequest.reminder();
+
+        for (Integer minutesBefore : reminderDto.minutesBefore()) {
+            LocalDateTime remindTime = createEventRequest.startTime().minusMinutes(minutesBefore);
+            EventNotificationRequest request = EventNotificationRequest.builder()
+                .userId()
+                .title(createEventRequest.title())
+                .location(createEventRequest.location())
+                .build();
+            eventSchedulingService.scheduleEvent(remindTime, )
+        }
+
 
         return eventMapper.toDetailedResponse(savedEvent );
     }
@@ -93,16 +111,16 @@ public class EventManagementServiceImpl implements EventManagementService {
     }
 
     @Override
-    public EventDetailedResponse getEventDetailedInfoById(UUID eventId) {
+    public EventDetailedResponse getEventDetailedInfoById(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
             .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
         return eventMapper.toDetailedResponse(event);
     }
 
     @Override
-    public void updateEventById(UUID userId, UUID eventId, UpdateEventRequest updateEventRequest) {
+    public void updateEventById(UUID userId, Long eventId, UpdateEventRequest updateEventRequest) {
         EventEntity event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+            .orElseThrow(() -> new BadRequestException("Event with id: %s not found".formatted(eventId)));
         if (!userId.equals(event.getOrganizerId())) {
             throw new ForbiddenException("Events can be updated only by it's organizer");
         }
@@ -124,7 +142,7 @@ public class EventManagementServiceImpl implements EventManagementService {
     }
 
     @Override
-    public void deleteEventById(UUID userId, UUID eventId) {
+    public void deleteEventById(UUID userId, Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
             .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
         if (userId.equals(event.getOrganizerId())) {
@@ -135,6 +153,9 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     @Override
     public void setVideoMeetingLinkToEvent(Long eventId, String link) {
-
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        event.setVideoMeetingUrl(link);
+        eventRepository.save(event);
     }
 }

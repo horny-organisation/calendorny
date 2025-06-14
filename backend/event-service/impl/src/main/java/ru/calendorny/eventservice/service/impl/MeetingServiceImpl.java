@@ -2,7 +2,7 @@ package ru.calendorny.eventservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.calendorny.dto.enums.MeetingType;
+import ru.calendorny.eventservice.dto.enums.MeetingType;
 import ru.calendorny.eventservice.exception.ServiceException;
 import ru.calendorny.eventservice.rabbit.dto.request.MeetingCreateRequest;
 import ru.calendorny.eventservice.rabbit.dto.response.MeetingResponse;

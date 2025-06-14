@@ -1,14 +1,13 @@
-package ru.calendorny.dto.response;
+package ru.calendorny.eventservice.dto.response;
 
 import lombok.Builder;
-import ru.calendorny.dto.LabelDto;
+import ru.calendorny.eventservice.dto.LabelDto;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Builder
 public record EventShortResponse(
-    UUID id,
+    Long id,
     String title,
     String location,
     LocalDateTime startTime,

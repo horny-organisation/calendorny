@@ -1,7 +1,10 @@
 package ru.calendorny.eventservice.util.rrule;
 
-import ru.calendorny.dto.RruleDto;
-import ru.calendorny.dto.enums.EventFrequency;
+import org.quartz.SchedulerException;
+import ru.calendorny.eventservice.dto.RruleDto;
+import ru.calendorny.eventservice.dto.enums.EventFrequency;
+import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
+import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
 
 public interface RruleHandler {
 
@@ -14,4 +17,6 @@ public interface RruleHandler {
     void validate(RruleDto rruleDto);
 
     void validateRruleString(String rruleString);
+
+    String schedule(EventNotificationRequest request, RruleDto rruleDto) throws SchedulerException;
 }

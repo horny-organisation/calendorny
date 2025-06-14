@@ -1,7 +1,8 @@
-package ru.calendorny.dto;
+package ru.calendorny.eventservice.dto;
 
 import lombok.Builder;
-import ru.calendorny.dto.enums.EventFrequency;
+import ru.calendorny.eventservice.dto.enums.EventFrequency;
+
 import java.time.DayOfWeek;
 
 

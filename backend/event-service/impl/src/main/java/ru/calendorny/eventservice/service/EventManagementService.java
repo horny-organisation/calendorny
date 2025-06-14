@@ -1,9 +1,9 @@
 package ru.calendorny.eventservice.service;
 
-import ru.calendorny.dto.request.CreateEventRequest;
-import ru.calendorny.dto.request.UpdateEventRequest;
-import ru.calendorny.dto.response.EventDetailedResponse;
-import ru.calendorny.dto.response.EventShortResponse;
+import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
+import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.security.AuthenticatedUser;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,11 +15,11 @@ public interface EventManagementService {
 
     List<EventShortResponse> getAllEventsByDateRange(UUID userId, LocalDate from, LocalDate to);
 
-    EventDetailedResponse getEventDetailedInfoById(UUID eventId);
+    EventDetailedResponse getEventDetailedInfoById(Long eventId);
 
-    void updateEventById(AuthenticatedUser authenticatedUser, UUID eventId, UpdateEventRequest updateEventRequest);
+    void updateEventById(UUID userId, Long eventId, UpdateEventRequest updateEventRequest);
 
-    void deleteEventById(UUID eventId);
+    void deleteEventById(UUID userId, Long eventId);
 
     void setVideoMeetingLinkToEvent(Long eventId, String link);
 }

@@ -2,7 +2,7 @@ package ru.calendorny.eventservice.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.calendorny.dto.enums.ParticipantStatus;
+import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

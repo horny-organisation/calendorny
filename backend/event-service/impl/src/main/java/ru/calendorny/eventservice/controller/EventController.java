@@ -2,18 +2,17 @@ package ru.calendorny.eventservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-import ru.calendorny.api.EventApi;
-import ru.calendorny.dto.enums.ParticipantStatus;
-import ru.calendorny.dto.request.CreateEventRequest;
-import ru.calendorny.dto.request.UpdateEventRequest;
-import ru.calendorny.dto.response.EventDetailedResponse;
-import ru.calendorny.dto.response.EventShortResponse;
+import ru.calendorny.eventservice.api.EventApi;
+import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
+import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
+import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.security.AuthenticatedUser;
 import ru.calendorny.eventservice.service.EventInvitationService;
 import ru.calendorny.eventservice.service.EventManagementService;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,18 +33,18 @@ public class EventController implements EventApi {
     }
 
     @Override
-    public EventDetailedResponse getEventDetailedInfoById(AuthenticatedUser authenticatedUser, UUID eventId) {
+    public EventDetailedResponse getEventDetailedInfoById(AuthenticatedUser authenticatedUser, Long eventId) {
         return eventManagementService.getEventDetailedInfoById(eventId);
     }
 
     @Override
-    public void updateEventById(AuthenticatedUser authenticatedUser, UUID eventId, UpdateEventRequest updateEventRequest) {
-        eventManagementService.updateEventById(authenticatedUser, eventId, updateEventRequest);
+    public void updateEventById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventRequest updateEventRequest) {
+        eventManagementService.updateEventById(authenticatedUser.id(), eventId, updateEventRequest);
     }
 
     @Override
-    public void deleteEventById(AuthenticatedUser authenticatedUser, UUID eventId) {
-        eventManagementService.deleteEventById(eventId);
+    public void deleteEventById(AuthenticatedUser authenticatedUser, Long eventId) {
+        eventManagementService.deleteEventById(authenticatedUser.id(), eventId);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class EventController implements EventApi {
     }
 
     @Override
-    public EventDetailedResponse answerInvitation(AuthenticatedUser authenticatedUser, UUID eventId, ParticipantStatus participantStatus) {
+    public EventDetailedResponse answerInvitation(AuthenticatedUser authenticatedUser, Long eventId, ParticipantStatus participantStatus) {
         return eventInvitationService.answerInvitation(authenticatedUser.id(), eventId, participantStatus);
     }
 }

@@ -1,17 +1,17 @@
-package ru.calendorny.dto.response;
+package ru.calendorny.eventservice.dto.response;
 
 import lombok.Builder;
-import ru.calendorny.dto.LabelDto;
-import ru.calendorny.dto.ReminderDto;
-import ru.calendorny.dto.RruleDto;
-import ru.calendorny.dto.enums.MeetingType;
+import ru.calendorny.eventservice.dto.LabelDto;
+import ru.calendorny.eventservice.dto.ReminderDto;
+import ru.calendorny.eventservice.dto.RruleDto;
+import ru.calendorny.eventservice.dto.enums.MeetingType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Builder
 public record EventDetailedResponse(
-    UUID id,
+    Long id,
     String title,
     String description,
     String location,

@@ -1,4 +1,4 @@
-package ru.calendorny.dto;
+package ru.calendorny.eventservice.dto;
 
 import lombok.Builder;
 

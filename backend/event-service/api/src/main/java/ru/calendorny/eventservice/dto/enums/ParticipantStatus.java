@@ -1,4 +1,4 @@
-package ru.calendorny.dto.enums;
+package ru.calendorny.eventservice.dto.enums;
 
 public enum ParticipantStatus {
     PENDING,
