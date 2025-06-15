@@ -29,6 +29,7 @@ services:
     depends_on:
       - db-auth
       - liquibase-auth
+      - consul
     env_file:
       - .env
     networks:
@@ -160,6 +161,7 @@ services:
     depends_on:
       - task-service-postgres
       - task-service-liquibase
+      - consul
     env_file:
       - .env
     restart: unless-stopped
