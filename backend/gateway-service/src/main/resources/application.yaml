@@ -17,11 +17,15 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
+          filters:
+            - StripPrefix=1
 
         - id: task-service
           uri: lb://task-service
           predicates:
             - Path=/task/**
+          filters:
+            - StripPrefix=1
 
 server:
   port: 8080
