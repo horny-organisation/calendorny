@@ -56,7 +56,7 @@ public class EventEntity {
     @Column(name = "rrule")
     private RruleDto rrule;
 
-    @Column(name = "is_meeting")
+    @Column(name = "is_meeting", nullable = false)
     private boolean isMeeting;
 
     @Enumerated(EnumType.STRING)
@@ -66,13 +66,13 @@ public class EventEntity {
     @Column(name = "video_meeting_url")
     private String videoMeetingUrl;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
     @OneToMany(mappedBy = "event")
     private List<ParticipantEntity> participants;
 
-    @Column(name = "organizer_id")
+    @Column(name = "organizer_id", nullable = false)
     private UUID organizerId;
 
     @ManyToMany

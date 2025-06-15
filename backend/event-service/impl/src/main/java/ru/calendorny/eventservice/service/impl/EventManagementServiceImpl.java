@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.calendorny.eventservice.data.entity.EventEntity;
 import ru.calendorny.eventservice.data.entity.EventLabelEntity;
 import ru.calendorny.eventservice.data.entity.ParticipantEntity;
@@ -142,114 +143,170 @@ public class EventManagementServiceImpl implements EventManagementService {
     }
 
     @Override
-    public void updateEventInfoById(UUID userId, Long eventId, UpdateEventInfoRequest updateEventInfoRequest) {
+    @Transactional
+    public void updateEventInfoById(UUID userId, Long eventId, UpdateEventInfoRequest request) {
         EventEntity event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new BadRequestException("Event with id: %s not found".formatted(eventId)));
+            .orElseThrow(() -> new BadRequestException("Event not found"));
+
         if (!userId.equals(event.getOrganizerId())) {
-            throw new ForbiddenException("Events can be updated only by it's organizer");
+            throw new ForbiddenException("Only organizer can update event info");
         }
-        event.setTitle(updateEventInfoRequest.title());
-        event.setDescription(updateEventInfoRequest.description());
-        event.setLocation(updateEventInfoRequest.location());
-        event.setStart(updateEventInfoRequest.startTime());
-        event.setEnd(updateEventInfoRequest.endTime());
 
-        List<EventLabelEntity> newLabels = new ArrayList<>();
-        for (Long labelId : updateEventInfoRequest.labels()) {
-            EventLabelEntity eventLabelEntity = eventLabelRepository.findById(labelId)
-                .orElseThrow(() -> new BadRequestException("Label with id: %s was not found".formatted(labelId)));
-            newLabels.add(eventLabelEntity);
+        if (request.startTime().isAfter(request.endTime())) {
+            throw new BadRequestException("End time must be after start time");
         }
-        try {
-            updateReminder(userId, eventId, updateEventInfoRequest, updateEventInfoRequest.startTime(), updateEventInfoRequest.endTime());
-        } catch (SchedulerException e) {
-
+        event.setTitle(request.title());
+        event.setDescription(request.description());
+        event.setLocation(request.location());
+        event.setStart(request.startTime());
+        event.setEnd(request.endTime());
+        event.setRrule(request.rrule());
+        event.setMeeting(request.isMeeting());
+        event.setMeetingType(request.meetingType());
+        eventRepository.save(event);
+        updateEventLabels(event, request.labels());
+        if (request.participantEmails() != null) {
+            updateParticipants(event, request.participantEmails());
         }
+        updateOrganizerReminders(event, request.startTime());
     }
 
-    private void updateReminder(UUID userId, Long eventId, UpdateEventInfoRequest event, LocalDateTime start, LocalDateTime end) throws SchedulerException {
-        List<ReminderEntity> reminders = reminderRepository.findByEventId(eventId);
-        for (ReminderEntity reminder : reminders) {
-            if (reminder.getNotificationJobId() != null) {
-                try {
-                    eventSchedulingService.deleteJob(reminder.getNotificationJobId());
-                } catch (SchedulerException e) {
-                }
+    private void updateEventLabels(EventEntity event, List<Long> labelIds) {
+        if (labelIds == null) return;
+
+        List<EventLabelEntity> newLabels = labelIds.stream()
+            .map(labelId -> eventLabelRepository.findById(labelId)
+                .orElseThrow(() -> new BadRequestException("Label not found")))
+            .toList();
+
+        event.setLabels(newLabels);
+    }
+
+    private void updateParticipants(EventEntity event, List<String> participantEmails) {
+        List<ParticipantEntity> currentParticipants = participantRepository.findByEvent_Id(event.getId());
+        currentParticipants.stream()
+            .filter(p -> !participantEmails.contains(p.getEmail()))
+            .forEach(participantRepository::delete);
+
+        participantEmails.forEach(email -> {
+            if (currentParticipants.stream().noneMatch(p -> p.getEmail().equals(email))) {
+                // TODO: Получить userId по email
+                UUID participantId = UUID.randomUUID();
+
+                ParticipantEntity participant = ParticipantEntity.builder()
+                    .event(event)
+                    .userId(participantId)
+                    .email(email)
+                    .status(ParticipantStatus.PENDING)
+                    .invitedAt(LocalDateTime.now())
+                    .build();
+
+                participantRepository.save(participant);
             }
+        });
+    }
 
-            LocalDateTime reminderTime = start.minusMinutes(reminder.getMinutesBefore());
-            EventNotificationRequest request = new EventNotificationRequest(
-                eventId,
-                userId,
-                event.title(),
-                event.location(),
-                start,
-                end
-            );
-            String newJobId = eventSchedulingService.scheduleEvent(reminderTime, request, event.rrule());
-            reminder.setNotificationJobId(newJobId);
-            reminderRepository.save(reminder);
+    private void updateOrganizerReminders(EventEntity event, LocalDateTime newStartTime) {
+        List<ReminderEntity> organizerReminders = reminderRepository.findByEventIdAndUserId(
+            event.getId(),
+            event.getOrganizerId()
+        );
+
+        for (ReminderEntity reminder : organizerReminders) {
+            try {
+                if (reminder.getNotificationJobId() != null) {
+                    eventSchedulingService.deleteJob(reminder.getNotificationJobId());
+                }
+                LocalDateTime reminderTime = newStartTime.minusMinutes(reminder.getMinutesBefore());
+                EventNotificationRequest notification = createNotificationRequest(event, event.getOrganizerId());
+
+                String newJobId = eventSchedulingService.scheduleEvent(
+                    reminderTime,
+                    notification,
+                    event.getRrule()
+                );
+
+                reminder.setNotificationJobId(newJobId);
+                reminderRepository.save(reminder);
+
+            } catch (SchedulerException e) {
+                throw new ServiceException("Failed to update organizer reminder");
+            }
         }
     }
 
+    private EventNotificationRequest createNotificationRequest(EventEntity event, UUID userId) {
+        return EventNotificationRequest.builder()
+            .eventId(event.getId())
+            .userId(userId)
+            .title(event.getTitle())
+            .location(event.getLocation())
+            .start(event.getStart())
+            .end(event.getEnd())
+            .build();
+    }
+    private void scheduleReminderJob(ReminderEntity reminder, EventEntity event) {
+        try {
+            LocalDateTime reminderTime = event.getStart().minusMinutes(reminder.getMinutesBefore());
 
+            EventNotificationRequest notificationRequest = EventNotificationRequest.builder()
+                .eventId(event.getId())
+                .userId(reminder.getUserId())
+                .title(event.getTitle())
+                .location(event.getLocation())
+                .start(event.getStart())
+                .end(event.getEnd())
+                .build();
+
+            String jobId = eventSchedulingService.scheduleEvent(
+                reminderTime,
+                notificationRequest,
+                event.getRrule()
+            );
+            reminder.setNotificationJobId(jobId);
+        } catch (SchedulerException e) {
+            throw new ServiceException("Failed to schedule reminder for event: " + event.getId());
+        }
+    }
 
     @Override
-    public void updateEventReminderById(UUID userId, Long eventId, UpdateEventReminderRequest updateEventReminderRequest) {
-        // 1. Проверяем, что пользователь является участником события
+    @Transactional
+    public void updateEventReminderById(UUID userId, Long eventId, UpdateEventReminderRequest request) {
         ParticipantEntity participant = participantRepository.findByUserIdAndEvent_Id(userId, eventId)
-            .orElseThrow(() -> new NotFoundException("Participant not found for event"));
+            .orElseThrow(() -> new ForbiddenException("You are not a participant of this event"));
 
-        // 2. Получаем текущие напоминания для этого события и пользователя
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event not found"));
+
         List<ReminderEntity> existingReminders = reminderRepository.findByEventIdAndUserId(eventId, userId);
+        deleteRemindersWithJobs(existingReminders);
 
-        // 3. Удаляем все старые напоминания и их jobs
-        existingReminders.forEach(reminder -> {
+        if (request.reminder() != null && request.reminder().minutesBefore() != null) {
+            for (Integer minutesBefore : request.reminder().minutesBefore()) {
+                ReminderEntity newReminder = ReminderEntity.builder()
+                    .event(event)
+                    .userId(userId)
+                    .minutesBefore(minutesBefore)
+                    .build();
+
+                scheduleReminderJob(newReminder, event);
+                reminderRepository.save(newReminder);
+            }
+        }
+    }
+
+    private void deleteRemindersWithJobs(List<ReminderEntity> reminders) {
+        for (ReminderEntity reminder : reminders) {
             try {
                 if (reminder.getNotificationJobId() != null) {
                     eventSchedulingService.deleteJob(reminder.getNotificationJobId());
                 }
                 reminderRepository.delete(reminder);
             } catch (SchedulerException e) {
-                throw new RuntimeException("Failed to delete reminder job", e);
+                throw new ServiceException("Failed to delete reminder job");
             }
-        });
-
-        // 4. Создаем новые напоминания из запроса
-        for (Integer minutesBefore : updateEventReminderRequest.reminder().minutesBefore()) {
-            ReminderEntity newReminder = ReminderEntity.builder()
-                .event(participant.getEvent())
-                .minutesBefore(minutesBefore)
-                .build();
-
-            // Создаем job для напоминания
-            createReminderJob(newReminder, participant.getEvent());
-
-            // Сохраняем напоминание
-            reminderRepository.save(newReminder);
         }
     }
-
-    private void createReminderJob(ReminderEntity reminder, EventEntity event) {
-        try {
-            LocalDateTime reminderTime = event.getStart().minusMinutes(reminder.getMinutesBefore());
-
-            EventNotificationRequest request = new EventNotificationRequest(
-                event.getId(),
-                event.getOrganizerId(),
-                event.getTitle(),
-                event.getLocation(),
-                event.getStart(),
-                event.getEnd()
-            );
-
-            String jobId = eventSchedulingService.scheduleEvent(reminderTime, request, event.getRrule());
-            reminder.setNotificationJobId(jobId);
-        } catch (SchedulerException e) {
-            throw new RuntimeException("Failed to create reminder job", e);
-        }
-    }
-
 
     @Override
     public void deleteEventById(UUID userId, Long eventId) {

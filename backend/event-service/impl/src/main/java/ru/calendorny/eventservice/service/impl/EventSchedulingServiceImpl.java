@@ -1,7 +1,6 @@
 package ru.calendorny.eventservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 import ru.calendorny.eventservice.dto.RruleDto;
@@ -29,7 +28,6 @@ public class EventSchedulingServiceImpl implements EventSchedulingService {
             EventFrequency frequency = rruleDto.frequency();
             RruleHandler handler = handlerRegistry.findHandler(frequency)
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported frequency: " + frequency));
-
             return handler.schedule(request, rruleDto);
         }
     }

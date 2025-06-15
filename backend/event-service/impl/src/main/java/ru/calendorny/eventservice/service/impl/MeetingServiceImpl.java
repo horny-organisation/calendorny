@@ -17,7 +17,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     private final RabbitMeetingProducer meetingProducer;
 
-    private EventManagementService eventManagementService;
+    private final EventManagementService eventManagementService;
     @Override
     public void sendMeetingRequest(MeetingType meetingType, Long eventId, LocalDateTime start) {
         MeetingCreateRequest request = MeetingCreateRequest.builder()

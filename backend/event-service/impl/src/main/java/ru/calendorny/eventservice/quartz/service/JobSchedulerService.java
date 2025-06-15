@@ -2,7 +2,6 @@ package ru.calendorny.eventservice.quartz.service;
 
 import lombok.RequiredArgsConstructor;
 import org.quartz.CronScheduleBuilder;
-import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -14,9 +13,7 @@ import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.springframework.stereotype.Service;
 import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
-import ru.calendorny.eventservice.quartz.job.MonthlyJob;
-import ru.calendorny.eventservice.quartz.job.OneTimeJob;
-import ru.calendorny.eventservice.quartz.job.WeeklyJob;
+import ru.calendorny.eventservice.quartz.job.ReminderJob;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -30,7 +27,7 @@ public class JobSchedulerService {
     private final Scheduler scheduler;
 
     public String scheduleOneTime(EventNotificationRequest request, LocalDateTime runAt) throws SchedulerException {
-        JobDetail jobDetail = buildJobDetail(OneTimeJob.class, request);
+        JobDetail jobDetail = buildJobDetail(request);
         Trigger trigger = TriggerBuilder.newTrigger()
             .forJob(jobDetail)
             .startAt(Timestamp.valueOf(runAt))
@@ -42,7 +39,7 @@ public class JobSchedulerService {
     }
 
     public String scheduleWeekly(EventNotificationRequest request, DayOfWeek dayOfWeek, LocalTime time) throws SchedulerException {
-        JobDetail jobDetail = buildJobDetail(WeeklyJob.class, request);
+        JobDetail jobDetail = buildJobDetail(request);
         Trigger trigger = TriggerBuilder.newTrigger()
             .forJob(jobDetail)
             .withSchedule(CronScheduleBuilder
@@ -56,7 +53,7 @@ public class JobSchedulerService {
     }
 
     public String scheduleMonthly(EventNotificationRequest request, int dayOfMonth, LocalTime time) throws SchedulerException {
-        JobDetail jobDetail = buildJobDetail(MonthlyJob.class, request);
+        JobDetail jobDetail = buildJobDetail(request);
         String cron = String.format("0 %d %d %d * ?", time.getMinute(), time.getHour(), dayOfMonth);
 
         Trigger trigger = TriggerBuilder.newTrigger()
@@ -77,7 +74,7 @@ public class JobSchedulerService {
     }
 
 
-    private JobDetail buildJobDetail(Class<? extends Job> jobClass, EventNotificationRequest request) {
+    private JobDetail buildJobDetail(EventNotificationRequest request) {
         JobDataMap map = new JobDataMap();
         map.put("eventId", request.eventId());
         map.put("userId", request.userId().toString());
@@ -86,7 +83,7 @@ public class JobSchedulerService {
         map.put("start", request.start().toString());
         map.put("end", request.end().toString());
 
-        return JobBuilder.newJob(jobClass)
+        return JobBuilder.newJob(ReminderJob.class)
             .withIdentity(UUID.randomUUID().toString(), "event-jobs")
             .usingJobData(map)
             .storeDurably()

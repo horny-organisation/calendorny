@@ -5,3 +5,9 @@ databaseChangeLog:
   - include:
       file: "DDL/V1_2025_06_14_ADD_QUARTZ_TABLES.sql"
       relativeToChangelogFile: true
+  - include:
+      file: "DDL/V1_2025_06_15_ADD_INDEXES.sql"
+      relativeToChangelogFile: true
+  - include:
+      file: "DML/V1_2025_06_15_INSERT_DEMO_EVENT_LABELS.sql"
+      relativeToChangelogFile: true

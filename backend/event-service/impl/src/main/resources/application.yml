@@ -26,8 +26,8 @@ spring:
   rabbitmq:
     port: 5672
     host: localhost
-    username: user
-    password: password
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
@@ -65,6 +65,10 @@ app:
     googleMeetRoutingKey: googleMeet
     meetingLinkRoutingKey: meetingLink
     googleMeetDlqRoutingKey: googleMeetDlqRoutingKey
+    zoomMeetQueue: zoomMeetQueue
+    zoomMeetDlq: zoomMeetDlq
+    zoomMeetRoutingKey: zoomMeet
+    zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
   kafka:
     event-notification-topic: event.topic
     event-notification-dlq-topic: event.topic.dlq
