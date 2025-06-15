@@ -27,8 +27,8 @@ spring:
   rabbitmq:
     port: 5672
     host: localhost
-    username: user
-    password: password
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
 
   security:
     oauth2:
@@ -38,10 +38,10 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
-            - openid
-            - profile
-            - email
-            - https://www.googleapis.com/auth/meetings.space.created
+              - openid
+              - profile
+              - email
+              - https://www.googleapis.com/auth/meetings.space.created
             redirect-uri: http://localhost:8080/login/oauth2/code/google
         provider:
           google:
