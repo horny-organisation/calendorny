@@ -1,6 +1,7 @@
 package ru.calendorny.eventservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 import ru.calendorny.eventservice.dto.RruleDto;
@@ -31,6 +32,10 @@ public class EventSchedulingServiceImpl implements EventSchedulingService {
 
             return handler.schedule(request, rruleDto);
         }
+    }
+
+    public void deleteJob(String jobId) throws SchedulerException {
+        jobSchedulerService.deleteJob(jobId);
     }
 
 }

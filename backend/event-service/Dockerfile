@@ -1,5 +1,5 @@
 FROM eclipse-temurin:23-jdk
 LABEL authors="v_yamancheva"
 WORKDIR /app
-COPY build/libs/event-service-0.0.1-SNAPSHOT-plain.jar app.jar
+COPY impl/build/libs/event-service.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

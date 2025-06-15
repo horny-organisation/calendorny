@@ -10,10 +10,14 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.5'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.dmfs:lib-recur:0.17.1'
 }
 
 
 springBoot {
-    mainClass = 'ru.calendorny.EventServiceApplication'
+    mainClass = 'ru.calendorny.eventservice.EventServiceApplication'
 }
 
+bootJar {
+    archiveFileName = 'event-service.jar'
+}

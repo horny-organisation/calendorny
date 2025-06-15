@@ -5,13 +5,14 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.calendorny.eventservice.api.EventApi;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
-import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.security.AuthenticatedUser;
 import ru.calendorny.eventservice.service.EventInvitationService;
 import ru.calendorny.eventservice.service.EventManagementService;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,7 @@ public class EventController implements EventApi {
     }
 
     @Override
-    public List<EventShortResponse> getAllEventsByDateRange(AuthenticatedUser authenticatedUser, LocalDate from, LocalDate to) {
+    public List<EventShortResponse> getAllEventsByDateRange(AuthenticatedUser authenticatedUser, LocalDateTime from, LocalDateTime to) {
         return eventManagementService.getAllEventsByDateRange(authenticatedUser.id(), from, to);
     }
 
@@ -38,8 +39,13 @@ public class EventController implements EventApi {
     }
 
     @Override
-    public void updateEventById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventRequest updateEventRequest) {
-        eventManagementService.updateEventById(authenticatedUser.id(), eventId, updateEventRequest);
+    public void updateEventInfoById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventInfoRequest updateEventInfoRequest) {
+
+    }
+
+    @Override
+    public void updateEventReminderById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventReminderRequest updateEventReminderRequest) {
+
     }
 
     @Override

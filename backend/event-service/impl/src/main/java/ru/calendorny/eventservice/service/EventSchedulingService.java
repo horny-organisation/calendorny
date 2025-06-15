@@ -8,4 +8,6 @@ import java.time.LocalDateTime;
 public interface EventSchedulingService {
 
     String scheduleEvent(LocalDateTime notificationTime, EventNotificationRequest request, RruleDto rruleDto) throws SchedulerException;
+
+    void deleteJob(String jobId) throws SchedulerException;
 }

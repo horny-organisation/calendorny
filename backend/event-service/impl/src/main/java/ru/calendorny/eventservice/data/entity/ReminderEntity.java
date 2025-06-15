@@ -2,6 +2,7 @@ package ru.calendorny.eventservice.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -26,4 +27,7 @@ public class ReminderEntity {
 
     @Column(name = "notification_job_id")
     private String notificationJobId;
+
+    @Column(name = "user_id")
+    private UUID userId;
 }

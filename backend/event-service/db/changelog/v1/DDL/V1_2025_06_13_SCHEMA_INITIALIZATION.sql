@@ -38,6 +38,7 @@ CREATE TABLE reminders
     event_id            BIGINT,
     minutes_before      INTEGER,
     notification_job_id VARCHAR,
+    user_id             UUID,
     -----------------------------------------------------------------------------------------------
     CONSTRAINT rem_id_pk PRIMARY KEY (id),
     CONSTRAINT rem_event_id_nn CHECK ( event_id IS NOT NULL ),

@@ -9,7 +9,7 @@ import ru.calendorny.eventservice.dto.enums.MeetingType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record UpdateEventRequest(
+public record UpdateEventInfoRequest(
     @NotBlank(message = "Event title should not be empty")
     @Size(max = 200, message = "Event title should be longer than {} characters")
     String title,
@@ -29,7 +29,6 @@ public record UpdateEventRequest(
     List<Long> labels,
     boolean isMeeting,
     MeetingType meetingType,
-    List<String> participantEmails,
-    ReminderDto reminder
+    List<String> participantEmails
 ) {
 }

@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
-import ru.calendorny.eventservice.dto.request.UpdateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.security.AuthenticatedUser;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RequestMapping("/events")
 public interface EventApi {
@@ -39,8 +39,8 @@ public interface EventApi {
     @PreAuthorize("isAuthenticated()")
     List<EventShortResponse> getAllEventsByDateRange(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
-        @RequestParam LocalDate from,
-        @RequestParam LocalDate to
+        @RequestParam LocalDateTime from,
+        @RequestParam LocalDateTime to
     );
 
     @GetMapping("/{eventId}")
@@ -51,13 +51,22 @@ public interface EventApi {
         @PathVariable("eventId") Long eventId
     );
 
-    @PutMapping("/{eventId}")
+    @PutMapping("/{eventId}/info")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
-    void updateEventById(
+    void updateEventInfoById(
         @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
         @PathVariable("eventId") Long eventId,
-        @Valid @RequestBody UpdateEventRequest updateEventRequest
+        @Valid @RequestBody UpdateEventInfoRequest updateEventInfoRequest
+    );
+
+    @PutMapping("/{eventId}/reminder")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("isAuthenticated()")
+    void updateEventReminderById(
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+        @PathVariable("eventId") Long eventId,
+        @Valid @RequestBody UpdateEventReminderRequest updateEventReminderRequest
     );
 
     @DeleteMapping("/{eventId}")

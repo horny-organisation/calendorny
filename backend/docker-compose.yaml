@@ -157,7 +157,7 @@ services:
     image: postgres:16-alpine
     container_name: task-service-postgres
     ports:
-      - "5433:5432"
+      - "5434:5432"
     env_file:
       - .env
     environment:
@@ -204,7 +204,7 @@ services:
       dockerfile: Dockerfile
     container_name: task-service
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - task-service-postgres
       - task-service-liquibase

@@ -6,6 +6,7 @@ import org.quartz.Job;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
@@ -68,6 +69,11 @@ public class JobSchedulerService {
 
         scheduler.scheduleJob(jobDetail, trigger);
         return jobDetail.getKey().getName();
+    }
+
+    public void deleteJob(String jobId) throws SchedulerException {
+        JobKey jobKey = new JobKey(jobId, "event-jobs");
+        scheduler.deleteJob(jobKey);
     }
 
 

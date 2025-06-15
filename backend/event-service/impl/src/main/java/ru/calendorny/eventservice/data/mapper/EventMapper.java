@@ -54,19 +54,10 @@ public class EventMapper {
             .build();
     }
 
-    List<ReminderDto> reminderToDto(List<ReminderEntity> reminderEntities) {
-        List<ReminderDto> reminderDtos = new ArrayList<>();
-        for (ReminderEntity reminder : reminderEntities) {
-            if (reminderDtos.get(reminder.getReminderMethod().getId()) == null) {
-                reminderDtos.add(
-                    ReminderDto.builder()
-                        .reminderMethodId(reminder.getReminderMethod().getId())
-                        .build()
-                );
-            }
-            ReminderDto reminderDto = reminderDtos.get(reminder.getReminderMethod().getId());
-            reminderDto.minutesBefore().add(reminder.getMinutesBefore());
-        }
-        return reminderDtos;
+    ReminderDto reminderToDto(List<ReminderEntity> reminderEntities) {
+        ReminderDto dto = ReminderDto.builder()
+            .minutesBefore(reminderEntities.stream().map(ReminderEntity::getMinutesBefore).collect(Collectors.toList()))
+            .build();
+        return dto;
     }
 }
