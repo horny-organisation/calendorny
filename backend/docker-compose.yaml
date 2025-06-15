@@ -24,8 +24,8 @@ services:
     build:
       context: ./auth-service
     container_name: auth-service
-    ports:
-      - "8083:8080"
+    expose:
+      - 8080
     depends_on:
       - db-auth
       - liquibase-auth
