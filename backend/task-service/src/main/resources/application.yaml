@@ -1,7 +1,17 @@
 spring:
-
   application:
     name: task-service
+
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
 
   datasource:
     url: ${TASK_SERVICE_POSTGRES_URL}
@@ -30,6 +40,12 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
 
 task:
   kafka:

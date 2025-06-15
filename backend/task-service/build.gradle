@@ -26,7 +26,16 @@ dependencies {
 
     implementation 'org.dmfs:lib-recur:0.17.1'
 
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
+    }
+}
+
 
 tasks.register("prepareKotlinBuildScriptModel") {
     doLast {
