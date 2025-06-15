@@ -263,7 +263,6 @@ volumes:
 
 networks:
   task-service:
-    driver: bridge
   backend:
   auth-network:
 
