@@ -11,7 +11,7 @@ import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.event.TodayTaskEvent;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.kafka.KafkaConfigProperties;
+import ru.calendorny.taskservice.kafka.properties.KafkaConfigProperties;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;

@@ -105,7 +105,7 @@ services:
     image: postgres:16-alpine
     container_name: task-service-postgres
     ports:
-      - "5433:5432"
+      - "5434:5432"
     env_file:
       - .env
     environment:
@@ -115,11 +115,6 @@ services:
     volumes:
       - task-service-postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${TASK_SERVICE_POSTGRES_USER}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
     networks:
       - task-service
 
@@ -127,8 +122,7 @@ services:
     image: liquibase:4.29
     container_name: task-service-liquibase
     depends_on:
-      task-service-postgres:
-        condition: service_healthy
+      - task-service-postgres
     env_file:
       - .env
     environment:
@@ -151,8 +145,8 @@ services:
       context: ./task-service
       dockerfile: Dockerfile
     container_name: task-service
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     depends_on:
       - task-service-postgres
       - task-service-liquibase
@@ -205,7 +199,5 @@ volumes:
 
 networks:
   task-service:
-    driver: bridge
   backend:
   auth-network:
-

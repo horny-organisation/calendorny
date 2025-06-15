@@ -3,6 +3,17 @@ spring:
   application:
     name: task-service
 
+  cloud:
+    consul:
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
   datasource:
     url: ${TASK_SERVICE_POSTGRES_URL}
     username: ${TASK_SERVICE_POSTGRES_USER}
@@ -28,12 +39,21 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
       acks: all
       retries: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
 
 task:
   kafka:
     task-notification-topic: task-topic
+    task-notification-dlq-topic: task-dlq-topic
 
 auth:
   jwt:
