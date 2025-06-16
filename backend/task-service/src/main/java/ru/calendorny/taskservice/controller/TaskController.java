@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-import ru.calendorny.securitystarter.AuthenticatedUser;
 import ru.calendorny.taskservice.api.TaskApi;
 import ru.calendorny.taskservice.dto.request.CreateTaskRequest;
 import ru.calendorny.taskservice.dto.request.UpdateTaskRequest;
 import ru.calendorny.taskservice.dto.request.UpdateTaskStatusRequest;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
+import ru.calendorny.taskservice.security.AuthenticatedUser;
 import ru.calendorny.taskservice.service.TaskManagerService;
 
 @RestController
