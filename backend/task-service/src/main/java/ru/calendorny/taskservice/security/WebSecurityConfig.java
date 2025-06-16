@@ -12,22 +12,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ru.calendorny.securitystarter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
-
-    @Bean
-    public JwtService jwtService(JwtProperties jwtProperties) {
-        return new JwtService(jwtProperties);
-    }
-
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService) {
-        return new JwtAuthenticationFilter(jwtService);
-    }
 
     @Bean
     public SecurityFilterChain applicationSecurity(JwtAuthenticationFilter jwtAuthenticationFilter, HttpSecurity http) throws Exception {
