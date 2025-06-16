@@ -4,8 +4,8 @@ spring:
 
   cloud:
     consul:
-      host: consul
-      port: 8500
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
       discovery:
         service-name: ${spring.application.name}
         register: true
@@ -38,6 +38,8 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
       acks: all
       retries: 3
 
@@ -50,9 +52,17 @@ management:
 task:
   kafka:
     task-notification-topic: task-topic
+    task-notification-dlq-topic: task-dlq-topic
 
 auth:
   jwt:
     public-key: ${JWT_PUBLIC_KEY}
     access-token-expiration-minutes: 15
     private-key: ${JWT_PRIVATE_KEY}
+
+logging:
+  enabled: true
+  debug: true
+  level:
+    org.apache.kafka: DEBUG
+    org.springframework.kafka: DEBUG
