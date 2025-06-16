@@ -32,7 +32,6 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain applicationSecurity(JwtAuthenticationFilter jwtAuthenticationFilter, HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .cors(Customizer.withDefaults())
             .anonymous(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(AbstractHttpConfigurer::disable)
