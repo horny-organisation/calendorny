@@ -36,13 +36,7 @@ public class WebSecurityConfig {
             .anonymous(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.requestMatchers(
-                    "/api/v1/public",
-                    "/api/v1/register",
-                    "/api/v1/login",
-                    "/api/v1/refresh",
-                    "/api/v1/logout")
-                .permitAll()
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
                 .anyRequest()
