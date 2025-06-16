@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import ru.calendorny.securitystarter.JwtService;
+import ru.calendorny.securitystarter.SecurityAutoConfiguration;
 import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.RruleDto;
 import ru.calendorny.taskservice.dto.request.CreateTaskRequest;
@@ -30,7 +32,6 @@ import ru.calendorny.taskservice.enums.TaskFrequency;
 import ru.calendorny.taskservice.enums.TaskStatus;
 import ru.calendorny.taskservice.repository.RecurTaskRepository;
 import ru.calendorny.taskservice.repository.SingleTaskRepository;
-import ru.calendorny.taskservice.security.JwtService;
 import ru.calendorny.taskservice.util.rrule.RruleCalculator;
 import ru.calendorny.taskservice.util.rrule.RruleConverter;
 import java.time.DayOfWeek;
@@ -41,7 +42,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
+@Import({TestContainersConfiguration.class, SecurityAutoConfiguration.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TaskControllerIntegrationTest {

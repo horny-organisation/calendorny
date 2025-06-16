@@ -35,7 +35,7 @@ public class MethodLoggingAspect {
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
 
-        log.debug("Begin: {}.{}() with args: {}", className, methodName, Arrays.toString(args));
+        log.info("Begin: {}.{}() with args: {}", className, methodName, Arrays.toString(args));
     }
 
     @AfterReturning(pointcut = "allBasicComponentMethods()", returning = "result")
@@ -43,6 +43,6 @@ public class MethodLoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
 
-        log.debug("End: {}.{}()with result: {}", className, methodName, result);
+        log.info("End: {}.{}()with result: {}", className, methodName, result);
     }
 }
