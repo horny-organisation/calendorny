@@ -9,6 +9,7 @@ import ru.calendorny.authservice.dto.response.UserProfile;
 import ru.calendorny.authservice.entity.Account;
 import ru.calendorny.authservice.entity.Profile;
 import ru.calendorny.authservice.exception.NotFoundException;
+import ru.calendorny.authservice.metric.RegisterUserMetric;
 import ru.calendorny.authservice.repository.AccountRepository;
 import ru.calendorny.authservice.repository.ProfileRepository;
 
@@ -19,6 +20,7 @@ public class ProfileService {
 
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;
+    private final RegisterUserMetric registerUserMetric;
 
     public UserProfile getUserProfile(UUID id) {
         log.debug("Get user profile by id: {}", id);
@@ -39,6 +41,8 @@ public class ProfileService {
         log.debug("Save user profile: {}", userProfileEdit);
         Profile profile = convertToProfile(userProfileEdit, id);
         profileRepository.save(profile);
+        registerUserMetric.incrementRegisteredUsers();
+
     }
 
     private Profile convertToProfile(UserProfileEdit userProfileEdit, UUID id) {

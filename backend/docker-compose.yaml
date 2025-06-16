@@ -209,6 +209,7 @@ services:
     restart: unless-stopped
     depends_on:
       - task-service
+      - auth-service
     networks:
       - backend
 
