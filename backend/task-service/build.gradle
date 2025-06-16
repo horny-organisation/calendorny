@@ -27,6 +27,8 @@ dependencies {
 
     implementation 'org.codehaus.janino:janino:3.1.10'
     runtimeOnly 'org.aspectj:aspectjweaver'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 dependencyManagement {
