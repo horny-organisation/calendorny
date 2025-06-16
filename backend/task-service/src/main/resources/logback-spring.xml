@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty name="debug" source="logging.debug"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %magenta(%d{yyyy-MM-dd HH:mm:ss}) %magenta(%-5level %logger{36}) - %msg %n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="PURPLE_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%magenta(%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n)</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="ru.calendorny" level="DEBUG" additivity="false">
+        <appender-ref ref="PURPLE_CONSOLE"/>
+    </logger>
+
+
+    <springProfile name="default">
+        <if condition='property("debug").equals("true")'>
+            <then>
+                <root level="DEBUG">
+                    <appender-ref ref="CONSOLE"/>
+                </root>
+            </then>
+            <else>
+                <root level="INFO">
+                    <appender-ref ref="CONSOLE"/>
+                </root>
+            </else>
+        </if>
+    </springProfile>
+
+    <springProfile name="debug">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+</configuration>

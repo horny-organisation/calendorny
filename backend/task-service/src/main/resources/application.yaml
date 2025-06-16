@@ -59,3 +59,10 @@ auth:
     public-key: ${JWT_PUBLIC_KEY}
     access-token-expiration-minutes: 15
     private-key: ${JWT_PRIVATE_KEY}
+
+logging:
+  enabled: true
+  debug: true
+  level:
+    org.apache.kafka: DEBUG
+    org.springframework.kafka: DEBUG
