@@ -250,12 +250,35 @@ services:
     networks:
       - backend
 
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: notification-service
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+
 volumes:
   kafka-1-data:
   kafka-2-data:
   kafka-3-data:
   task-service-postgres-data:
   db-auth-data:
+  redis-data:
 
 networks:
   task-service:
