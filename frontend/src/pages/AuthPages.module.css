@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: #ffffff;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+  .card {
+    max-width: 100%;
+  }
+}
+
+/*# sourceMappingURL=AuthPages.module.css.map */
