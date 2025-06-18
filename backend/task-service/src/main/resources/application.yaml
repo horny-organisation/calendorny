@@ -62,7 +62,7 @@ auth:
 
 logging:
   enabled: true
-  debug: true
+  debug: false
   level:
     org.apache.kafka: DEBUG
     org.springframework.kafka: DEBUG

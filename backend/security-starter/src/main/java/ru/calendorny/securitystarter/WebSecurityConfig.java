@@ -29,18 +29,4 @@ public class WebSecurityConfig {
         return new JwtAuthenticationFilter(jwtService);
     }
 
-    @Bean
-    public SecurityFilterChain applicationSecurity(JwtAuthenticationFilter jwtAuthenticationFilter, HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-            .anonymous(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .formLogin(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**")
-                .permitAll()
-                .anyRequest()
-                .permitAll())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
 }

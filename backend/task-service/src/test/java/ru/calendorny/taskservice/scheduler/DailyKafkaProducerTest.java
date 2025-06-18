@@ -25,9 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
+@Import({TestContainersConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DailyKafkaProducerTaskIntegrationTest {
+public class DailyKafkaProducerTest {
 
     @Autowired
     private DailyKafkaProducerTask dailyKafkaProducerTask;
