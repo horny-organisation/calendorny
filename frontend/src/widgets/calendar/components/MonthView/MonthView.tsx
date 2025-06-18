@@ -7,6 +7,7 @@ interface MonthViewProps {
     calendar: CalendarMonth;
     events: CalendarEvent[];
     onDateClick: (date: Date) => void;
+    onDateDoubleClick?: (date: Date) => void;
     selectedDate: Date | null;
 }
 
@@ -14,6 +15,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                                                         calendar,
                                                         events,
                                                         onDateClick,
+                                                        onDateDoubleClick,
                                                         selectedDate,
                                                     }) => {
     const getEventsForDate = (date: Date): CalendarEvent[] => {
@@ -56,6 +58,7 @@ export const MonthView: React.FC<MonthViewProps> = ({
                                         isSelected ? styles.selected : ""
                                     }`}
                                     onClick={() => onDateClick(day.date)}
+                                    onDoubleClick={() => onDateDoubleClick?.(day.date)}
                                 >
                                     <div className={styles.dayNumber}>
                                         <Typography variant="body" className={styles.dayText}>

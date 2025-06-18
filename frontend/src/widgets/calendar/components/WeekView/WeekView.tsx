@@ -7,6 +7,7 @@ interface WeekViewProps {
     week: CalendarWeek;
     events: CalendarEvent[];
     onDateClick: (date: Date) => void;
+    onDateDoubleClick?: (date: Date) => void;
     selectedDate: Date | null;
 }
 
@@ -14,6 +15,7 @@ export const WeekView: React.FC<WeekViewProps> = ({
                                                       week,
                                                       events,
                                                       onDateClick,
+                                                      onDateDoubleClick,
                                                       selectedDate,
                                                   }) => {
     const timeSlots = Array.from({ length: 24 }, (_, i) => i);
@@ -87,12 +89,16 @@ export const WeekView: React.FC<WeekViewProps> = ({
                             const dayEvents = getEventsForDateAndHour(day.date, hour);
 
                             return (
-                                <div key={dayIndex} className={styles.hourCell}>
+                                <div
+                                        key={dayIndex}
+                                        className={styles.hourCell}
+                                        onDoubleClick={() => onDateDoubleClick?.(day.date)}
+                                >
                                     {dayEvents.map((event) => (
                                         <div
                                             key={event.id}
                                             className={styles.event}
-                                            style={{ backgroundColor: event.color }}
+                                            style={{backgroundColor: event.color}}
                                         >
                                             <Typography variant="small" className={styles.eventTitle}>
                                                 {event.title}

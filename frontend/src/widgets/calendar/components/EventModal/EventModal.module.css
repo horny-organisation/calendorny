@@ -1,0 +1,136 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: #ffffff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.closeButton {
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  min-width: auto;
+  width: 2rem;
+  height: 2rem;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.checkboxField {
+  display: flex;
+  align-items: center;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+}
+
+.timeFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.colorField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.colorLabel {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.colorOption {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.colorOption:hover {
+  transform: scale(1.1);
+}
+.colorOption.selected {
+  border-color: #1a1a1a;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.2);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: 0.5rem;
+  }
+  .modal {
+    max-height: 95vh;
+  }
+  .timeFields {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .actions {
+    flex-direction: column-reverse;
+  }
+  .actions button {
+    width: 100%;
+  }
+}
+
+/*# sourceMappingURL=EventModal.module.css.map */
