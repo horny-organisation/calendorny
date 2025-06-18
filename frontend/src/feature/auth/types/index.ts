@@ -4,16 +4,17 @@ export interface LoginFormData {
 }
 
 export interface RegisterFormData {
-    fullName: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    confirmPassword: string;
 }
 
 export interface AuthUser {
     id: string;
     email: string;
-    fullName: string;
+    firstName: string;
+    lastName: string;
 }
 
 export interface AuthState {

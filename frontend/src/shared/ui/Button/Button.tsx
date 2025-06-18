@@ -36,9 +36,9 @@ export const Button: React.FC<ButtonProps> = ({
             {...props}
         >
             {loading && <span className={styles.spinner} />}
-            <span className={cn(styles.content, { [styles.hidden]: loading })}>
-        {children}
-      </span>
+            <span className={cn(styles.content, {[styles.hidden]: loading})}>
+                {children}
+            </span>
         </button>
     );
 };

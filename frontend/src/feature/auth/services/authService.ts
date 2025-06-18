@@ -10,7 +10,8 @@ class AuthService {
             return {
                 id: "1",
                 email: data.email,
-                fullName: "Демо Пользователь",
+                firstName: "Демо",
+                lastName: "Пользователь",
             };
         }
 
@@ -21,11 +22,6 @@ class AuthService {
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-
-        if (data.password !== data.confirmPassword) {
-            throw new Error("Пароли не совпадают");
-        }
-
         if (data.password.length < 6) {
             throw new Error("Пароль должен содержать минимум 6 символов");
         }
@@ -33,7 +29,8 @@ class AuthService {
         return {
             id: "2",
             email: data.email,
-            fullName: data.fullName,
+            firstName: data.firstName,
+            lastName: data.lastName,
         };
     }
 

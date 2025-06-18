@@ -19,7 +19,9 @@ export const Typography: React.FC<TypographyProps> = ({
                                                       }) => {
     const Component = as || getDefaultComponent(variant);
 
-    return <Component className={cn(styles[variant], className)}>{children}</Component>;
+    return (
+        <Component className={cn(styles[variant], className)}>{children}</Component>
+    );
 };
 
 function getDefaultComponent(variant: TypographyVariant): React.ElementType {

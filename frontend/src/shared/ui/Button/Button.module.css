@@ -20,13 +20,13 @@
 }
 
 .primary {
-  background-color: var(--primary-blue);
+  background-color: #4285f4;
   color: white;
-  border: 1px solid var(--primary-blue);
+  border: 1px solid #4285f4;
 }
 .primary:hover:not(:disabled) {
-  background-color: var(--primary-blue-hover);
-  border-color: var(--primary-blue-hover);
+  background-color: #3367d6;
+  border-color: #3367d6;
 }
 .primary:active:not(:disabled) {
   transform: translateY(1px);
@@ -34,8 +34,8 @@
 
 .secondary {
   background-color: transparent;
-  color: var(--primary-blue);
-  border: 1px solid var(--primary-blue);
+  color: #4285f4;
+  border: 1px solid #4285f4;
 }
 .secondary:hover:not(:disabled) {
   background-color: rgba(66, 133, 244, 0.04);
@@ -46,7 +46,7 @@
 
 .text {
   background-color: transparent;
-  color: var(--primary-blue);
+  color: #4285f4;
   border: 1px solid transparent;
 }
 .text:hover:not(:disabled) {

@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Input, Button } from "@/shared/ui";
-import { Typography } from "@/shared/Typography/Typography";
-import { RegisterFormData } from "../../types";
+import { Input, Button } from "../../../../shared";
+import { Typography } from "../../../../shared";
+import type { RegisterFormData } from "../../types";
 import { authService } from "../../services/authService";
 import styles from "./RegisterForm.module.scss";
 
 export const RegisterForm: React.FC = () => {
     const [formData, setFormData] = useState<RegisterFormData>({
-        fullName: "",
+        firstName: "",
+        lastName: "",
         email: "",
         password: "",
-        confirmPassword: "",
     });
     const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -41,28 +41,22 @@ export const RegisterForm: React.FC = () => {
     const validateForm = (): boolean => {
         const newErrors: Partial<RegisterFormData> = {};
 
-        if (!formData.fullName.trim()) {
-            newErrors.fullName = "Введите полное имя";
-        } else if (formData.fullName.trim().length < 2) {
-            newErrors.fullName = "Имя должно содержать минимум 2 символа";
+        if (!formData.firstName.trim()) {
+            newErrors.firstName = "Введите имя";
+        } else if (formData.firstName.trim().length < 2) {
+            newErrors.firstName = "Имя должно содержать минимум 2 символа";
         }
 
-        if (!formData.email) {
-            newErrors.email = "Введите email";
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = "Введите корректный email";
+        if (!formData.lastName.trim()) {
+            newErrors.lastName = "Введите фамилию";
+        } else if (formData.lastName.trim().length < 2) {
+            newErrors.lastName = "Фамилия должна содержать минимум 2 символа";
         }
 
         if (!formData.password) {
             newErrors.password = "Введите пароль";
         } else if (formData.password.length < 6) {
             newErrors.password = "Пароль должен содержать минимум 6 символов";
-        }
-
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = "Подтвердите пароль";
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = "Пароли не совпадают";
         }
 
         setErrors(newErrors);
@@ -79,7 +73,7 @@ export const RegisterForm: React.FC = () => {
 
         try {
             const user = await authService.register(formData);
-            console.log("Успешная р��гистрация:", user);
+            console.log("Успешная регистрация:", user);
             // Здесь должен быть редирект или сохранение состояния пользователя
         } catch (error) {
             setServerError(
@@ -110,17 +104,27 @@ export const RegisterForm: React.FC = () => {
 
                 <Input
                     type="text"
-                    label="Полное имя"
-                    placeholder="Введите ваше полное имя"
-                    value={formData.fullName}
-                    onChange={handleInputChange("fullName")}
-                    error={errors.fullName}
-                    autoComplete="name"
+                    label="Имя"
+                    placeholder="Введите ваше имя"
+                    value={formData.firstName}
+                    onChange={handleInputChange("firstName")}
+                    error={errors.firstName}
+                    autoComplete="given-name"
+                />
+
+                <Input
+                    type="text"
+                    label="Фамилия"
+                    placeholder="Введите вашу фамилию"
+                    value={formData.lastName}
+                    onChange={handleInputChange("lastName")}
+                    error={errors.lastName}
+                    autoComplete="family-name"
                 />
 
                 <Input
                     type="email"
-                    label="Email"
+                    label="Почта"
                     placeholder="Введите ваш email"
                     value={formData.email}
                     onChange={handleInputChange("email")}
@@ -138,15 +142,6 @@ export const RegisterForm: React.FC = () => {
                     autoComplete="new-password"
                 />
 
-                <Input
-                    type="password"
-                    label="Подтверждение пароля"
-                    placeholder="Повторите пароль"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange("confirmPassword")}
-                    error={errors.confirmPassword}
-                    autoComplete="new-password"
-                />
             </div>
 
             <div className={styles.actions}>

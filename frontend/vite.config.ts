@@ -19,10 +19,5 @@ export default defineConfig({
       localsConvention: 'camelCaseOnly',
       generateScopedName: '[name]__[local]___[hash:base64:5]',
     },
-    preprocessorOptions: {
-      scss: {
-        additionalData: '@use "@/shared/styles/globals.scss" as globals;',
-      },
-    },
   },
 })
