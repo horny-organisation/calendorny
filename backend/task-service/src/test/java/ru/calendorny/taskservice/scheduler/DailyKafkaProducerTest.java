@@ -11,7 +11,7 @@ import ru.calendorny.taskservice.TestContainersConfiguration;
 import ru.calendorny.taskservice.dto.event.TodayTaskEvent;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
 import ru.calendorny.taskservice.enums.TaskStatus;
-import ru.calendorny.taskservice.kafka.KafkaConfigProperties;
+import ru.calendorny.taskservice.kafka.properties.KafkaConfigProperties;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
@@ -25,9 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles(profiles = "test")
-@Import(TestContainersConfiguration.class)
+@Import({TestContainersConfiguration.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DailyKafkaProducerTaskIntegrationTest {
+public class DailyKafkaProducerTest {
 
     @Autowired
     private DailyKafkaProducerTask dailyKafkaProducerTask;

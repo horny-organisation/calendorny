@@ -3,6 +3,13 @@ spring:
     admin:
       auto-create: false
 
+  cloud:
+    consul:
+      enabled: false
+    service-registry:
+      auto-registration:
+        enabled: false
+
 auth:
   jwt:
     public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA02gyZ7pIaqNrtdvUHTxAxtY3C+P0WWfwyt9ZfY2GAWZvcSir1jKkiOQr3a/4oOGDMGZcuxkxMKs/DCiSoYClwAegf+J+Y6qrEtYJOzB1PS/cFsXPw2VbdGP4fCDv7dvjUfzkXhZAvRPl/QKSHVXXNDyngAM2s67Jb1JE1ThFyAEtPfVJLMZKVLbGPDXw+qWw+1VLLi7K8QOiW8+bclHaWLrTeI9IQpZi3CPFdoHuDopfsSKum1eUAXgUWEgVtk+wbkJ28FKtwgXJgydtvcngn0e+Y3IzgUO6X5hekKkQVDP/804cczjrrY/djLrpvkLCWC5pEZFPlkysLkJxWEApBwIDAQAB

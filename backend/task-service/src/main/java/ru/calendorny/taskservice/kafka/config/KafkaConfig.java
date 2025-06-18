@@ -1,4 +1,4 @@
-package ru.calendorny.taskservice.kafka;
+package ru.calendorny.taskservice.kafka.config;
 
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +10,13 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import ru.calendorny.taskservice.kafka.properties.KafkaConfigProperties;
 
 @Configuration
 @RequiredArgsConstructor
-public class KafkaProducerConfig {
+public class KafkaConfig {
 
-    private final KafkaConfigProperties kafkaConfigProperties;
+    private final KafkaConfigProperties kafkaConfig;
 
     @Bean
     public KafkaTemplate<String, Object> kafkaTemplate(
@@ -31,7 +32,15 @@ public class KafkaProducerConfig {
 
     @Bean
     public NewTopic taskTopic() {
-        return TopicBuilder.name(kafkaConfigProperties.taskNotificationTopic())
+        return TopicBuilder.name(kafkaConfig.taskNotificationTopic())
+            .partitions(1)
+            .replicas(1)
+            .build();
+    }
+
+    @Bean
+    public NewTopic taskDlqTopic() {
+        return TopicBuilder.name(kafkaConfig.taskNotificationDlqTopic())
             .partitions(1)
             .replicas(1)
             .build();
