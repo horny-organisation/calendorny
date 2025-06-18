@@ -11,7 +11,7 @@ app:
     zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
 
   zoom:
-    fileName: zoom-token.json
+    fileName: /app/zoom-token.json
     principalName: ${ZOOM_OAUTH_PRINCIPAL_NAME}
     clientRegistrationId: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
     baseUrl: https://api.zoom.us/v2

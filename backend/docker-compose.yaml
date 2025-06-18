@@ -215,6 +215,8 @@ services:
     depends_on:
       local-rabbit-mq:
         condition: service_healthy
+    volumes:
+      - zoom-meeting-data:/app
 
   prometheus:
     image: prom/prometheus:latest
@@ -253,6 +255,7 @@ volumes:
   prometheus-data:
   grafana-data:
   google-meeting-data:
+  zoom-meeting-data:
 
 networks:
   task-service:
