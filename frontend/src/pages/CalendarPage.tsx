@@ -65,7 +65,7 @@ const mockEvents: CalendarEvent[] = [
 
 export const CalendarPage: React.FC = () => {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+    const [events] = useState<CalendarEvent[]>(mockEvents);
 
     const handleDateClick = (date: Date) => {
         setSelectedDate(date);
@@ -77,10 +77,6 @@ export const CalendarPage: React.FC = () => {
         console.log("Выбрана дата из sidebar:", date);
     };
 
-    const handleEventClick = (event: CalendarEvent) => {
-        console.log("Выбрано событие:", event);
-    };
-
     return (
         <div className={styles.calendarPage}>
             <CalendarSidebar
@@ -89,11 +85,7 @@ export const CalendarPage: React.FC = () => {
             />
 
             <div className={styles.calendarContent}>
-                <Calendar
-                    events={events}
-                    onDateClick={handleDateClick}
-                    onEventClick={handleEventClick}
-                />
+                <Calendar events={events} onDateClick={handleDateClick} />
             </div>
         </div>
     );

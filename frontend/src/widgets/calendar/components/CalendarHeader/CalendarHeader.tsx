@@ -5,7 +5,6 @@ import type { CalendarView } from "../../../../entities/calendar";
 import styles from "./CalendarHeader.module.scss";
 
 interface CalendarHeaderProps {
-    currentDate: Date;
     view: CalendarView;
     onViewChange: (view: CalendarView) => void;
     onNavigate: (direction: "prev" | "next" | "today") => void;
@@ -13,7 +12,6 @@ interface CalendarHeaderProps {
 }
 
 export const CalendarHeader: React.FC<CalendarHeaderProps> = ({
-                                                                  currentDate,
                                                                   view,
                                                                   onViewChange,
                                                                   onNavigate,

@@ -1,5 +1,5 @@
 import React from "react";
-import { type CalendarMonth, DAYS_OF_WEEK, generateCalendarMonth, addMonths, isSameDay } from "../../../../entities/calendar";
+import { DAYS_OF_WEEK, generateCalendarMonth, isSameDay } from "../../../../entities/calendar";
 import { Button } from "../../../../shared";
 import { Typography } from "../../../../shared";
 import styles from "./MiniCalendar.module.scss";

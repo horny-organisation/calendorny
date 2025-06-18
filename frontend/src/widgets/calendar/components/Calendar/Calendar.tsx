@@ -19,13 +19,11 @@ import styles from "./Calendar.module.scss";
 interface CalendarProps {
     events?: CalendarEvent[];
     onDateClick?: (date: Date) => void;
-    onEventClick?: (event: CalendarEvent) => void;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
                                                       events = [],
                                                       onDateClick,
-                                                      onEventClick,
                                                   }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [view, setView] = useState<CalendarView>("month");
@@ -101,7 +99,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     return (
         <div className={styles.calendar}>
             <CalendarHeader
-                currentDate={currentDate}
                 view={view}
                 onViewChange={setView}
                 onNavigate={handleNavigate}
