@@ -255,6 +255,9 @@ services:
     expose:
       - 8080
     container_name: notification-service
+    depends_on:
+      - kafka
+      - redis
     env_file:
       - .env
     networks:
