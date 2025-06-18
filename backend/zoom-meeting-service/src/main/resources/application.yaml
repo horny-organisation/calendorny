@@ -11,7 +11,7 @@ app:
     zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
 
   zoom:
-    fileName: zoom-token.json
+    fileName: /app/zoom-token.json
     principalName: ${ZOOM_OAUTH_PRINCIPAL_NAME}
     clientRegistrationId: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
     baseUrl: https://api.zoom.us/v2
@@ -29,7 +29,7 @@ spring:
 
   rabbitmq:
     port: 5672
-    host: localhost
+    host: local-rabbit-mq
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
 
@@ -41,7 +41,7 @@ spring:
             client-id: ${ZOOM_CLIENT_ID}
             client-secret: ${ZOOM_CLIENT_SECRET}
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8080/login/oauth2/code/zoom
+            redirect-uri: http://localhost:8086/login/oauth2/code/zoom
             client-name: Zoom
         provider:
           zoom:

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.calendorny.taskservice.dto.response.TaskResponse;
-import ru.calendorny.taskservice.kafka.KafkaTaskEventProducer;
+import ru.calendorny.taskservice.kafka.producer.KafkaTaskProducer;
 import ru.calendorny.taskservice.mapper.TaskMapper;
 import ru.calendorny.taskservice.service.impl.RecurTaskProcessor;
 import ru.calendorny.taskservice.service.impl.SingleTaskProcessor;
@@ -26,7 +26,7 @@ public class DailyKafkaProducerTask {
 
     private final RruleCalculator rruleCalculator;
 
-    private final KafkaTaskEventProducer kafkaTaskEventProducer;
+    private final KafkaTaskProducer kafkaTaskEventProducer;
 
     private final TaskMapper mapper;
 
