@@ -15,9 +15,7 @@ public interface EventManagementService {
 
     List<EventShortResponse> getAllEventsByDateRange(UUID userId, LocalDateTime from, LocalDateTime to);
 
-    EventDetailedResponse getEventDetailedInfoById(Long eventId);
+    EventDetailedResponse getEventDetailedInfoById(UUID userId, Long eventId);
 
     void deleteEventById(UUID userId, Long eventId);
-
-    void setVideoMeetingLinkToEvent(Long eventId, String link);
 }

@@ -1,6 +1,7 @@
 package ru.calendorny.eventservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
 import ru.calendorny.eventservice.data.dto.EventInfo;
@@ -34,7 +35,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EventManagementServiceImpl implements EventManagementService {
@@ -70,16 +73,7 @@ public class EventManagementServiceImpl implements EventManagementService {
 
         List<ParticipantDto> participants = createEventRequest.participants();
         if (!participants.isEmpty()) {
-            for (ParticipantDto participantDto : participants) {
-                ParticipantEntity participant = ParticipantEntity.builder()
-                    .event(savedEvent)
-                    .userId(participantDto.userId())
-                    .email(participantDto.email())
-                    .invitedAt(LocalDateTime.now())
-                    .status(ParticipantStatus.PENDING)
-                    .build();
-                participantRepository.save(participant);
-            }
+            createParticipants(participants, savedEvent);
         }
         ReminderDto reminderDto = createEventRequest.reminder();
         createEventReminders(userId, reminderDto, savedEvent);
@@ -135,22 +129,39 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     }
 
-    @Override
-    public void setVideoMeetingLinkToEvent(Long eventId, String link) {
-        EventEntity event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
-        event.setVideoMeetingUrl(link);
-        eventRepository.save(event);
+    private void createParticipants(List<ParticipantDto> participants, EventEntity event) {
+        for (ParticipantDto participantDto : participants) {
+            ParticipantEntity participant = ParticipantEntity.builder()
+                .event(event)
+                .userId(participantDto.userId())
+                .email(participantDto.email())
+                .invitedAt(LocalDateTime.now())
+                .status(ParticipantStatus.PENDING)
+                .build();
+            participantRepository.save(participant);
+        }
     }
 
     @Override
     public List<EventShortResponse> getAllEventsByDateRange(UUID userId, LocalDateTime from, LocalDateTime to) {
-        return null;
+        List<EventEntity> simpleEvents = eventRepository.findAllSimpleEventsInRange(userId, from, to);
+        List<EventShortResponse> result = new ArrayList<>(simpleEvents.stream()
+            .map(eventMapper::toShortResponse)
+            .toList());
+        List<EventEntity> recurEvents = eventRepository.findAllRecurEventsInRange(userId);
+        for (EventEntity recurEvent :recurEvents) {
+            result.addAll(rruleEventCalculator.generateOccurrences(eventMapper.toDetailedResponseWithoutReminders(recurEvent), from, to));
+        }
+        return result;
     }
 
     @Override
-    public EventDetailedResponse getEventDetailedInfoById(Long eventId) {
-        return null;
+    public EventDetailedResponse getEventDetailedInfoById(UUID userId, Long eventId) {
+        log.info("USERID: {}, EVENT: {}", userId, eventId);
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        List<ReminderEntity> savedReminders = reminderRepository.findByEventIdAndUserId(eventId, userId);
+        return eventMapper.toDetailedResponseWithReminders(event, savedReminders);
     }
 
     @Override

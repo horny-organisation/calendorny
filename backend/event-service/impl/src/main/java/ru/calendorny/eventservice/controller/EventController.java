@@ -1,6 +1,7 @@
 package ru.calendorny.eventservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import ru.calendorny.eventservice.api.EventApi;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
@@ -13,6 +14,7 @@ import ru.calendorny.securitystarter.AuthenticatedUser;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class EventController implements EventApi {
@@ -33,7 +35,8 @@ public class EventController implements EventApi {
 
     @Override
     public EventDetailedResponse getEventDetailedInfoById(AuthenticatedUser authenticatedUser, Long eventId) {
-        return eventManagementService.getEventDetailedInfoById(eventId);
+        log.info("CONTROLLER: {}", authenticatedUser.id());
+        return eventManagementService.getEventDetailedInfoById(authenticatedUser.id(), eventId);
     }
 
     @Override

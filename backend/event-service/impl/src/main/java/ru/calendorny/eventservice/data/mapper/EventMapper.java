@@ -10,6 +10,8 @@ import ru.calendorny.eventservice.dto.ReminderDto;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.ParticipantDto;
+import ru.calendorny.eventservice.dto.response.EventShortResponse;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,6 +96,17 @@ public class EventMapper {
             .userId(entity.getUserId())
             .email(entity.getEmail())
             .status(entity.getStatus())
+            .build();
+    }
+
+    public EventShortResponse toShortResponse(EventEntity eventEntity) {
+        return EventShortResponse.builder()
+            .id(eventEntity.getId())
+            .title(eventEntity.getTitle())
+            .location(eventEntity.getLocation())
+            .startTime(eventEntity.getStart())
+            .endTime(eventEntity.getEnd())
+            .labels(eventEntity.getLabels().stream().map(this::eventLabelToDto).collect(Collectors.toList()))
             .build();
     }
 }

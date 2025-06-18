@@ -8,6 +8,7 @@ import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
 import org.springframework.stereotype.Component;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
+import ru.calendorny.eventservice.exception.ServiceException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,7 +21,7 @@ public class RruleEventCalculator {
 
     private final RruleConverter rruleConverter;
 
-    public List<EventShortResponse> generateOccurrences(EventDetailedResponse event, LocalDateTime fromDate, LocalDateTime toDate) throws InvalidRecurrenceRuleException {
+    public List<EventShortResponse> generateOccurrences(EventDetailedResponse event, LocalDateTime fromDate, LocalDateTime toDate) {
         List<EventShortResponse> occurrences = new ArrayList<>();
 
         if (event.rrule() == null) {
@@ -35,7 +36,12 @@ public class RruleEventCalculator {
         long durationNanos = java.time.Duration.between(event.startTime(), event.endTime()).toNanos();
 
         DateTime rfcStart = new DateTime(firstStart.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-        RecurrenceRuleIterator it = new RecurrenceRule(rruleString).iterator(rfcStart);
+        RecurrenceRuleIterator it = null;
+        try {
+            it = new RecurrenceRule(rruleString).iterator(rfcStart);
+        } catch (InvalidRecurrenceRuleException e) {
+            throw new ServiceException("Invalid rrule: %s".formatted(rruleString));
+        }
 
         long fromMillis = fromDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         long toMillis = toDate.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();

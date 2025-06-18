@@ -21,15 +21,38 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     List<EventEntity> getAllPendingToUserEvents(@Param("userId") UUID userId);
 
     @Query("""
-    SELECT DISTINCT e FROM EventEntity e
-    LEFT JOIN e.participants p
-    WHERE e.isActive = true
-      AND (e.organizerId = :userId OR p.userId = :userId)
-      AND (
-        e.rrule IS NOT NULL OR
-        (e.start BETWEEN :start AND :end)
-      )
-""")
+           SELECT e FROM EventEntity e
+           LEFT JOIN e.participants p
+           WHERE e.rrule IS NULL
+           AND (e.start BETWEEN :rangeStart AND :rangeEnd OR e.end BETWEEN :rangeStart AND :rangeEnd)
+           AND e.isActive = true
+           AND e.organizerId = :userId OR p.userId = :userId
+        """)
+    List<EventEntity> findAllSimpleEventsInRange(
+        @Param("userId") UUID userId,
+        @Param("rangeStart") LocalDateTime rangeStart,
+        @Param("rangeEnd") LocalDateTime rangeEnd
+    );
+
+    @Query("""
+           SELECT e FROM EventEntity e
+           LEFT JOIN e.participants p
+           WHERE e.rrule IS NOT NULL
+           AND e.isActive = true
+           AND e.organizerId = :userId OR p.userId = :userId
+        """)
+    List<EventEntity> findAllRecurEventsInRange(@Param("userId") UUID userId);
+
+    @Query("""
+            SELECT DISTINCT e FROM EventEntity e
+            LEFT JOIN e.participants p
+            WHERE e.isActive = true
+              AND (e.organizerId = :userId OR p.userId = :userId)
+              AND (
+                e.rrule IS NOT NULL OR
+                (e.start BETWEEN :start AND :end)
+              )
+        """)
     List<EventEntity> findRelevantEvents(
         @Param("userId") UUID userId,
         @Param("start") LocalDateTime start,

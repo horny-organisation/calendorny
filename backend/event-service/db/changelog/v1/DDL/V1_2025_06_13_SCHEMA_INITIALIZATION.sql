@@ -37,7 +37,7 @@ CREATE TABLE reminders
     id                  BIGINT GENERATED ALWAYS AS IDENTITY,
     event_id            BIGINT,
     minutes_before      INTEGER,
-    notification_job_id VARCHAR,
+    notification_job_id UUID,
     user_id             UUID,
     -----------------------------------------------------------------------------------------------
     CONSTRAINT rem_id_pk PRIMARY KEY (id),
