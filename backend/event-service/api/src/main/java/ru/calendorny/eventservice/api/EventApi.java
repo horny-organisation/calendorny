@@ -8,22 +8,19 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
-import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
-import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.securitystarter.AuthenticatedUser;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@RequestMapping("/events")
+@RequestMapping("/api/v1/events")
 public interface EventApi {
 
     @PostMapping
@@ -51,6 +48,7 @@ public interface EventApi {
         @PathVariable("eventId") Long eventId
     );
 
+    /*
     @PutMapping("/{eventId}/info")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
@@ -68,6 +66,7 @@ public interface EventApi {
         @PathVariable("eventId") Long eventId,
         @Valid @RequestBody UpdateEventReminderRequest updateEventReminderRequest
     );
+     */
 
     @DeleteMapping("/{eventId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

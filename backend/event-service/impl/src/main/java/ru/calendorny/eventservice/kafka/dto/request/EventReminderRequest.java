@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
-public record EventNotificationRequest(
+public record EventReminderRequest(
     Long eventId,
     UUID userId,
     String title,

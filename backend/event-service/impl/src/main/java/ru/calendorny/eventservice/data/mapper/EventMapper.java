@@ -7,44 +7,73 @@ import ru.calendorny.eventservice.data.entity.ParticipantEntity;
 import ru.calendorny.eventservice.data.entity.ReminderEntity;
 import ru.calendorny.eventservice.dto.LabelDto;
 import ru.calendorny.eventservice.dto.ReminderDto;
+import ru.calendorny.eventservice.dto.request.CreateEventRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
-import ru.calendorny.eventservice.dto.response.EventShortResponse;
-import java.util.ArrayList;
+import ru.calendorny.eventservice.dto.ParticipantDto;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class EventMapper {
 
-    public EventDetailedResponse toDetailedResponse (EventEntity eventEntity) {
-        return EventDetailedResponse.builder()
-            .id(eventEntity.getId())
-            .title(eventEntity.getTitle())
-            .description(eventEntity.getDescription())
-            .location(eventEntity.getLocation())
-            .startTime(eventEntity.getStart())
-            .endTime(eventEntity.getEnd())
-            .rrule(eventEntity.getRrule())
-            .labels(eventEntity.getLabels().stream().map(this::eventLabelToDto).collect(Collectors.toList()))
-            .isMeeting(eventEntity.isMeeting())
-            .meetingType(eventEntity.getMeetingType())
-            .videoMeetingUrl(eventEntity.getVideoMeetingUrl())
-            .participantEmails(eventEntity.getParticipants().stream().map(ParticipantEntity::getEmail).collect(Collectors.toList()))
-            .reminder(reminderToDto(eventEntity.getReminders()))
-            .organizerId(eventEntity.getOrganizerId())
+    public EventEntity toEntity (CreateEventRequest createEventRequest, List<EventLabelEntity> labels, UUID organizerId) {
+        return EventEntity.builder()
+            .title(createEventRequest.title())
+            .description(createEventRequest.description())
+            .location(createEventRequest.location())
+            .start(createEventRequest.start())
+            .end(createEventRequest.end())
+            .rrule(createEventRequest.rrule())
+            .isMeeting(createEventRequest.isMeeting())
+            .meetingType(createEventRequest.meetingType())
+            .labels(labels)
+            .organizerId(organizerId)
+            .isActive(true)
             .build();
     }
 
-    public EventShortResponse toShortResponse (EventEntity eventEntity) {
-        return EventShortResponse.builder()
-            .id(eventEntity.getId())
-            .title(eventEntity.getTitle())
-            .location(eventEntity.getLocation())
-            .startTime(eventEntity.getStart())
-            .endTime(eventEntity.getEnd())
-            .labels(eventEntity.getLabels().stream().map(this::eventLabelToDto).collect(Collectors.toList()))
+    public EventDetailedResponse toDetailedResponseWithoutReminders (EventEntity entity) {
+        return buildBaseEventDetailedResponse(entity).build();
+    }
+
+    public EventDetailedResponse toDetailedResponseWithReminders (EventEntity entity, List<ReminderEntity> reminderEntities) {
+        return buildBaseEventDetailedResponse(entity)
+            .reminder(reminderToDto(reminderEntities))
             .build();
     }
+
+    private EventDetailedResponse.EventDetailedResponseBuilder buildBaseEventDetailedResponse(EventEntity entity) {
+        return EventDetailedResponse.builder()
+            .id(entity.getId())
+            .title(entity.getTitle())
+            .description(entity.getDescription())
+            .location(entity.getLocation())
+            .startTime(entity.getStart())
+            .endTime(entity.getEnd())
+            .rrule(entity.getRrule())
+            .labels(
+                Optional.ofNullable(entity.getLabels())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(this::eventLabelToDto)
+                    .collect(Collectors.toList())
+            )
+            .isMeeting(entity.isMeeting())
+            .meetingType(entity.getMeetingType())
+            .videoMeetingUrl(entity.getVideoMeetingUrl())
+            .participantEmails(
+                Optional.ofNullable(entity.getParticipants())
+                    .orElse(Collections.emptyList())
+                    .stream()
+                    .map(this::participantEntityToDto)
+                    .collect(Collectors.toList())
+            )
+            .organizerId(entity.getOrganizerId());
+    }
+
 
     LabelDto eventLabelToDto(EventLabelEntity entity) {
         return LabelDto.builder()
@@ -55,9 +84,16 @@ public class EventMapper {
     }
 
     ReminderDto reminderToDto(List<ReminderEntity> reminderEntities) {
-        ReminderDto dto = ReminderDto.builder()
+        return ReminderDto.builder()
             .minutesBefore(reminderEntities.stream().map(ReminderEntity::getMinutesBefore).collect(Collectors.toList()))
             .build();
-        return dto;
+    }
+
+    ParticipantDto participantEntityToDto(ParticipantEntity entity) {
+        return ParticipantDto.builder()
+            .userId(entity.getUserId())
+            .email(entity.getEmail())
+            .status(entity.getStatus())
+            .build();
     }
 }

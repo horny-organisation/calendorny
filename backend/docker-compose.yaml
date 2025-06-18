@@ -168,13 +168,17 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    expose:
+      - 5672
     ports:
-      - "5672:5672"
       - "15672:15672"
-    env_file:
-    - .env
     networks:
       - backend
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   google-meeting-service:
     build:
@@ -187,6 +191,9 @@ services:
       - .env
     networks:
       - backend
+    depends_on:
+      local-rabbit-mq:
+        condition: service_healthy
 
   zoom-meeting-service:
     build:
@@ -199,6 +206,9 @@ services:
       - .env
     networks:
       - backend
+    depends_on:
+      local-rabbit-mq:
+        condition: service_healthy
 
   event-service-postgres:
     image: postgres:16-alpine
@@ -221,8 +231,7 @@ services:
     image: liquibase:4.29
     container_name: event-service-liquibase
     depends_on:
-      event-service-postgres:
-        condition: service_healthy
+      - event-service-postgres
     env_file:
       - .env
     environment:
@@ -245,8 +254,8 @@ services:
       context: ./event-service
       dockerfile: Dockerfile
     container_name: event-service
-    ports:
-      - "8081:8080"
+    expose:
+      - 8080
     depends_on:
       - event-service-postgres
       - event-service-liquibase
@@ -256,6 +265,7 @@ services:
     restart: unless-stopped
     networks:
       - event-service
+      - backend
 
   prometheus:
     image: prom/prometheus:latest
@@ -269,6 +279,7 @@ services:
     depends_on:
       - task-service
       - auth-service
+      - event-service
     networks:
       - backend
 

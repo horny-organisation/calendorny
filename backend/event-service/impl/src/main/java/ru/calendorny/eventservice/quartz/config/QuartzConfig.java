@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class QuartzConfig {
@@ -36,6 +37,14 @@ public class QuartzConfig {
         factoryBean.setJobFactory(jobFactory);
         factoryBean.setDataSource(dataSource);
         factoryBean.setOverwriteExistingJobs(true);
+
+        Properties properties = new Properties();
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+        properties.setProperty("org.quartz.jobStore.tablePrefix", "qrtz_");
+        properties.setProperty("org.quartz.scheduler.instanceId", "AUTO");
+        properties.setProperty("org.quartz.scheduler.instanceName", "schedulerFactoryBean");
+
+        factoryBean.setQuartzProperties(properties);
         return factoryBean;
     }
 

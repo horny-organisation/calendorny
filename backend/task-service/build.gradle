@@ -20,11 +20,6 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.32'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-    implementation platform('io.jsonwebtoken:jjwt-root:0.12.6')
-    implementation 'io.jsonwebtoken:jjwt-api'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
-
     implementation 'org.dmfs:lib-recur:0.17.1'
 
     implementation 'org.codehaus.janino:janino:3.1.10'

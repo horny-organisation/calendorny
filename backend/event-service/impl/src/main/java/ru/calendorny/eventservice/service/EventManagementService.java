@@ -17,10 +17,6 @@ public interface EventManagementService {
 
     EventDetailedResponse getEventDetailedInfoById(Long eventId);
 
-    void updateEventInfoById(UUID userId, Long eventId, UpdateEventInfoRequest updateEventInfoRequest);
-
-    void updateEventReminderById(UUID userId, Long eventId, UpdateEventReminderRequest updateEventReminderRequest);
-
     void deleteEventById(UUID userId, Long eventId);
 
     void setVideoMeetingLinkToEvent(Long eventId, String link);

@@ -1,12 +1,17 @@
 package ru.calendorny.eventservice.util.rrule;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
+import ru.calendorny.eventservice.data.dto.EventInfo;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.EventFrequency;
 import ru.calendorny.eventservice.exception.InvalidRruleException;
+import ru.calendorny.eventservice.exception.ServiceException;
 
 import static ru.calendorny.eventservice.util.rrule.RruleConstants.*;
 
@@ -49,6 +54,11 @@ public class RruleHandlerRegistry {
         findHandler(frequency)
             .orElseThrow(() -> new InvalidRruleException("Unsupported frequency: " + frequency))
             .validateRruleString(rruleString);
+    }
+
+    public UUID schedule(EventInfo eventInfo, UUID userId, RruleDto rruleDto, LocalDateTime start, LocalDateTime end, Integer minutesBefore) throws SchedulerException {
+        RruleHandler handler = findHandler(rruleDto.frequency()).orElseThrow(() -> new ServiceException("No such rrule handler for frequency: %s".formatted(rruleDto.frequency())));
+        return  handler.schedule(eventInfo, userId, rruleDto, start, end, minutesBefore);
     }
 
 }

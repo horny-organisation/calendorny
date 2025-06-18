@@ -2,6 +2,7 @@ package ru.calendorny.eventservice.dto.response;
 
 import lombok.Builder;
 import ru.calendorny.eventservice.dto.LabelDto;
+import ru.calendorny.eventservice.dto.ParticipantDto;
 import ru.calendorny.eventservice.dto.ReminderDto;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.MeetingType;
@@ -23,7 +24,7 @@ public record EventDetailedResponse(
     MeetingType meetingType,
     String videoMeetingUrl,
     UUID organizerId,
-    List<String> participantEmails,
+    List<ParticipantDto> participantEmails,
     ReminderDto reminder
 ) {
 }

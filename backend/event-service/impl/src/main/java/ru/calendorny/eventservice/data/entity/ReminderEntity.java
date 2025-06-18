@@ -26,7 +26,7 @@ public class ReminderEntity {
     private Integer minutesBefore;
 
     @Column(name = "notification_job_id")
-    private String notificationJobId;
+    private UUID notificationJobId;
 
     @Column(name = "user_id")
     private UUID userId;

@@ -3,6 +3,17 @@ spring:
   application:
     name: event-service
 
+  cloud:
+    consul:
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
   datasource:
     url: ${EVENT_SERVICE_POSTGRES_URL}
     username: ${EVENT_SERVICE_POSTGRES_USER}
@@ -20,12 +31,15 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
 
+  jackson:
+    time-zone: Europe/Moscow
+
   liquibase:
     enabled: false
 
   rabbitmq:
     port: 5672
-    host: localhost
+    host: local-rabbit-mq
     username: ${RABBITMQ_USER}
     password: ${RABBITMQ_PASSWORD}
 
@@ -42,11 +56,17 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.scheduler.instanceName: QuartzScheduler
+      org.quartz.scheduler.instanceName: schedulerFactoryBean
       org.quartz.jobStore.isClustered: false
       org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
-      org.quartz.jobStore.tablePrefix: QRTZ_
+      org.quartz.jobStore.tablePrefix: qrtz_
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
 
 auth:
   jwt:
@@ -71,5 +91,4 @@ app:
     zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
   kafka:
     event-notification-topic: event.topic
-    event-notification-dlq-topic: event.topic.dlq
 

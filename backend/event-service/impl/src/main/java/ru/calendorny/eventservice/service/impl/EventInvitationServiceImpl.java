@@ -30,7 +30,7 @@ public class EventInvitationServiceImpl implements EventInvitationService {
     public List<EventDetailedResponse> getAllEventInvitations(UUID userId) {
         List<EventEntity> pendingEvents = eventRepository.getAllPendingToUserEvents(userId);
         return pendingEvents.stream()
-            .map(eventMapper::toDetailedResponse)
+            .map(eventMapper::toDetailedResponseWithoutReminders)
             .collect(Collectors.toList());
     }
 
@@ -47,6 +47,6 @@ public class EventInvitationServiceImpl implements EventInvitationService {
         }
         EventEntity event = eventRepository.findById(eventId)
             .orElseThrow(() -> new BadRequestException("No such event with id: %s".formatted(eventId)));
-        return eventMapper.toDetailedResponse(event);
+        return eventMapper.toDetailedResponseWithoutReminders(event);
     }
 }

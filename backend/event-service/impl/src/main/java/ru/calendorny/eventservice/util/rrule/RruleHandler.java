@@ -1,10 +1,12 @@
 package ru.calendorny.eventservice.util.rrule;
 
 import org.quartz.SchedulerException;
+import ru.calendorny.eventservice.data.dto.EventInfo;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.EventFrequency;
-import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
-import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
+import ru.calendorny.eventservice.kafka.dto.request.EventReminderRequest;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public interface RruleHandler {
 
@@ -18,5 +20,5 @@ public interface RruleHandler {
 
     void validateRruleString(String rruleString);
 
-    String schedule(EventNotificationRequest request, RruleDto rruleDto) throws SchedulerException;
+    UUID schedule(EventInfo eventInfo, UUID userId, RruleDto rruleDto, LocalDateTime start, LocalDateTime end, Integer minutesBefore) throws SchedulerException;
 }

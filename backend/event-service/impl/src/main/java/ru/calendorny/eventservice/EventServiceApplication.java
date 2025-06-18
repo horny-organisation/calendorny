@@ -15,7 +15,7 @@ import ru.calendorny.securitystarter.SecurityAutoConfiguration;
     RabbitConfigProperties.class,
     KafkaConfigProperties.class
 })
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
+@SpringBootApplication
 public class EventServiceApplication {
 
 

@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "event")
 public class EventEntity {
 
     @Id
@@ -82,8 +84,4 @@ public class EventEntity {
         inverseJoinColumns = @JoinColumn(name = "label_id")
     )
     private List<EventLabelEntity> labels;
-
-    @OneToMany(mappedBy = "event")
-    private List<ReminderEntity> reminders;
-
 }

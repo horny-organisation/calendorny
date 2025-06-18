@@ -2,37 +2,24 @@ package ru.calendorny.eventservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.calendorny.eventservice.dto.enums.MeetingType;
-import ru.calendorny.eventservice.exception.ServiceException;
-import ru.calendorny.eventservice.rabbit.dto.request.MeetingCreateRequest;
+import ru.calendorny.eventservice.data.entity.EventEntity;
+import ru.calendorny.eventservice.exception.NotFoundException;
 import ru.calendorny.eventservice.rabbit.dto.response.MeetingResponse;
-import ru.calendorny.eventservice.rabbit.producer.RabbitMeetingProducer;
-import ru.calendorny.eventservice.service.EventManagementService;
+import ru.calendorny.eventservice.repository.EventRepository;
 import ru.calendorny.eventservice.service.MeetingService;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class MeetingServiceImpl implements MeetingService {
 
-    private final RabbitMeetingProducer meetingProducer;
-
-    private final EventManagementService eventManagementService;
-    @Override
-    public void sendMeetingRequest(MeetingType meetingType, Long eventId, LocalDateTime start) {
-        MeetingCreateRequest request = MeetingCreateRequest.builder()
-            .eventId(eventId)
-            .startDateTime(start)
-            .build();
-        switch (meetingType) {
-            case GOOGLE -> meetingProducer.sendGoogleMeetingCreationRequest(request);
-            case ZOOM -> meetingProducer.sendZoomMeetingCreationRequest(request);
-            default -> throw new ServiceException("No such meeting type: %s".formatted(meetingType));
-        }
-    }
+    private final EventRepository eventRepository;
 
     @Override
     public void processMeetingResponse(MeetingResponse meetingResponse) {
-        eventManagementService.setVideoMeetingLinkToEvent(meetingResponse.eventId(), meetingResponse.link());
+        Long eventId = meetingResponse.eventId();
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        event.setVideoMeetingUrl(meetingResponse.link());
+        eventRepository.save(event);
     }
 }

@@ -6,7 +6,5 @@ import java.time.LocalDateTime;
 
 public interface MeetingService {
 
-    void sendMeetingRequest(MeetingType meetingType, Long eventId, LocalDateTime start);
-
     void processMeetingResponse(MeetingResponse meetingResponse);
 }

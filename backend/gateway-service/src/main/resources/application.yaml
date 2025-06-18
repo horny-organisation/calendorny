@@ -27,5 +27,12 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: event-service
+          uri: lb://event-service
+          predicates:
+            - Path=/event/**
+          filters:
+            - StripPrefix=1
+
 server:
   port: 8080

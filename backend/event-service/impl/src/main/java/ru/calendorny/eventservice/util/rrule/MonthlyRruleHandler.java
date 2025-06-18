@@ -3,11 +3,14 @@ package ru.calendorny.eventservice.util.rrule;
 import lombok.RequiredArgsConstructor;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Component;
+import ru.calendorny.eventservice.data.dto.EventInfo;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.EventFrequency;
 import ru.calendorny.eventservice.exception.InvalidRruleException;
-import ru.calendorny.eventservice.kafka.dto.request.EventNotificationRequest;
+import ru.calendorny.eventservice.kafka.dto.request.EventReminderRequest;
 import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import static ru.calendorny.eventservice.util.rrule.RruleConstants.BY_MONTHDAY_KEY;
 import static ru.calendorny.eventservice.util.rrule.RruleConstants.BY_MONTHDAY_PREFIX;
 
@@ -67,7 +70,14 @@ public class MonthlyRruleHandler implements RruleHandler {
     }
 
     @Override
-    public String schedule(EventNotificationRequest request, RruleDto rruleDto) throws SchedulerException {
-        return jobSchedulerService.scheduleMonthly(request, rruleDto.dayOfMonth(), request.start().toLocalTime());
+    public UUID schedule(EventInfo eventInfo, UUID userId, RruleDto rruleDto, LocalDateTime start, LocalDateTime end, Integer minutesBefore) throws SchedulerException {
+        EventReminderRequest eventReminderRequest = EventReminderRequest.builder()
+            .userId(userId)
+            .eventId(eventInfo.eventId())
+            .title(eventInfo.title())
+            .location(eventInfo.location())
+            .build();
+        LocalDateTime reminderTime = start.minusMinutes(minutesBefore);
+        return jobSchedulerService.scheduleMonthly(eventReminderRequest, rruleDto.dayOfMonth(), reminderTime.toLocalTime());
     }
 }
