@@ -12,7 +12,6 @@ import {
 import { CalendarHeader } from "../CalendarHeader/CalendarHeader";
 import { MonthView } from "../MonthView/MonthView";
 import { WeekView } from "../WeekView/WeekView";
-import { EventModal } from "../EventModal/EventModal";
 import styles from "./Calendar.module.scss";
 
 interface CalendarProps {
@@ -29,31 +28,10 @@ export const Calendar: React.FC<CalendarProps> = ({
     const [currentDate, setCurrentDate] = useState(new Date());
     const [view, setView] = useState<CalendarView>("month");
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(events);
-    const [isEventModalOpen, setIsEventModalOpen] = useState(false);
-    const [eventModalDate, setEventModalDate] = useState<Date | null>(null);
 
     const handleDateClick = (date: Date) => {
         setSelectedDate(date);
         onDateClick?.(date);
-    };
-
-    const handleDateDoubleClick = (date: Date) => {
-        setEventModalDate(date);
-        setIsEventModalOpen(true);
-    };
-
-    const handleCreateEvent = (eventData: Omit<CalendarEvent, "id">) => {
-        const newEvent: CalendarEvent = {
-            ...eventData,
-            id: Date.now().toString(),
-        };
-        setCalendarEvents((prev) => [...prev, newEvent]);
-    };
-
-    const handleCloseEventModal = () => {
-        setIsEventModalOpen(false);
-        setEventModalDate(null);
     };
 
     const handleNavigate = (direction: "prev" | "next" | "today") => {
@@ -102,27 +80,19 @@ export const Calendar: React.FC<CalendarProps> = ({
                 {view === "month" ? (
                     <MonthView
                         calendar={calendar}
-                        events={calendarEvents}
+                        events={events}
                         onDateClick={handleDateClick}
-                        onDateDoubleClick={handleDateDoubleClick}
                         selectedDate={selectedDate}
                     />
                 ) : (
                     <WeekView
                         week={week}
-                        events={calendarEvents}
+                        events={events}
                         onDateClick={handleDateClick}
-                        onDateDoubleClick={handleDateDoubleClick}
                         selectedDate={selectedDate}
                     />
                 )}
             </div>
-            <EventModalAdd commentMore actions
-                           isOpen={isEventModalOpen}
-                           onClose={handleCloseEventModal}
-                           onSave={handleCreateEvent}
-                           selectedDate={eventModalDate}
-            />
         </div>
     );
 };

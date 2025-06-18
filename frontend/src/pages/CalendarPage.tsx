@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useState } from "react";
 import { Calendar } from "../widgets/calendar";
+import { CalendarSidebar } from "../widgets/calendar";
 import type { CalendarEvent } from "../entities/calendar";
 import styles from "./CalendarPage.module.scss";
 
@@ -53,8 +54,17 @@ const mockEvents: CalendarEvent[] = [
 ];
 
 export const CalendarPage: React.FC = () => {
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [events, setEvents] = useState<CalendarEvent[]>(mockEvents);
+
     const handleDateClick = (date: Date) => {
+        setSelectedDate(date);
         console.log("Выбрана дата:", date);
+    };
+
+    const handleSidebarDateSelect = (date: Date) => {
+        setSelectedDate(date);
+        console.log("Выбрана дата из sidebar:", date);
     };
 
     const handleEventClick = (event: CalendarEvent) => {
@@ -63,11 +73,18 @@ export const CalendarPage: React.FC = () => {
 
     return (
         <div className={styles.calendarPage}>
-            <Calendar
-                events={mockEvents}
-                onDateClick={handleDateClick}
-                onEventClick={handleEventClick}
+            <CalendarSidebar
+                selectedDate={selectedDate}
+                onDateSelect={handleSidebarDateSelect}
             />
+
+            <div className={styles.calendarContent}>
+                <Calendar
+                    events={events}
+                    onDateClick={handleDateClick}
+                    onEventClick={handleEventClick}
+                />
+            </div>
         </div>
     );
 };

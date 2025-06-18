@@ -1,5 +1,7 @@
 import React from "react";
-import { type CalendarMonth, type CalendarEvent, DAYS_OF_WEEK } from "../../../../entities/calendar";
+import { type CalendarMonth,
+    type CalendarEvent,
+    DAYS_OF_WEEK } from "../../../../entities/calendar";
 import { Typography } from "../../../../shared";
 import styles from "./MonthView.module.scss";
 
@@ -7,7 +9,6 @@ interface MonthViewProps {
     calendar: CalendarMonth;
     events: CalendarEvent[];
     onDateClick: (date: Date) => void;
-    onDateDoubleClick?: (date: Date) => void;
     selectedDate: Date | null;
 }
 
@@ -15,7 +16,6 @@ export const MonthView: React.FC<MonthViewProps> = ({
                                                         calendar,
                                                         events,
                                                         onDateClick,
-                                                        onDateDoubleClick,
                                                         selectedDate,
                                                     }) => {
     const getEventsForDate = (date: Date): CalendarEvent[] => {
@@ -58,7 +58,6 @@ export const MonthView: React.FC<MonthViewProps> = ({
                                         isSelected ? styles.selected : ""
                                     }`}
                                     onClick={() => onDateClick(day.date)}
-                                    onDoubleClick={() => onDateDoubleClick?.(day.date)}
                                 >
                                     <div className={styles.dayNumber}>
                                         <Typography variant="body" className={styles.dayText}>
