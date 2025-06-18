@@ -45,6 +45,13 @@
   flex-direction: column;
   align-items: center;
   gap: 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  transition: background-color 0.2s ease;
+}
+.dayHeader:hover {
+  background-color: rgba(66, 133, 244, 0.1);
 }
 
 .dayName {
@@ -99,12 +106,14 @@
   border-right: 1px solid #f0f0f0;
   position: relative;
   padding: 0.125rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 .hourCell:last-child {
   border-right: none;
 }
 .hourCell:hover {
-  background-color: rgba(66, 133, 244, 0.02);
+  background-color: rgba(66, 133, 244, 0.08);
 }
 
 .event {

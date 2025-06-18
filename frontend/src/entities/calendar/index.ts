@@ -5,6 +5,7 @@ export type {
     CalendarMonth,
     CalendarView,
     CalendarState,
+    EventType,
 } from "./types";
 
 export {

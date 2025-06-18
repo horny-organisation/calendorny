@@ -14,7 +14,9 @@ const mockEvents: CalendarEvent[] = [
         endDate: new Date(2024, 11, 20, 11, 30),
         color: "#4285f4",
         isAllDay: false,
+        type: "event",
         location: "Офис",
+        recurrence: "none",
     },
     {
         id: "2",
@@ -24,6 +26,8 @@ const mockEvents: CalendarEvent[] = [
         endDate: new Date(2024, 11, 20, 17, 0),
         color: "#34a853",
         isAllDay: false,
+        type: "event",
+        recurrence: "none",
     },
     {
         id: "3",
@@ -33,6 +37,8 @@ const mockEvents: CalendarEvent[] = [
         endDate: new Date(2024, 11, 21, 10, 0),
         color: "#ea4335",
         isAllDay: false,
+        type: "event",
+        recurrence: "none",
     },
     {
         id: "4",
@@ -41,6 +47,8 @@ const mockEvents: CalendarEvent[] = [
         endDate: new Date(2024, 11, 22, 23, 59),
         color: "#ff9800",
         isAllDay: true,
+        type: "task",
+        recurrence: "none",
     },
     {
         id: "5",
@@ -50,6 +58,8 @@ const mockEvents: CalendarEvent[] = [
         endDate: new Date(2024, 11, 23, 16, 0),
         color: "#9c27b0",
         isAllDay: false,
+        type: "event",
+        recurrence: "none",
     },
 ];
 

@@ -1,3 +1,5 @@
+export type EventType = "event" | "task";
+
 export interface CalendarEvent {
     id: string;
     title: string;
@@ -6,8 +8,10 @@ export interface CalendarEvent {
     endDate: Date;
     color: string;
     isAllDay: boolean;
+    type: EventType;
     location?: string;
     attendees?: string[];
+    recurrence?: "none" | "daily" | "weekly" | "monthly";
 }
 
 export interface CalendarDay {
