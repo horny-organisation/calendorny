@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input, Button } from "../../../../shared";
 import { Typography } from "../../../../shared";
 import type { RegisterFormData } from "../../types";
@@ -7,6 +7,7 @@ import { authService } from "../../services/authService";
 import styles from "./RegisterForm.module.scss";
 
 export const RegisterForm: React.FC = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState<RegisterFormData>({
         firstName: "",
         lastName: "",
@@ -74,7 +75,8 @@ export const RegisterForm: React.FC = () => {
         try {
             const user = await authService.register(formData);
             console.log("Успешная регистрация:", user);
-            // Здесь должен быть редирект или сохранение состояния пользователя
+            // Переход на страницу календаря после успешной регистрации
+            navigate("/calendar");
         } catch (error) {
             setServerError(
                 error instanceof Error ? error.message : "Произошла ошибка",
