@@ -12,7 +12,7 @@ app:
 
   google:
     oauth:
-      fileName: google-token.json
+      file-name: /app/google-token.json
       principalName: ${GOOGLE_OAUTH_PRINCIPAL_NAME}
       clientRegistrationId: ${GOOGLE_OAUTH_CLIENT_REGISTRATION_ID}
 
