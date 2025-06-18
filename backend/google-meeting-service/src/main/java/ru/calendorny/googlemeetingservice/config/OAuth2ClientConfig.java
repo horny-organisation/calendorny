@@ -40,7 +40,7 @@ public class OAuth2ClientConfig {
 
         AuthorizedClientServiceOAuth2AuthorizedClientManager manager =
                 new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientService);
+                    clientRegistrationRepository, authorizedClientService);
 
         manager.setAuthorizedClientProvider(authorizedClientProvider);
         return manager;
@@ -48,13 +48,13 @@ public class OAuth2ClientConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public OAuth2AuthorizedClient authorizedClient(OAuth2AuthorizedClientManager manager) {
+    public OAuth2AuthorizedClient authorizedClient(OAuth2AuthorizedClientManager authorizedClientManager) {
         OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId(
-                        properties.clientRegistrationId())
+                    properties.clientRegistrationId())
                 .principal(properties.principalName())
                 .build();
 
-        OAuth2AuthorizedClient client = manager.authorize(authorizeRequest);
+        OAuth2AuthorizedClient client = authorizedClientManager.authorize(authorizeRequest);
         if (client == null || client.getAccessToken() == null) {
             throw new IllegalStateException("Failed to get or refresh token");
         }

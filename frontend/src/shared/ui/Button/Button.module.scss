@@ -1,0 +1,112 @@
+.button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Варианты
+.primary {
+  background-color: #4285f4;
+  color: white;
+  border: 1px solid #4285f4;
+
+  &:hover:not(:disabled) {
+    background-color: #3367d6;
+    border-color: #3367d6;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+.secondary {
+  background-color: transparent;
+  color: #4285f4;
+  border: 1px solid #4285f4;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(66, 133, 244, 0.04);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+.text {
+  background-color: transparent;
+  color: #4285f4;
+  border: 1px solid transparent;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(66, 133, 244, 0.04);
+  }
+}
+
+// Размеры
+.small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  height: 2.25rem;
+}
+
+.medium {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  height: 2.75rem;
+}
+
+.large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  height: 3.25rem;
+}
+
+// Состояние загрузки
+.loading {
+  .content {
+    opacity: 0;
+  }
+}
+
+.spinner {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.content {
+  transition: opacity 0.2s ease;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

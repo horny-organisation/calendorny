@@ -1,0 +1,46 @@
+// Переменные для всего проекта
+:root {
+  --primary-blue: #4285f4;
+  --primary-blue-hover: #3367d6;
+  --error-red: #ea4335;
+  --success-green: #34a853;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-light: #999999;
+  --border-color: #dadce0;
+  --border-focus: #4285f4;
+  --background-white: #ffffff;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+// Миксины
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+@mixin input-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  appearance: none;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

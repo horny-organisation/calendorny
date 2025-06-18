@@ -186,6 +186,8 @@ services:
       dockerfile: Dockerfile
     expose:
       - 8080
+    ports:
+      - "8087:8080"
     container_name: google-meeting-service
     env_file:
       - .env
@@ -194,11 +196,15 @@ services:
     depends_on:
       local-rabbit-mq:
         condition: service_healthy
+    volumes:
+      - google-meeting-data:/app
 
   zoom-meeting-service:
     build:
       context: ./zoom-meeting-service
       dockerfile: Dockerfile
+    ports:
+      - "8086:8080"
     expose:
       - 8080
     container_name: zoom-meeting-service
@@ -209,6 +215,8 @@ services:
     depends_on:
       local-rabbit-mq:
         condition: service_healthy
+    volumes:
+      - zoom-meeting-data:/app
 
   event-service-postgres:
     image: postgres:16-alpine
@@ -257,9 +265,13 @@ services:
     expose:
       - 8080
     depends_on:
-      - event-service-postgres
-      - event-service-liquibase
-      - local-rabbit-mq
+      event-service-postgres:
+        condition: service_started
+      event-service-liquibase:
+        condition: service_started
+      local-rabbit-mq:
+        condition: service_healthy
+
     env_file:
       - .env
     restart: unless-stopped
@@ -305,6 +317,8 @@ volumes:
   db-auth-data:
   prometheus-data:
   grafana-data:
+  google-meeting-data:
+  zoom-meeting-data:
 
 networks:
   task-service:
