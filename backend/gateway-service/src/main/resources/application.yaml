@@ -27,5 +27,12 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: nlp-service
+          uri: lb://nlp-service
+          predicates:
+            - Path=/nlp/**
+          filters:
+            - StripPrefix=1
+
 server:
   port: 8080

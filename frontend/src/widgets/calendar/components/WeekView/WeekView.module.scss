@@ -1,0 +1,227 @@
+.weekView {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.weekHeader {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  border-bottom: 1px solid #dadce0;
+  background-color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.timeColumn {
+  border-right: 1px solid #dadce0;
+}
+
+.dayColumn {
+  padding: 0.5rem 0.25rem;
+  text-align: center;
+  border-right: 1px solid #dadce0;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &.today {
+    background-color: rgba(66, 133, 244, 0.05);
+  }
+
+  &.selected {
+    background-color: rgba(66, 133, 244, 0.1);
+  }
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  transition: background-color 0.2s ease;
+  width: 100%;
+  flex: 1;
+
+  &:hover {
+    background-color: rgba(66, 133, 244, 0.1);
+  }
+}
+
+.dayHeaderTop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.tasksSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0 0.25rem;
+}
+
+.taskItem {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  z-index: 5;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2px;
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.taskTitle {
+  color: white;
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dayName {
+  color: #666666;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.dayNumber {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  &.todayNumber {
+    background-color: #4285f4;
+    color: white;
+  }
+}
+
+.timeGrid {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.timeRow {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  min-height: 48px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: 1px solid #dadce0;
+  }
+}
+
+.timeSlot {
+  border-right: 1px solid #dadce0;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.timeLabel {
+  color: #666666;
+  font-size: 0.75rem;
+  margin-top: -0.5rem;
+}
+
+.hourCell {
+  border-right: 1px solid #f0f0f0;
+  position: relative;
+  padding: 0.125rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    background-color: rgba(66, 133, 244, 0.08);
+  }
+}
+
+.event {
+  position: absolute;
+  left: 0.125rem;
+  right: 0.125rem;
+  top: 0.125rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  z-index: 5;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.eventTitle {
+  color: white;
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .weekHeader {
+    grid-template-columns: 40px repeat(7, 1fr);
+  }
+
+  .timeRow {
+    grid-template-columns: 40px repeat(7, 1fr);
+    min-height: 40px;
+  }
+
+  .timeSlot {
+    padding: 0.125rem 0.25rem;
+  }
+
+  .timeLabel {
+    font-size: 0.625rem;
+  }
+
+  .dayColumn {
+    padding: 0.5rem 0.25rem;
+  }
+
+  .dayName {
+    font-size: 0.625rem;
+  }
+
+  .event {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.625rem;
+  }
+}

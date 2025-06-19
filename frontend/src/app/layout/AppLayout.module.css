@@ -1,0 +1,16 @@
+.layout {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/*# sourceMappingURL=AppLayout.module.css.map */
