@@ -310,6 +310,59 @@ services:
     networks:
       - backend
 
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: notification-service
+    depends_on:
+      - kafka
+      - redis
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+      
+  nlp-service:
+    build:
+      context: ./nlp-service
+    container_name: nlp-service
+    expose:
+      - 8080
+    depends_on:
+      - mongodb
+      - consul
+    env_file:
+      - .env
+    networks:
+      - nlp-network
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${NLP_MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${NLP_MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - nlp-network
+
 volumes:
   kafka-data:
   task-service-postgres-data:
@@ -319,9 +372,12 @@ volumes:
   grafana-data:
   google-meeting-data:
   zoom-meeting-data:
+  redis-data:
+  mongodb-data:
 
 networks:
   task-service:
   event-service:
   backend:
   auth-network:
+  nlp-network:
