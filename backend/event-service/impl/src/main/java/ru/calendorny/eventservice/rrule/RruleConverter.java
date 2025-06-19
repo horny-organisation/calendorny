@@ -1,4 +1,4 @@
-package ru.calendorny.eventservice.util.rrule;
+package ru.calendorny.eventservice.rrule;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.EventFrequency;
 import ru.calendorny.eventservice.exception.InvalidRruleException;
-import static ru.calendorny.eventservice.util.rrule.RruleConstants.FREQUENCY_KEY;
-import static ru.calendorny.eventservice.util.rrule.RruleConstants.FREQUENCY_PREFIX;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class RruleConverter implements AttributeConverter<RruleDto, String> {
         StringBuilder sb = new StringBuilder();
         EventFrequency frequency = rruleDto.frequency();
 
-        sb.append(FREQUENCY_PREFIX).append(frequency);
+        sb.append(RruleConstants.FREQUENCY_PREFIX).append(frequency);
 
         handlerRegistry.findHandler(frequency)
             .ifPresent(handler -> handler.append(rruleDto, sb));
@@ -54,7 +52,7 @@ public class RruleConverter implements AttributeConverter<RruleDto, String> {
             String key = kv[0].trim();
             String value = kv[1].trim();
 
-            if (key.equals(FREQUENCY_KEY)) {
+            if (key.equals(RruleConstants.FREQUENCY_KEY)) {
                 rruleDtoBuilder.frequency(EventFrequency.valueOf(value));
             } else {
                 handlerRegistry.setKeyValue(key, value, rruleDtoBuilder);

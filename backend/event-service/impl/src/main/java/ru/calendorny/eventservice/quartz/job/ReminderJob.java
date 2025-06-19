@@ -22,6 +22,7 @@ public class ReminderJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) {
+        log.info("Executing job with data: {}", context.getMergedJobDataMap());
         try {
             JobDataMap data = context.getMergedJobDataMap();
             EventReminderRequest request = EventReminderRequest.builder()
@@ -29,8 +30,6 @@ public class ReminderJob implements Job {
                 .userId(UUID.fromString(data.getString("userId")))
                 .title(data.getString("title"))
                 .location(data.getString("location"))
-                //.start(LocalDateTime.parse(data.getString("start")))
-                //.end(LocalDateTime.parse(data.getString("end")))
                 .build();
             kafkaEventProducer.send(request);
             log.info("Kafka sended in %s".formatted(LocalDateTime.now()));
@@ -38,7 +37,6 @@ public class ReminderJob implements Job {
             throw new ServiceException("Invalid job data format");
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            log.error("SCHEDULE ERROR {}", e.getMessage());
             throw new ServiceException("Failed to execute reminder job");
         }
     }

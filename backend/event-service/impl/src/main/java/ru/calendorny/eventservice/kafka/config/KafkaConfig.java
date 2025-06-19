@@ -25,6 +25,7 @@ import ru.calendorny.eventservice.kafka.properties.KafkaConfigProperties;
 public class KafkaConfig {
 
     private final KafkaConfigProperties kafkaConfigProperties;
+
     private final KafkaProperties kafkaProperties;
 
     @Bean

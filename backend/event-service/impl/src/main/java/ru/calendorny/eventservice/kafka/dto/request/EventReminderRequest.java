@@ -9,8 +9,6 @@ public record EventReminderRequest(
     Long eventId,
     UUID userId,
     String title,
-    String location,
-    LocalDateTime start,
-    LocalDateTime end
+    String location
 ) {
 }

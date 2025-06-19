@@ -4,8 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.calendorny.eventservice.data.entity.EventEntity;
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
@@ -43,21 +45,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
         """)
     List<EventEntity> findAllRecurEventsInRange(@Param("userId") UUID userId);
 
-    @Query("""
-            SELECT DISTINCT e FROM EventEntity e
-            LEFT JOIN e.participants p
-            WHERE e.isActive = true
-              AND (e.organizerId = :userId OR p.userId = :userId)
-              AND (
-                e.rrule IS NOT NULL OR
-                (e.start BETWEEN :start AND :end)
-              )
-        """)
-    List<EventEntity> findRelevantEvents(
-        @Param("userId") UUID userId,
-        @Param("start") LocalDateTime start,
-        @Param("end") LocalDateTime end
-    );
-
-
+    @Query("SELECT DISTINCT e FROM EventEntity e WHERE e.isActive = true AND e.id = :eventId")
+    Optional<EventEntity> findActiveById(@Param("eventId") Long eventId);
 }

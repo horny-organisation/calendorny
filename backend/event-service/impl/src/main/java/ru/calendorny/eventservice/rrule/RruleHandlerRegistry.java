@@ -1,4 +1,4 @@
-package ru.calendorny.eventservice.util.rrule;
+package ru.calendorny.eventservice.rrule;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,8 +12,6 @@ import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.EventFrequency;
 import ru.calendorny.eventservice.exception.InvalidRruleException;
 import ru.calendorny.eventservice.exception.ServiceException;
-
-import static ru.calendorny.eventservice.util.rrule.RruleConstants.*;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +37,11 @@ public class RruleHandlerRegistry {
     }
 
     public void validateRruleString(String rruleString) throws InvalidRruleException {
-        if (!rruleString.startsWith(FREQUENCY_PREFIX)) {
+        if (!rruleString.startsWith(RruleConstants.FREQUENCY_PREFIX)) {
             throw new InvalidRruleException("RRULE must start with FREQ=");
         }
 
-        String freqPart = rruleString.split(FREQUENCY_PREFIX)[1].split(";")[0];
+        String freqPart = rruleString.split(RruleConstants.FREQUENCY_PREFIX)[1].split(";")[0];
         EventFrequency frequency;
         try {
             frequency = EventFrequency.valueOf(freqPart);

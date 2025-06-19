@@ -5,6 +5,7 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,8 +21,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.MeetingType;
-import ru.calendorny.eventservice.util.rrule.RruleConverter;
+import ru.calendorny.eventservice.rrule.RruleConverter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,8 +73,9 @@ public class EventEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
-    @OneToMany(mappedBy = "event")
-    private List<ParticipantEntity> participants;
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<ParticipantEntity> participants = new ArrayList<>();
 
     @Column(name = "organizer_id", nullable = false)
     private UUID organizerId;

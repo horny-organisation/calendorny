@@ -30,42 +30,33 @@ import java.util.UUID;
 public class JobSchedulerService {
 
     private final Scheduler scheduler;
-
-    private static final ZoneId MOSCOW_ZONE = ZoneId.of("Europe/Moscow"); // UTC+3 с учетом переходов
+    private static final ZoneId MOSCOW_ZONE = ZoneId.of("Europe/Moscow");
 
     public UUID scheduleOneTime(EventReminderRequest request, LocalDateTime runAt) throws SchedulerException {
-        // Интерпретируем runAt как московское время
         ZonedDateTime zonedDateTime = runAt.atZone(MOSCOW_ZONE);
-
-        // Конвертируем в Instant (UTC)
         Instant runAtUtc = zonedDateTime.toInstant();
-
         JobDetail jobDetail = buildJobDetail(request);
-
         Trigger trigger = TriggerBuilder.newTrigger()
             .forJob(jobDetail)
-            .startAt(Date.from(runAtUtc)) // Передаем UTC-время, которое соответствует московскому
+            .startAt(Date.from(runAtUtc))
             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                 .withMisfireHandlingInstructionFireNow())
             .build();
-
         scheduler.scheduleJob(jobDetail, trigger);
         return UUID.fromString(jobDetail.getKey().getName());
     }
 
     public UUID scheduleWeekly(EventReminderRequest request, DayOfWeek dayOfWeek, LocalTime time) throws SchedulerException {
         JobDetail jobDetail = buildJobDetail(request);
-
         Trigger trigger = TriggerBuilder.newTrigger()
             .forJob(jobDetail)
             .withSchedule(CronScheduleBuilder
                 .weeklyOnDayAndHourAndMinute(dayOfWeek.getValue(), time.getHour(), time.getMinute())
                 .withMisfireHandlingInstructionFireAndProceed()
-                .inTimeZone(TimeZone.getTimeZone(MOSCOW_ZONE)) // обязательно московская зона
+                .inTimeZone(TimeZone.getTimeZone(MOSCOW_ZONE))
             )
             .startNow()
             .build();
-
         scheduler.scheduleJob(jobDetail, trigger);
         return UUID.fromString(jobDetail.getKey().getName());
     }
@@ -73,17 +64,15 @@ public class JobSchedulerService {
     public UUID scheduleMonthly(EventReminderRequest request, int dayOfMonth, LocalTime time) throws SchedulerException {
         JobDetail jobDetail = buildJobDetail(request);
         String cron = String.format("0 %d %d %d * ?", time.getMinute(), time.getHour(), dayOfMonth);
-
         Trigger trigger = TriggerBuilder.newTrigger()
             .forJob(jobDetail)
             .withSchedule(CronScheduleBuilder
                 .cronSchedule(cron)
                 .withMisfireHandlingInstructionFireAndProceed()
-                .inTimeZone(TimeZone.getTimeZone(MOSCOW_ZONE)) // московская зона
+                .inTimeZone(TimeZone.getTimeZone(MOSCOW_ZONE))
             )
             .startNow()
             .build();
-
         scheduler.scheduleJob(jobDetail, trigger);
         return UUID.fromString(jobDetail.getKey().getName());
     }
@@ -99,17 +88,9 @@ public class JobSchedulerService {
         map.put("userId", request.userId().toString());
         map.put("title", request.title());
         map.put("location", request.location());
-        if (request.start() != null) {
-            map.put("start", request.start().toString());
-        }
-        if (request.end() != null) {
-            map.put("end", request.end().toString());
-        }
-
         return JobBuilder.newJob(ReminderJob.class)
             .withIdentity(UUID.randomUUID().toString(), "event-jobs")
             .usingJobData(map)
-            //.storeDurably()
             .build();
     }
 }

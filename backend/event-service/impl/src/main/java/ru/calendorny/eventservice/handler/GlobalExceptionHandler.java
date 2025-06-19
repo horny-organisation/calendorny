@@ -10,7 +10,9 @@ import org.springframework.web.context.request.WebRequest;
 import ru.calendorny.eventservice.dto.error.ApiErrorResponse;
 import ru.calendorny.eventservice.dto.error.ValidationError;
 import ru.calendorny.eventservice.dto.error.ValidationErrorResponse;
+import ru.calendorny.eventservice.exception.ForbiddenException;
 import ru.calendorny.eventservice.exception.NotFoundException;
+import ru.calendorny.eventservice.exception.ServiceException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,11 +52,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleTaskNotFoundException(
+    public ResponseEntity<ApiErrorResponse> handleNotFoundException(
         NotFoundException ex, WebRequest webRequest) {
 
         log.error("""
-                Task not found:
+                Event not found:
                 {}
                 Error: {}
                 Stack trace: {}""",
@@ -69,6 +71,50 @@ public class GlobalExceptionHandler {
             .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ApiErrorResponse> handleForbiddenException(
+        ForbiddenException ex, WebRequest webRequest) {
+
+        log.error("""
+                Forbidden:
+                {}
+                Error: {}
+                Stack trace: {}""",
+            webRequest.getDescription(false),
+            ex.getMessage(),
+            getFormattedStackTrace(ex));
+
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+            .code(HttpStatus.FORBIDDEN.value())
+            .exceptionName(ex.getClass().getSimpleName())
+            .exceptionMessage(ex.getMessage())
+            .build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiErrorResponse);
+    }
+
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<ApiErrorResponse> handleServiceException(
+        ForbiddenException ex, WebRequest webRequest) {
+
+        log.error("""
+                Service:
+                {}
+                Error: {}
+                Stack trace: {}""",
+            webRequest.getDescription(false),
+            ex.getMessage(),
+            getFormattedStackTrace(ex));
+
+        ApiErrorResponse apiErrorResponse = ApiErrorResponse.builder()
+            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .exceptionName(ex.getClass().getSimpleName())
+            .exceptionMessage(ex.getMessage())
+            .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiErrorResponse);
     }
 
     private String getFormattedStackTrace(Throwable ex) {

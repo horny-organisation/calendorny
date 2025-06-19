@@ -74,6 +74,5 @@ CREATE TABLE participants
     CONSTRAINT participant_user_id_nn CHECK ( user_id IS NOT NULL ),
     CONSTRAINT participant_email_nn CHECK ( email IS NOT NULL ),
     CONSTRAINT participant_status_nn CHECK ( status IS NOT NULL ),
-    CONSTRAINT participant_invited_at_nn CHECK ( invited_at IS NOT NULL ),
-    CONSTRAINT participant_responded_at_nn CHECK ( responded_at IS NOT NULL )
+    CONSTRAINT participant_invited_at_nn CHECK ( invited_at IS NOT NULL )
 );

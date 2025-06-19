@@ -7,7 +7,7 @@ import ru.calendorny.eventservice.data.entity.ParticipantEntity;
 import ru.calendorny.eventservice.data.mapper.EventMapper;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
-import ru.calendorny.eventservice.exception.BadRequestException;
+import ru.calendorny.eventservice.exception.NotFoundException;
 import ru.calendorny.eventservice.repository.EventRepository;
 import ru.calendorny.eventservice.repository.ParticipantRepository;
 import ru.calendorny.eventservice.service.EventInvitationService;
@@ -37,7 +37,7 @@ public class EventInvitationServiceImpl implements EventInvitationService {
     @Override
     public EventDetailedResponse answerInvitation(UUID userId, Long eventId, ParticipantStatus participantStatus) {
         ParticipantEntity participant = participantRepository.findByUserIdAndEvent_Id(userId, eventId)
-            .orElseThrow(() -> new BadRequestException("No participant found with id: %s".formatted(userId)));
+            .orElseThrow(() -> new NotFoundException("No participant found with id: %s".formatted(userId)));
         if (participantStatus == ParticipantStatus.ACCEPTED) {
             participant.setStatus(participantStatus);
             participant.setRespondedAt(LocalDateTime.now());
@@ -46,7 +46,7 @@ public class EventInvitationServiceImpl implements EventInvitationService {
             participantRepository.deleteById(participant.getId());
         }
         EventEntity event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new BadRequestException("No such event with id: %s".formatted(eventId)));
+            .orElseThrow(() -> new NotFoundException("No such event with id: %s".formatted(eventId)));
         return eventMapper.toDetailedResponseWithoutReminders(event);
     }
 }

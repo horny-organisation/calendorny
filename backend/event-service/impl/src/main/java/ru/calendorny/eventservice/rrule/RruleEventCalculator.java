@@ -1,4 +1,4 @@
-package ru.calendorny.eventservice.util.rrule;
+package ru.calendorny.eventservice.rrule;
 
 import lombok.RequiredArgsConstructor;
 import org.dmfs.rfc5545.DateTime;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.exception.ServiceException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;

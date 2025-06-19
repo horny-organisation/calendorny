@@ -1,4 +1,4 @@
-package ru.calendorny.eventservice.util.rrule;
+package ru.calendorny.eventservice.rrule;
 
 import org.quartz.SchedulerException;
 import ru.calendorny.eventservice.data.dto.EventInfo;

@@ -6,6 +6,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1'
     implementation 'org.springframework.boot:spring-boot-starter-quartz'
     implementation 'org.postgresql:postgresql:42.7.5'
+    testImplementation 'org.testcontainers:postgresql:1.21.0'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.dmfs:lib-recur:0.17.1'
@@ -14,6 +15,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-logging'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
+    testImplementation 'org.testcontainers:rabbitmq:1.17.6'
 }
 
 dependencyManagement {

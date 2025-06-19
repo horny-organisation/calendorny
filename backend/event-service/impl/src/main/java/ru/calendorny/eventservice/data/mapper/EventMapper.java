@@ -1,6 +1,7 @@
 package ru.calendorny.eventservice.data.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.calendorny.eventservice.data.dto.EventInfo;
 import ru.calendorny.eventservice.data.entity.EventEntity;
 import ru.calendorny.eventservice.data.entity.EventLabelEntity;
 import ru.calendorny.eventservice.data.entity.ParticipantEntity;
@@ -11,7 +12,6 @@ import ru.calendorny.eventservice.dto.request.CreateEventRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.ParticipantDto;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -107,6 +107,14 @@ public class EventMapper {
             .startTime(eventEntity.getStart())
             .endTime(eventEntity.getEnd())
             .labels(eventEntity.getLabels().stream().map(this::eventLabelToDto).collect(Collectors.toList()))
+            .build();
+    }
+
+    public EventInfo toEventInfo(EventEntity eventEntity) {
+        return EventInfo.builder()
+            .eventId(eventEntity.getId())
+            .title(eventEntity.getTitle())
+            .location(eventEntity.getLocation())
             .build();
     }
 }

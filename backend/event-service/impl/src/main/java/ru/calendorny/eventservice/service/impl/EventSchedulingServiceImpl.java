@@ -8,7 +8,7 @@ import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.kafka.dto.request.EventReminderRequest;
 import ru.calendorny.eventservice.quartz.service.JobSchedulerService;
 import ru.calendorny.eventservice.service.EventSchedulingService;
-import ru.calendorny.eventservice.util.rrule.RruleHandlerRegistry;
+import ru.calendorny.eventservice.rrule.RruleHandlerRegistry;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,8 +28,6 @@ public class EventSchedulingServiceImpl implements EventSchedulingService {
                 .eventId(eventInfo.eventId())
                 .title(eventInfo.title())
                 .location(eventInfo.location())
-                .start(start)
-                .end(end)
                 .build();
             LocalDateTime reminderTime = start.minusMinutes(minutesBefore);
             return jobSchedulerService.scheduleOneTime(eventReminderRequest, reminderTime);

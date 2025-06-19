@@ -6,7 +6,6 @@ import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
 import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
-import java.awt.Label;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
