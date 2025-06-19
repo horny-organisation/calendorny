@@ -1,0 +1,170 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 1rem;
+  color: white;
+}
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+.avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+@media (max-width: 768px) {
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.avatarIcon {
+  width: 2rem;
+  height: 2rem;
+  color: white;
+}
+@media (max-width: 768px) {
+  .avatarIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.userName {
+  margin: 0;
+  color: white;
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  .userName {
+    font-size: 1.5rem;
+  }
+}
+
+.userEmail {
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.editButton {
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .editButton {
+    width: 100%;
+  }
+}
+
+.profileCard {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+  margin: 0 0 2rem 0;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+@media (max-width: 768px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoLabel {
+  color: #666666;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+.infoValue {
+  color: #1a1a1a;
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.emptyValue {
+  color: #999999;
+  font-style: italic;
+}
+
+.errorCard {
+  text-align: center;
+  padding: 3rem;
+}
+.errorCard .errorCard h2 {
+  color: #ea4335;
+  margin-bottom: 1rem;
+}
+.errorCard .errorCard p {
+  color: #666666;
+}
+
+/*# sourceMappingURL=UserProfilePage.module.css.map */

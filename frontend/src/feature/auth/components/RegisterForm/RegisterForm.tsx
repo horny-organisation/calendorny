@@ -2,12 +2,19 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input, Button } from "../../../../shared";
 import { Typography } from "../../../../shared";
-import type { RegisterFormData } from "../../types";
-import { authService } from "../../services/authService";
+import { registerUser } from "../../../../shared";
 import styles from "./RegisterForm.module.scss";
+
+interface RegisterFormData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+}
 
 export const RegisterForm: React.FC = () => {
     const navigate = useNavigate();
+
     const [formData, setFormData] = useState<RegisterFormData>({
         firstName: "",
         lastName: "",
@@ -16,7 +23,8 @@ export const RegisterForm: React.FC = () => {
     });
     const [errors, setErrors] = useState<Partial<RegisterFormData>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [serverError, setServerError] = useState<string>("");
+    const [serverError, setServerError] = useState<string | null>(null);
+    const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
     const handleInputChange =
         (field: keyof RegisterFormData) =>
@@ -35,7 +43,7 @@ export const RegisterForm: React.FC = () => {
                 }
 
                 if (serverError) {
-                    setServerError("");
+                    setServerError(null);
                 }
             };
 
@@ -70,17 +78,21 @@ export const RegisterForm: React.FC = () => {
         if (!validateForm()) return;
 
         setIsLoading(true);
-        setServerError("");
+        setServerError(null);
 
         try {
-            const user = await authService.register(formData);
-            console.log("Успешная регистрация:", user);
-            // Переход на страницу календаря после успешной регистрации
-            navigate("/calendar");
+            const result = await registerUser(formData);
+
+            if (result.success) {
+                setRegistrationSuccess(true);
+                setTimeout(() => {
+                    navigate("/login");
+                }, 2000);
+            } else {
+                setServerError(result.message || "Ошибка регистрации");
+            }
         } catch (error) {
-            setServerError(
-                error instanceof Error ? error.message : "Произошла ошибка",
-            );
+            setServerError("Произошла ошибка. Попробуйте снова.");
         } finally {
             setIsLoading(false);
         }
@@ -103,6 +115,12 @@ export const RegisterForm: React.FC = () => {
                 </Typography>
 
                 {serverError && <div className={styles.serverError}>{serverError}</div>}
+
+                {registrationSuccess && (
+                    <div className={styles.successMessage}>
+                    Регистрация успешна! Перенаправляем на страницу входа...
+                    </div>
+                    )}
 
                 <Input
                     type="text"

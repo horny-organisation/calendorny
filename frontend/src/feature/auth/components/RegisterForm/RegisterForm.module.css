@@ -37,9 +37,19 @@
 .serverError {
   padding: 0.75rem 1rem;
   background-color: rgba(234, 67, 53, 0.1);
-  border: 1px solid var(--error-red);
+  border: 1px solid #ea4335;
   border-radius: 0.5rem;
-  color: var(--error-red);
+  color: #ea4335;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.successMessage {
+  padding: 0.75rem 1rem;
+  background-color: rgba(52, 168, 83, 0.1);
+  border: 1px solid #34a853;
+  border-radius: 0.5rem;
+  color: #34a853;
   font-size: 0.875rem;
   text-align: center;
 }

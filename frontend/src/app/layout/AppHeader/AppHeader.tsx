@@ -2,18 +2,23 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "../../../shared";
 import { Typography } from "../../../shared";
+import { getCurrentUser, logoutUser } from "../../../shared";
 import styles from "./AppHeader.module.scss";
 
 export const AppHeader: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const user = getCurrentUser();
 
     const isAuthPage = ["/login", "/register"].includes(location.pathname);
 
     const handleLogout = () => {
-        // Здесь должна быть логика выхода из системы
-        console.log("Выход из системы");
+        logoutUser();
         navigate("/login");
+    };
+
+    const handleProfileClick = () => {
+        navigate("/profile");
     };
 
     if (isAuthPage) {
@@ -23,12 +28,19 @@ export const AppHeader: React.FC = () => {
     return (
         <header className={styles.header}>
             <div className={styles.brand}>
-                <Typography variant="h3" className={styles.brandText}>
-                    Calendorny
-                </Typography>
+                <button className={styles.userButton} onClick={handleProfileClick}>
+                    <Typography variant="caption" className={styles.userInfo}>
+                        {user.firstName} {user.lastName}
+                    </Typography>
+                </button>
             </div>
 
             <div className={styles.actions}>
+                {user && (
+                    <Typography variant="caption" className={styles.userInfo}>
+                        {user.firstName} {user.lastName}
+                    </Typography>
+                )}
                 <Button variant="text" size="medium" onClick={handleLogout}>
                     Выйти
                 </Button>

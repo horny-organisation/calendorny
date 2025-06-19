@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-//import { Link, useNavigate } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { Input, Button } from "../../../../shared";
 import { Typography } from "../../../../shared";
-import type {LoginFormData} from "../../types";
-
-import { authService } from "../../services/authService";
+import { loginUser } from "../../../../shared";
 import styles from "./LoginForm.module.scss";
+
+interface LoginFormData {
+    email: string;
+    password: string;
+}
 
 export const LoginForm: React.FC = () => {
     const navigate = useNavigate();
@@ -16,7 +18,7 @@ export const LoginForm: React.FC = () => {
     });
     const [errors, setErrors] = useState<Partial<LoginFormData>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [serverError, setServerError] = useState<string>("");
+    const [serverError, setServerError] = useState<string | null>(null);
 
     const handleInputChange =
         (field: keyof LoginFormData) =>
@@ -35,7 +37,7 @@ export const LoginForm: React.FC = () => {
                 }
 
                 if (serverError) {
-                    setServerError("");
+                    setServerError(null);
                 }
             };
 
@@ -62,17 +64,18 @@ export const LoginForm: React.FC = () => {
         if (!validateForm()) return;
 
         setIsLoading(true);
-        setServerError("");
+        setServerError(null);
 
         try {
-            const user = await authService.login(formData);
-            console.log("Успешный вход:", user);
-            // Переход на страницу календаря после успешного входа
-            navigate("/calendar");
+            const result = await loginUser(formData);
+
+            if (result.success) {
+                navigate("/calendar");
+            } else {
+                setServerError(result.message || "Ошибка входа");
+            }
         } catch (error) {
-            setServerError(
-                error instanceof Error ? error.message : "Произошла ошибка",
-            );
+            setServerError("Произошла ошибка. Попробуйте снова.");
         } finally {
             setIsLoading(false);
         }
