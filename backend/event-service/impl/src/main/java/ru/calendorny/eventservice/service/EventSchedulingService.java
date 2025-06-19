@@ -9,9 +9,7 @@ import java.util.UUID;
 
 public interface EventSchedulingService {
 
-    //UUID scheduleEvent(LocalDateTime notificationTime, EventReminderRequest request, RruleDto rruleDto) throws SchedulerException;
-
     UUID schedule(EventInfo eventInfo, UUID userId, RruleDto rruleDto, LocalDateTime start, LocalDateTime end, Integer minutesBefore) throws SchedulerException;
 
-    //void deleteJob(String jobId) throws SchedulerException;
+    void deleteJob(UUID jobId) throws SchedulerException;
 }

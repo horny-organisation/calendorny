@@ -38,4 +38,8 @@ public class EventSchedulingServiceImpl implements EventSchedulingService {
         }
     }
 
+    @Override
+    public void deleteJob(UUID jobId) throws SchedulerException {
+        jobSchedulerService.deleteJob(jobId.toString());
+    }
 }

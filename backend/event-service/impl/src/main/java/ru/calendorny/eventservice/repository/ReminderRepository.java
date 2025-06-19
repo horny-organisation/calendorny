@@ -7,5 +7,7 @@ import java.util.UUID;
 
 public interface ReminderRepository extends JpaRepository<ReminderEntity, Long> {
 
-    List<ReminderEntity> findByEventIdAndUserId(Long eventId, UUID userId);
+    List<ReminderEntity> findAllByEvent_IdAndUserId(Long eventId, UUID userId);
+
+    List<ReminderEntity> findAllByEvent_Id(Long eventId);
 }

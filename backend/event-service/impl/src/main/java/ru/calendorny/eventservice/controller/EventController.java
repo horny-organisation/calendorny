@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.calendorny.eventservice.api.EventApi;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.service.EventInvitationService;
@@ -37,6 +39,16 @@ public class EventController implements EventApi {
     public EventDetailedResponse getEventDetailedInfoById(AuthenticatedUser authenticatedUser, Long eventId) {
         log.info("CONTROLLER: {}", authenticatedUser.id());
         return eventManagementService.getEventDetailedInfoById(authenticatedUser.id(), eventId);
+    }
+
+    @Override
+    public void updateEventInfoById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventInfoRequest updateEventInfoRequest) {
+        eventManagementService.updateEventInfo(authenticatedUser.id(), eventId, updateEventInfoRequest);
+    }
+
+    @Override
+    public void updateEventReminderById(AuthenticatedUser authenticatedUser, Long eventId, UpdateEventReminderRequest updateEventReminderRequest) {
+        eventManagementService.updateEventReminder(authenticatedUser.id(), eventId, updateEventReminderRequest);
     }
 
     @Override

@@ -18,4 +18,8 @@ public interface EventManagementService {
     EventDetailedResponse getEventDetailedInfoById(UUID userId, Long eventId);
 
     void deleteEventById(UUID userId, Long eventId);
+
+    void updateEventInfo(UUID userId, Long eventId, UpdateEventInfoRequest updateEventInfoRequest);
+
+    void updateEventReminder(UUID userId, Long eventId, UpdateEventReminderRequest updateEventReminderRequest);
 }

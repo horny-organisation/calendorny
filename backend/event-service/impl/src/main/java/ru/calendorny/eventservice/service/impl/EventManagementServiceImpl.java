@@ -16,9 +16,12 @@ import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.MeetingType;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
+import ru.calendorny.eventservice.dto.request.UpdateEventReminderRequest;
 import ru.calendorny.eventservice.dto.response.EventDetailedResponse;
 import ru.calendorny.eventservice.dto.response.EventShortResponse;
 import ru.calendorny.eventservice.exception.BadRequestException;
+import ru.calendorny.eventservice.exception.ForbiddenException;
 import ru.calendorny.eventservice.exception.NotFoundException;
 import ru.calendorny.eventservice.exception.ServiceException;
 import ru.calendorny.eventservice.rabbit.dto.request.MeetingCreateRequest;
@@ -29,7 +32,6 @@ import ru.calendorny.eventservice.repository.ParticipantRepository;
 import ru.calendorny.eventservice.repository.ReminderRepository;
 import ru.calendorny.eventservice.service.EventManagementService;
 import ru.calendorny.eventservice.service.EventSchedulingService;
-import ru.calendorny.eventservice.service.MeetingService;
 import ru.calendorny.eventservice.util.rrule.RruleEventCalculator;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,8 +56,6 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     private final EventSchedulingService eventSchedulingService;
 
-    private final MeetingService meetingService;
-
     private final RruleEventCalculator rruleEventCalculator;
 
     private final RabbitMeetingProducer meetingProducer;
@@ -77,7 +77,7 @@ public class EventManagementServiceImpl implements EventManagementService {
         }
         ReminderDto reminderDto = createEventRequest.reminder();
         createEventReminders(userId, reminderDto, savedEvent);
-        List<ReminderEntity> savedReminders = reminderRepository.findByEventIdAndUserId(savedEvent.getId(), userId);
+        List<ReminderEntity> savedReminders = reminderRepository.findAllByEvent_IdAndUserId(savedEvent.getId(), userId);
         return eventMapper.toDetailedResponseWithReminders(savedEvent, savedReminders);
     }
 
@@ -157,15 +157,116 @@ public class EventManagementServiceImpl implements EventManagementService {
 
     @Override
     public EventDetailedResponse getEventDetailedInfoById(UUID userId, Long eventId) {
-        log.info("USERID: {}, EVENT: {}", userId, eventId);
         EventEntity event = eventRepository.findById(eventId)
             .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
-        List<ReminderEntity> savedReminders = reminderRepository.findByEventIdAndUserId(eventId, userId);
+        if (!event.isActive()) {
+            throw new NotFoundException("Event with id: %s not found".formatted(eventId));
+        }
+        List<ReminderEntity> savedReminders = reminderRepository.findAllByEvent_IdAndUserId(eventId, userId);
         return eventMapper.toDetailedResponseWithReminders(event, savedReminders);
     }
 
     @Override
     public void deleteEventById(UUID userId, Long eventId) {
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        if (!userId.equals(event.getOrganizerId())) {
+            throw new ForbiddenException("Only organizer can delete events");
+        }
+        List<ReminderEntity> reminders = reminderRepository.findAllByEvent_Id(eventId);
+        for (ReminderEntity reminder : reminders){
+            try {
+                eventSchedulingService.deleteJob(reminder.getNotificationJobId());
+            } catch (SchedulerException e) {
+                throw new ServiceException("Can't delete event notification: %s".formatted(e.getMessage()));
+            }
+        }
+        event.setActive(false);
+        eventRepository.save(event);
+    }
 
+    @Override
+    public void updateEventInfo(UUID userId, Long eventId, UpdateEventInfoRequest updateEventInfoRequest) {
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        if (!event.isActive()) {
+            throw new NotFoundException("Event with id: %s not found".formatted(eventId));
+        }
+        if (!userId.equals(event.getOrganizerId())) {
+            throw new ForbiddenException("Only organizer can update event main info");
+        }
+        List<ReminderEntity> oldReminders = reminderRepository.findAllByEvent_Id(eventId);
+        for (ReminderEntity oldReminder : oldReminders) {
+            try {
+                eventSchedulingService.deleteJob(oldReminder.getNotificationJobId());
+            } catch (SchedulerException e) {
+                throw new ServiceException("Can't delete event notification: %s".formatted(e.getMessage()));
+            }
+        }
+
+        event.setTitle(updateEventInfoRequest.title());
+        event.setDescription(updateEventInfoRequest.description());
+        event.setLocation(updateEventInfoRequest.location());
+        event.setStart(updateEventInfoRequest.start());
+        event.setEnd(updateEventInfoRequest.end());
+        event.setRrule(updateEventInfoRequest.rrule());
+        event.setLabels(getEventLabelsEntitiesFromRequest(updateEventInfoRequest.labels()));
+        if (!event.isMeeting() && updateEventInfoRequest.isMeeting()) {
+            sendMeetingRequest(updateEventInfoRequest.meetingType(), eventId, updateEventInfoRequest.start());
+        } else if (event.isMeeting()) {
+            if (!updateEventInfoRequest.isMeeting()) {
+                event.setMeeting(false);
+                event.setMeetingType(MeetingType.NONE);
+                event.setVideoMeetingUrl(null);
+            }
+            else {
+                if (event.getMeetingType() != updateEventInfoRequest.meetingType()) {
+                    event.setMeetingType(updateEventInfoRequest.meetingType());
+                    event.setVideoMeetingUrl(null);
+                    sendMeetingRequest(updateEventInfoRequest.meetingType(), eventId, updateEventInfoRequest.start());
+                }
+            }
+        }
+        List<UUID> oldParticipants = event.getParticipants().stream().map(ParticipantEntity::getUserId).toList();
+        List<UUID> newParticipants = updateEventInfoRequest.participants().stream().map(ParticipantDto::userId).toList();
+        event.setParticipants(updateEventInfoRequest.participants().stream().map(p -> ParticipantEntity.builder()
+            .event(event)
+            .userId(p.userId())
+            .status(p.status())
+            .build()
+        ).collect(Collectors.toList()));
+        EventEntity savedEvent = eventRepository.save(event);
+
+        List<UUID> deletedParticipants = oldParticipants.stream().filter(id -> !newParticipants.contains(id)).toList();
+        for (UUID participant : deletedParticipants) {
+            participantRepository.deleteByUserId(participant);
+        }
+        List<UUID> onlyNewParticipants = newParticipants.stream().filter(id -> !oldParticipants.contains(id)).toList();
+        createParticipants(updateEventInfoRequest.participants().stream().filter(p -> onlyNewParticipants.contains(p.userId())).collect(Collectors.toList()), savedEvent);
+        List<UUID> survivorParticipants = oldParticipants.stream().filter(newParticipants::contains).toList();
+        for (UUID participant : survivorParticipants) {
+            ReminderDto reminder = ReminderDto.builder()
+                .minutesBefore(oldReminders.stream().filter(r -> r.getUserId().equals(participant)).map(ReminderEntity::getMinutesBefore).collect(Collectors.toList()))
+                .build();
+            createEventReminders(userId, reminder, savedEvent);
+        }
+    }
+
+    @Override
+    public void updateEventReminder(UUID userId, Long eventId, UpdateEventReminderRequest updateEventReminderRequest) {
+        List<ReminderEntity> oldReminders = reminderRepository.findAllByEvent_Id(eventId);
+        for (ReminderEntity oldReminder : oldReminders) {
+            try {
+                eventSchedulingService.deleteJob(oldReminder.getNotificationJobId());
+            } catch (SchedulerException e) {
+                throw new ServiceException("Can't delete event notification: %s".formatted(e.getMessage()));
+            }
+        }
+        EventEntity event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new NotFoundException("Event with id: %s not found".formatted(eventId)));
+        if (!event.isActive()) {
+            throw new NotFoundException("Event with id: %s not found".formatted(eventId));
+        }
+        createEventReminders(userId, updateEventReminderRequest.reminder(), event);
     }
 }

@@ -24,7 +24,7 @@ public record EventDetailedResponse(
     MeetingType meetingType,
     String videoMeetingUrl,
     UUID organizerId,
-    List<ParticipantDto> participantEmails,
+    List<ParticipantDto> participants,
     ReminderDto reminder
 ) {
 }

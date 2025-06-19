@@ -3,7 +3,7 @@ package ru.calendorny.eventservice.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import ru.calendorny.eventservice.dto.ReminderDto;
+import ru.calendorny.eventservice.dto.ParticipantDto;
 import ru.calendorny.eventservice.dto.RruleDto;
 import ru.calendorny.eventservice.dto.enums.MeetingType;
 import java.time.LocalDateTime;
@@ -21,14 +21,14 @@ public record UpdateEventInfoRequest(
     String location,
 
     @NotNull(message = "Event start should not be empty")
-    LocalDateTime startTime,
+    LocalDateTime start,
 
     @NotNull(message = "Event end should not be empty")
-    LocalDateTime endTime,
+    LocalDateTime end,
     RruleDto rrule,
     List<Long> labels,
     boolean isMeeting,
     MeetingType meetingType,
-    List<String> participantEmails
+    List<ParticipantDto> participants
 ) {
 }

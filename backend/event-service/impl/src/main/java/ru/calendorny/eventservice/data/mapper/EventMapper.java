@@ -66,7 +66,7 @@ public class EventMapper {
             .isMeeting(entity.isMeeting())
             .meetingType(entity.getMeetingType())
             .videoMeetingUrl(entity.getVideoMeetingUrl())
-            .participantEmails(
+            .participants(
                 Optional.ofNullable(entity.getParticipants())
                     .orElse(Collections.emptyList())
                     .stream()
