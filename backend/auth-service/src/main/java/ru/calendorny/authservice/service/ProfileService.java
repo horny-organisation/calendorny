@@ -12,6 +12,7 @@ import ru.calendorny.authservice.exception.NotFoundException;
 import ru.calendorny.authservice.metric.RegisterUserMetric;
 import ru.calendorny.authservice.repository.AccountRepository;
 import ru.calendorny.authservice.repository.ProfileRepository;
+import ru.calendorny.authservice.service.TelegramLinkService.TelegramLinkService;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class ProfileService {
     private final AccountRepository accountRepository;
     private final ProfileRepository profileRepository;
     private final RegisterUserMetric registerUserMetric;
+    private final TelegramLinkService telegramLinkService;
 
     public UserProfile getUserProfile(UUID id) {
         log.debug("Get user profile by id: {}", id);
@@ -62,14 +64,22 @@ public class ProfileService {
         log.debug("Get user profile edit by id: {}", id);
         Profile profile = profileRepository.findByUserId(id)
             .orElseThrow(() -> new NotFoundException("Profile by id=%s not found".formatted(id.toString())));
+
+        String tg = null;
+        if (profile.getTelegram() != null) {
+            tg = "already linked";
+        } else {
+            tg = telegramLinkService.createLink(id);
+        }
+
         return new UserProfileEdit(
             profile.getFirstName(),
-            profile.getFirstName(),
+            profile.getLastName(),
             profile.getBirthDate(),
             profile.getPhoneNumber(),
             profile.getTimezone(),
             profile.getLanguage(),
-            profile.getTelegram()
+            tg
         );
     }
 
