@@ -52,13 +52,11 @@ public class NotificationListener {
     )
     public void handleEventUpdates(EventReminderRequest request) {
         log.info(
-            "Received new notification request. EventId={}, UserId={}, Title={}, Location={}, StartTime={}, EndTime={}",
+            "Received new notification request. EventId={}, UserId={}, Title={}, Location={}",
             request.eventId(),
             request.userId(),
             request.title(),
-            request.location(),
-            request.start(),
-            request.end());
+            request.location());
 
         updatesHandler.handleEventUpdates(request);
     }

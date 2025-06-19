@@ -1,7 +1,6 @@
 package ru.calendorny.notificationservice.handler;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +48,6 @@ public class NotificationsHandler {
         UUID userId = request.userId();
         String title = request.title();
         String location = request.location();
-        LocalDateTime startTime = request.start();
-        LocalDateTime endTime = request.end();
 
         ChatOperationResponse<Long> response = botAuthClient.getChatId(userId);
         Long chatId = null;
@@ -62,7 +59,7 @@ public class NotificationsHandler {
         if (chatId == null) {
             log.warn("Received empty chat id for event notification");
         } else {
-            String message = getMessageEvent(title, location, startTime, endTime);
+            String message = getMessageEvent(title, location);
             sender.send(chatId, message);
         }
     }
@@ -88,14 +85,12 @@ public class NotificationsHandler {
         return message;
     }
 
-    private static @NotNull String getMessageEvent(String title, String location, LocalDateTime startTime, LocalDateTime endTime) {
+    private static @NotNull String getMessageEvent(String title, String location) {
 
         return """
             Notification on event!
             Title: %s
-            Location: %s
-            Start datetime: %s
-            End datetime: %s"""
-            .formatted(title, location, startTime, endTime);
+            Location: %s"""
+            .formatted(title, location);
     }
 }
