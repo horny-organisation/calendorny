@@ -7,6 +7,7 @@ import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.DltStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
+import ru.calendorny.notificationservice.entity.EventReminderRequest;
 import ru.calendorny.notificationservice.entity.TodayTaskEvent;
 import ru.calendorny.notificationservice.handler.NotificationsHandler;
 
@@ -25,9 +26,9 @@ public class NotificationListener {
     @KafkaListener(
         topics = "${kafka.task-notification-topic}",
         groupId = "${kafka.group-id}",
-        containerFactory = "kafkaListenerContainerFactory"
+        containerFactory = "kafkaListenerContainerFactoryTask"
     )
-    public void handleUpdates(TodayTaskEvent request) {
+    public void handleTaskUpdates(TodayTaskEvent request) {
         log.info(
             "Received new notification request. TaskId={}, UserId={}, Title={}, Description={}, DueDate={}",
             request.taskId(),
@@ -36,6 +37,29 @@ public class NotificationListener {
             request.description(),
             request.dueDate());
 
-        updatesHandler.handleUpdates(request);
+        updatesHandler.handleTaskUpdates(request);
+    }
+
+    @RetryableTopic(
+        backoff = @Backoff(delay = 1000, multiplier = 2.0),
+        dltTopicSuffix = ".dlt",
+        dltStrategy = DltStrategy.FAIL_ON_ERROR
+    )
+    @KafkaListener(
+        topics = "${kafka.event-notification-topic}",
+        groupId = "${kafka.group-id}",
+        containerFactory = "kafkaListenerContainerFactoryEvent"
+    )
+    public void handleEventUpdates(EventReminderRequest request) {
+        log.info(
+            "Received new notification request. EventId={}, UserId={}, Title={}, Location={}, StartTime={}, EndTime={}",
+            request.eventId(),
+            request.userId(),
+            request.title(),
+            request.location(),
+            request.start(),
+            request.end());
+
+        updatesHandler.handleEventUpdates(request);
     }
 }

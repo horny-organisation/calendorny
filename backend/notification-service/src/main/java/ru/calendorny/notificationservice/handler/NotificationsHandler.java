@@ -1,12 +1,14 @@
 package ru.calendorny.notificationservice.handler;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import ru.calendorny.notificationservice.client.BotAuthClient;
+import ru.calendorny.notificationservice.entity.EventReminderRequest;
 import ru.calendorny.notificationservice.entity.TodayTaskEvent;
 import ru.calendorny.notificationservice.response.ChatOperationResponse;
 import ru.calendorny.notificationservice.sender.MessageSender;
@@ -19,7 +21,7 @@ public class NotificationsHandler {
     private final MessageSender sender;
     private final BotAuthClient botAuthClient;
 
-    public void handleUpdates(TodayTaskEvent request) {
+    public void handleTaskUpdates(TodayTaskEvent request) {
 
         UUID userId = request.userId();
         String title = request.title();
@@ -35,14 +37,37 @@ public class NotificationsHandler {
         }
 
         if (chatId == null) {
-            log.warn("Received empty chat ids");
+            log.warn("Received empty chat id for task notification");
+        } else {
+            String message = getMessageTask(description, title, dueDate);
+            sender.send(chatId, message);
         }
-
-        String message = getMessage(description, title, dueDate);
-        sender.send(chatId, message);
     }
 
-    private static @NotNull String getMessage(String description, String title, LocalDate dueDate) {
+    public void handleEventUpdates(EventReminderRequest request) {
+
+        UUID userId = request.userId();
+        String title = request.title();
+        String location = request.location();
+        LocalDateTime startTime = request.start();
+        LocalDateTime endTime = request.end();
+
+        ChatOperationResponse<Long> response = botAuthClient.getChatId(userId);
+        Long chatId = null;
+
+        if (response.success()) {
+            chatId = response.data();
+        }
+
+        if (chatId == null) {
+            log.warn("Received empty chat id for event notification");
+        } else {
+            String message = getMessageEvent(title, location, startTime, endTime);
+            sender.send(chatId, message);
+        }
+    }
+
+    private static @NotNull String getMessageTask(String description, String title, LocalDate dueDate) {
         String message;
         if (description != null) {
             message =
@@ -61,5 +86,16 @@ public class NotificationsHandler {
                     .formatted(title, dueDate);
         }
         return message;
+    }
+
+    private static @NotNull String getMessageEvent(String title, String location, LocalDateTime startTime, LocalDateTime endTime) {
+
+        return """
+            Notification on event!
+            Title: %s
+            Location: %s
+            Start datetime: %s
+            End datetime: %s"""
+            .formatted(title, location, startTime, endTime);
     }
 }

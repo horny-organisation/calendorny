@@ -23,12 +23,13 @@ spring:
 
   data:
     redis:
-      host: {REDIS_HOST}
-      port: {REDIS_PORT}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 kafka:
   group-id: updatesGroup
   task-notification-topic: task-topic
+  event-notification-topic: event.topic
 
 cache:
   names:

@@ -19,6 +19,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import ru.calendorny.notificationservice.entity.EventReminderRequest;
 import ru.calendorny.notificationservice.entity.TodayTaskEvent;
 
 @EnableKafka
@@ -41,7 +42,16 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, TodayTaskEvent> consumerFactory() {
+    public ConsumerFactory<String, TodayTaskEvent> consumerFactoryTask() {
+        return createConsumerFactory(TodayTaskEvent.class);
+    }
+
+    @Bean
+    public ConsumerFactory<String, EventReminderRequest> consumerFactoryEvent() {
+        return createConsumerFactory(EventReminderRequest.class);
+    }
+
+    private <T> ConsumerFactory<String, T> createConsumerFactory(Class<T> valueType) {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, botKafkaProperties.groupId());
@@ -49,17 +59,27 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.KEY_DESERIALIZER_CLASS, StringDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, TodayTaskEvent.class.getName());
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, valueType.getName());
 
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, TodayTaskEvent> kafkaListenerContainerFactory(
-        ConsumerFactory<String, TodayTaskEvent> consumerFactory) {
+    public ConcurrentKafkaListenerContainerFactory<String, TodayTaskEvent> kafkaListenerContainerFactoryTask(
+        ConsumerFactory<String, TodayTaskEvent> consumerFactoryTask) {
         ConcurrentKafkaListenerContainerFactory<String, TodayTaskEvent> factory =
             new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
+        factory.setConsumerFactory(consumerFactoryTask);
+
+        return factory;
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, EventReminderRequest> kafkaListenerContainerFactoryEvent(
+        ConsumerFactory<String, EventReminderRequest> consumerFactoryEvent) {
+        ConcurrentKafkaListenerContainerFactory<String, EventReminderRequest> factory =
+            new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryEvent);
 
         return factory;
     }
