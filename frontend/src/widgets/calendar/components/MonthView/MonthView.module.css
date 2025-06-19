@@ -1,0 +1,126 @@
+.monthView {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.daysHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid #dadce0;
+  background-color: #f8f9fa;
+}
+
+.dayHeader {
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  color: #666666;
+}
+
+.calendarGrid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  flex: 1;
+  min-height: 120px;
+  border-bottom: 1px solid #dadce0;
+}
+
+.day {
+  border-right: 1px solid #dadce0;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+.day:hover {
+  background-color: #f8f9fa;
+}
+.day:last-child {
+  border-right: none;
+}
+.day.otherMonth {
+  color: #999999;
+  background-color: #fafafa;
+}
+.day.otherMonth .dayText {
+  color: #999999;
+}
+.day.today .dayNumber {
+  background-color: #4285f4;
+  color: white;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.day.selected {
+  background-color: rgba(66, 133, 244, 0.1);
+}
+
+.dayNumber {
+  margin-bottom: 0.25rem;
+}
+
+.dayText {
+  font-weight: 500;
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.event {
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.eventTitle {
+  color: white;
+  font-weight: 500;
+}
+
+.moreEvents {
+  padding: 0.125rem 0.25rem;
+  color: #666666;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .week {
+    min-height: 80px;
+  }
+  .day {
+    padding: 0.25rem;
+  }
+  .dayHeader {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+  .event {
+    font-size: 0.625rem;
+    padding: 0.0625rem 0.125rem;
+  }
+}
+
+/*# sourceMappingURL=MonthView.module.css.map */

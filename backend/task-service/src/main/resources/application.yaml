@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: task-service
+
+  cloud:
+    consul:
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
+  datasource:
+    url: ${TASK_SERVICE_POSTGRES_URL}
+    username: ${TASK_SERVICE_POSTGRES_USER}
+    password: ${TASK_SERVICE_POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
+
+  liquibase:
+    enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
+      acks: all
+      retries: 3
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+
+task:
+  kafka:
+    task-notification-topic: task-topic
+    task-notification-dlq-topic: task-dlq-topic
+
+auth:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY}
+    access-token-expiration-minutes: 15
+    private-key: ${JWT_PRIVATE_KEY}
+
+logging:
+  enabled: true
+  debug: false
+  level:
+    org.apache.kafka: DEBUG
+    org.springframework.kafka: DEBUG

@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: nlp-service
+
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
+  data:
+    mongodb:
+      host: ${NLP_MONGO_HOST}
+      port: 27017
+      database: ${NLP_MONGO_DATABASE}
+      authentication-database: admin
+      username: ${NLP_MONGO_USERNAME}
+      password: ${NLP_MONGO_PASSWORD}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+
+server:
+  port: 8080
