@@ -1,0 +1,27 @@
+.calendarPage {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+.calendarContent {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .calendarPage {
+    background-color: #ffffff;
+  }
+  .calendarContent {
+    flex: 1;
+  }
+}
+
+/*# sourceMappingURL=CalendarPage.module.css.map */

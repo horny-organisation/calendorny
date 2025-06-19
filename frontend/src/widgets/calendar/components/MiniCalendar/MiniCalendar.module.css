@@ -1,0 +1,112 @@
+.miniCalendar {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #dadce0;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.navButton {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  padding: 0;
+  font-size: 1rem;
+  color: #666666;
+}
+.navButton:hover {
+  color: #4285f4;
+}
+
+.monthTitle {
+  font-weight: 500;
+  color: #1a1a1a;
+  text-align: center;
+  flex: 1;
+}
+
+.weekHeader {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.weekDay {
+  text-align: center;
+  padding: 0.25rem;
+  color: #666666;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.calendarGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.125rem;
+}
+
+.day {
+  aspect-ratio: 1;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 0.75rem;
+}
+.day:hover {
+  background-color: #f0f4ff;
+}
+.day.otherMonth .dayNumber {
+  color: #999999;
+}
+.day.today {
+  background-color: #4285f4;
+}
+.day.today .dayNumber {
+  color: white;
+  font-weight: 500;
+}
+.day.today:hover {
+  background-color: #3367d6;
+}
+.day.selected {
+  background-color: rgba(66, 133, 244, 0.2);
+}
+.day.selected .dayNumber {
+  color: #4285f4;
+  font-weight: 500;
+}
+.day.selected:hover {
+  background-color: rgba(66, 133, 244, 0.3);
+}
+.day.today.selected {
+  background-color: #4285f4;
+}
+.day.today.selected .dayNumber {
+  color: white;
+}
+
+.dayNumber {
+  color: #1a1a1a;
+  transition: color 0.2s ease;
+}
+
+/*# sourceMappingURL=MiniCalendar.module.css.map */
