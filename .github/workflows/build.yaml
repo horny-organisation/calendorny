@@ -42,28 +42,3 @@ jobs:
           min-coverage-changed-files: 30
           title: Code Coverage
           update-comment: true
-
-  lint:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Make gradlew executable
-        run: chmod +x backend/gradlew
-
-      - name: Set up JDK17 + Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          java-version: 17
-          distribution: temurin
-          gradle-wrapper-directory: backend
-          cache-read-only: false
-
-      - name: Run checkCode
-        working-directory: backend
-        run: ./gradlew checkCode

@@ -1,3 +1,12 @@
 rootProject.name = 'backend'
 
-include 'test-service'
+include 'auth-service'
+include 'task-service'
+include 'google-meeting-service'
+include 'zoom-meeting-service'
+include 'event-service:api'
+include 'event-service:impl'
+include 'security-starter'
+include 'notification-service'
+include 'gateway-service'
+include 'nlp-service'

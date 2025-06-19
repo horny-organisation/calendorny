@@ -1,0 +1,25 @@
+dependencies {
+    implementation platform('io.jsonwebtoken:jjwt-root:0.12.6')
+    implementation 'io.jsonwebtoken:jjwt-api'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    testImplementation 'org.testcontainers:postgresql'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
+    }
+}
+
+tasks.register("prepareKotlinBuildScriptModel") {
+    doLast {
+    }
+}

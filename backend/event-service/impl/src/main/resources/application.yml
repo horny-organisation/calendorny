@@ -1,0 +1,94 @@
+spring:
+
+  application:
+    name: event-service
+
+  cloud:
+    consul:
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
+  datasource:
+    url: ${EVENT_SERVICE_POSTGRES_URL}
+    username: ${EVENT_SERVICE_POSTGRES_USER}
+    password: ${EVENT_SERVICE_POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+          use_jdbc_metadata_defaults: false
+
+  jackson:
+    time-zone: Europe/Moscow
+
+  liquibase:
+    enabled: false
+
+  rabbitmq:
+    port: 5672
+    host: local-rabbit-mq
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.scheduler.instanceName: schedulerFactoryBean
+      org.quartz.jobStore.isClustered: false
+      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.tablePrefix: qrtz_
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+
+auth:
+  jwt:
+    public-key: ${JWT_PUBLIC_KEY}
+    access-token-expiration-minutes: 15
+    private-key: ${JWT_PRIVATE_KEY}
+
+app:
+  rabbit:
+    googleMeetQueue: googleMeetQueue
+    meetingLinksQueue: meetingLinksQueue
+    googleMeetDlq: googleMeetDlq
+    meetingCreateExchange: meetingCreateExchange
+    meetingLinksExchange: meetingLinksExchange
+    deadLetterExchange: googleDeadLetterExchange
+    googleMeetRoutingKey: googleMeet
+    meetingLinkRoutingKey: meetingLink
+    googleMeetDlqRoutingKey: googleMeetDlqRoutingKey
+    zoomMeetQueue: zoomMeetQueue
+    zoomMeetDlq: zoomMeetDlq
+    zoomMeetRoutingKey: zoomMeet
+    zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
+  kafka:
+    event-notification-topic: event.topic
+

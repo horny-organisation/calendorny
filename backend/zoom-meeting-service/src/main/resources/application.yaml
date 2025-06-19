@@ -1,0 +1,54 @@
+app:
+  rabbit:
+    zoomMeetQueue: zoomMeetQueue
+    meetingLinksQueue: meetingLinksQueue
+    zoomMeetDlq: zoomMeetDlq
+    meetingCreateExchange: meetingCreateExchange
+    meetingLinksExchange: meetingLinksExchange
+    deadLetterExchange: zoomDeadLetterExchange
+    zoomMeetRoutingKey: zoomMeet
+    meetingLinkRoutingKey: meetingLink
+    zoomMeetDlqRoutingKey: zoomMeetDlqRoutingKey
+
+  zoom:
+    fileName: /app/zoom-token.json
+    principalName: ${ZOOM_OAUTH_PRINCIPAL_NAME}
+    clientRegistrationId: ${ZOOM_OAUTH_CLIENT_REGISTRATION_ID}
+    baseUrl: https://api.zoom.us/v2
+    meetingCreateUrl: /users/me/meetings
+    timezone: UTC
+    dateTimePattern: yyyy-MM-dd HH:mm
+
+encryption:
+  aes:
+    key: ${SECRET_KEY}
+
+spring:
+  application:
+    name: ZoomMeetingService
+
+  rabbitmq:
+    port: 5672
+    host: local-rabbit-mq
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          zoom:
+            client-id: ${ZOOM_CLIENT_ID}
+            client-secret: ${ZOOM_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8086/login/oauth2/code/zoom
+            client-name: Zoom
+        provider:
+          zoom:
+            authorization-uri: https://zoom.us/oauth/authorize?prompt=consent&access_type=offline
+            token-uri: https://zoom.us/oauth/token
+            user-info-uri: https://api.zoom.us/v2/users/me
+            user-name-attribute: email
+
+server:
+  port: 8080
