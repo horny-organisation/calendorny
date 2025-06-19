@@ -55,7 +55,7 @@ public class NlpService {
             List<DateGroup> groups = parser.parse(dateString);
             if (!groups.isEmpty() && !groups.get(0).getDates().isEmpty()) {
                 Date extracted = groups.get(0).getDates().get(0);
-                dateTime = LocalDateTime.ofInstant(extracted.toInstant(), ZoneId.systemDefault());
+                dateTime = LocalDateTime.ofInstant(extracted.toInstant(), ZoneId.of("Europe/Moscow"));
             }
         }
         NlpResponse response = new NlpResponse(eventName.toString().trim(), dateTime);

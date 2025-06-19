@@ -14,6 +14,10 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    configurations {
+        implementation.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-security'
+    }
 }
 
 dependencyManagement {

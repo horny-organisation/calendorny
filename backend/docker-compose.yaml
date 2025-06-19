@@ -256,6 +256,7 @@ services:
       - 8080
     depends_on:
       - mongodb
+      - consul
     env_file:
       - .env
     networks:
