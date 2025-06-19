@@ -1,7 +1,5 @@
 package ru.calendorny.authservice.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +65,12 @@ public class ProfileRepository {
                     timezone     = COALESCE(source.timezone, target.timezone),
                     language     = COALESCE(source.language, target.language)
             """;
+    private static final String SQL_SAVE_TG =
+            """
+            UPDATE profiles
+            SET telegram = ?
+            WHERE user_id = ?
+            """;
 
 
     private final RowMapper<Profile> profileRowMapper = new ProfileRowMapper();
@@ -74,6 +78,10 @@ public class ProfileRepository {
     public Optional<Profile> findByUserId(UUID userId) {
         return jdbcTemplate.query(SQL_FIND_BY_USER_ID, profileRowMapper, userId).stream()
             .findFirst();
+    }
+
+    public void saveTgChatId(UUID userUuid, String tgChatId) {
+        jdbcTemplate.update(SQL_SAVE_TG, tgChatId, userUuid);
     }
 
     public void save(Profile profile) {
