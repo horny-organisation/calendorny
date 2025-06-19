@@ -1,0 +1,28 @@
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    implementation 'edu.stanford.nlp:stanford-corenlp:4.5.4'
+    implementation 'edu.stanford.nlp:stanford-corenlp:4.5.4:models'
+    implementation 'com.joestelmach:natty:0.13'
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1'
+    implementation 'com.sun.xml.bind:jaxb-impl:2.3.1'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.1"
+    }
+}
+
+tasks.register("prepareKotlinBuildScriptModel") {
+    doLast {
+    }
+}
