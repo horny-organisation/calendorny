@@ -1,0 +1,23 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: updatesGroup
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: ru.calendorny.notificationservice.entity.TodayTaskEvent
+        spring.json.trusted.packages: ru.calendorny.notificationservice.entity
+    listener:
+      ack-mode: record
+
+  cloud:
+    consul:
+      enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379

@@ -248,6 +248,31 @@ services:
     networks:
       - backend
 
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    expose:
+      - 8080
+    container_name: notification-service
+    depends_on:
+      - kafka
+      - redis
+    env_file:
+      - .env
+    networks:
+      - backend
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    expose:
+      - 6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+      
   nlp-service:
     build:
       context: ./nlp-service
@@ -284,6 +309,7 @@ volumes:
   grafana-data:
   google-meeting-data:
   zoom-meeting-data:
+  redis-data:
   mongodb-data:
 
 networks:

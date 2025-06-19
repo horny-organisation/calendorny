@@ -1,0 +1,42 @@
+app:
+  telegram-token: ${TELEGRAM_TOKEN}
+
+spring:
+  application:
+    name: notification-service
+
+  cloud:
+    consul:
+      host: consul
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        register: true
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    listener:
+      missing-topics-fatal: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+kafka:
+  group-id: updatesGroup
+  task-notification-topic: task-topic
+  event-notification-topic: event.topic
+
+cache:
+  names:
+    id: id
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
