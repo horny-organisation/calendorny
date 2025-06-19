@@ -1,6 +1,7 @@
 import React, { forwardRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import styles from "./Input.module.scss";
+import classNames from "classnames";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
@@ -35,7 +36,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         ref={ref}
                         id={inputId}
                         type={inputType}
-                        className={cn(styles.input, {
+                        className={classNames(styles.input, {
                             [styles.error]: error,
                             [styles.withIcon]: isPasswordField,
                         })}
