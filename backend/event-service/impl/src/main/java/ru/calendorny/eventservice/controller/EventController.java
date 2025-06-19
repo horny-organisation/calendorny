@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 import ru.calendorny.eventservice.api.EventApi;
+import ru.calendorny.eventservice.dto.LabelDto;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
 import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
@@ -64,5 +65,10 @@ public class EventController implements EventApi {
     @Override
     public EventDetailedResponse answerInvitation(AuthenticatedUser authenticatedUser, Long eventId, ParticipantStatus participantStatus) {
         return eventInvitationService.answerInvitation(authenticatedUser.id(), eventId, participantStatus);
+    }
+
+    @Override
+    public List<LabelDto> getAllEventLabels() {
+        return eventManagementService.getAllLabels();
     }
 }

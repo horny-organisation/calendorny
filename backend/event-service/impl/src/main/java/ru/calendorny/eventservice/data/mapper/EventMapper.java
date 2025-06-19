@@ -77,7 +77,7 @@ public class EventMapper {
     }
 
 
-    LabelDto eventLabelToDto(EventLabelEntity entity) {
+    public LabelDto eventLabelToDto(EventLabelEntity entity) {
         return LabelDto.builder()
             .id(entity.getId())
             .name(entity.getName())

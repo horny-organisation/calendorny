@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.calendorny.eventservice.dto.LabelDto;
 import ru.calendorny.eventservice.dto.enums.ParticipantStatus;
 import ru.calendorny.eventservice.dto.request.CreateEventRequest;
 import ru.calendorny.eventservice.dto.request.UpdateEventInfoRequest;
@@ -93,5 +94,9 @@ public interface EventApi {
         @PathVariable("eventId") Long eventId,
         @RequestParam("answer") ParticipantStatus participantStatus
     );
+
+    @GetMapping("/labels")
+    @ResponseStatus(HttpStatus.OK)
+    List<LabelDto> getAllEventLabels();
 
 }

@@ -10,6 +10,7 @@ import ru.calendorny.eventservice.data.entity.EventLabelEntity;
 import ru.calendorny.eventservice.data.entity.ParticipantEntity;
 import ru.calendorny.eventservice.data.entity.ReminderEntity;
 import ru.calendorny.eventservice.data.mapper.EventMapper;
+import ru.calendorny.eventservice.dto.LabelDto;
 import ru.calendorny.eventservice.dto.ParticipantDto;
 import ru.calendorny.eventservice.dto.ReminderDto;
 import ru.calendorny.eventservice.dto.RruleDto;
@@ -268,5 +269,10 @@ public class EventManagementServiceImpl implements EventManagementService {
             throw new NotFoundException("Event with id: %s not found".formatted(eventId));
         }
         createEventReminders(userId, updateEventReminderRequest.reminder(), event);
+    }
+
+    @Override
+    public List<LabelDto> getAllLabels() {
+        return eventLabelRepository.findAll().stream().map(eventMapper::eventLabelToDto).collect(Collectors.toList());
     }
 }
