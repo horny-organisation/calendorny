@@ -218,6 +218,67 @@ services:
     volumes:
       - zoom-meeting-data:/app
 
+  event-service-postgres:
+    image: postgres:16-alpine
+    container_name: event-service-postgres
+    ports:
+      - "5435:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${EVENT_SERVICE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${EVENT_SERVICE_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${EVENT_SERVICE_POSTGRES_DB}
+    volumes:
+      - event-service-postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - event-service
+
+  event-service-liquibase:
+    image: liquibase:4.29
+    container_name: event-service-liquibase
+    depends_on:
+      - event-service-postgres
+    env_file:
+      - .env
+    environment:
+      LIQUIBASE_CLASSPATH: /liquibase/changelog
+    volumes:
+      - ./event-service/db/changelog:/liquibase/changelog
+    command:
+      [
+        "--url=${EVENT_SERVICE_POSTGRES_URL}",
+        "--username=${EVENT_SERVICE_POSTGRES_USER}",
+        "--password=${EVENT_SERVICE_POSTGRES_PASSWORD}",
+        "--changeLogFile=changelog/db-changelog-master.yml",
+        "update"
+      ]
+    networks:
+      - event-service
+
+  event-service:
+    build:
+      context: ./event-service
+      dockerfile: Dockerfile
+    container_name: event-service
+    expose:
+      - 8080
+    depends_on:
+      event-service-postgres:
+        condition: service_started
+      event-service-liquibase:
+        condition: service_started
+      local-rabbit-mq:
+        condition: service_healthy
+
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - event-service
+      - backend
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -230,6 +291,7 @@ services:
     depends_on:
       - task-service
       - auth-service
+      - event-service
     networks:
       - backend
 
@@ -304,6 +366,7 @@ services:
 volumes:
   kafka-data:
   task-service-postgres-data:
+  event-service-postgres-data:
   db-auth-data:
   prometheus-data:
   grafana-data:
@@ -314,6 +377,7 @@ volumes:
 
 networks:
   task-service:
+  event-service:
   backend:
   auth-network:
   nlp-network:
