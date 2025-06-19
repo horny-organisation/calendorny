@@ -15,9 +15,26 @@
   align-items: center;
 }
 
+.brandButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+.brandButton:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.brandButton:focus {
+  outline: none;
+  background-color: rgba(66, 133, 244, 0.1);
+}
+
 .brandText {
-  color: #4285f4;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
 }
 
 .actions {
