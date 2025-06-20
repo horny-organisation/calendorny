@@ -1,11 +1,12 @@
-import type {AuthUser, LoginFormData, RegisterFormData} from "../types";
+import type { AuthUser, LoginFormData, RegisterFormData} from "../types";
 
+// Моковый сервис для демонстрации
 class AuthService {
     async login(data: LoginFormData): Promise<AuthUser> {
-
+        // Симуляция API запроса
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-
+        // Простая валидация для демо
         if (data.email === "demo@example.com" && data.password === "demo123") {
             return {
                 id: "1",
@@ -19,9 +20,10 @@ class AuthService {
     }
 
     async register(data: RegisterFormData): Promise<AuthUser> {
-
+        // Симуляция API запроса
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
+        // Простая валидация
         if (data.password.length < 6) {
             throw new Error("Пароль должен содержать минимум 6 символов");
         }

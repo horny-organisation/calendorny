@@ -17,28 +17,28 @@ export const AppRouter: React.FC = () => {
                     <Route path="login" element={<LoginPage />} />
                     <Route path="register" element={<RegisterPage />} />
                     <Route
-                              path="calendar"
-                              element={
-                                  <ProtectedRoute>
-                                      <CalendarPage />
-                                  </ProtectedRoute>
-                              }
+                        path="calendar"
+                        element={
+                            <ProtectedRoute>
+                                <CalendarPage />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
-                              path="profile"
-                              element={
-                                  <ProtectedRoute>
-                                      <UserProfilePage />
-                                  </ProtectedRoute>
-                              }
+                        path="profile"
+                        element={
+                            <ProtectedRoute>
+                                <UserProfilePage />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
-                              path="profile/edit"
-                              element={
-                                  <ProtectedRoute>
-                                      <UserProfileEditPage />
-                                  </ProtectedRoute>
-                              }
+                        path="profile/edit"
+                        element={
+                            <ProtectedRoute>
+                                <UserProfileEditPage />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route path="*" element={<Navigate to="/calendar" replace />} />
                 </Route>
